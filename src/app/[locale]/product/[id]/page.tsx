@@ -319,13 +319,13 @@ export default function ProductDetailPage() {
         <Box
           sx={{
             width: "100%",
-            px: 6,
-            pb: 4,
+            // px: 6,
             bgcolor: "#f4f4f4",
             borderRadius: 3,
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            color: "#000",
           }}
         >
           <InfoItem
@@ -347,13 +347,14 @@ export default function ProductDetailPage() {
               flexDirection: "column",
               alignItems: "center",
               gap: 1,
+              width: "33%", 
             }}
           >
             <Typography>Появились вопросы о товаре?</Typography>
             <Button
               variant="contained"
               startIcon={<TelegramIcon />}
-              sx={{ bgcolor: "#249FFC", borderRadius: 4, px: 4 }}
+              sx={{ bgcolor: "#249FFC", color: "#fff", borderRadius: 4, px: 4 }}
             >
               Telegram
             </Button>

@@ -71,8 +71,14 @@ const BestSellers = () => {
   const onFavoriteClick = (e: React.MouseEvent, item: any) => {
     e.preventDefault();
     e.stopPropagation();
-    handleToggleFavorite(item.id);
-    setLastToggledId(item.id);
+    // ✅ Full product data
+    handleToggleFavorite({
+      id: Date.now(),
+      productId: item.id,
+      title: item.short_description || "Product",
+      image: item.image,
+      price: item.price,
+    });
     setFavoriteToast(true);
   };
 

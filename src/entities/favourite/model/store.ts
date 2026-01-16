@@ -1,33 +1,48 @@
 import { createStore, createEvent, sample, createEffect } from "effector";
 import { FavoriteItem } from "./model";
 
-export const toggleFavorite = createEvent<number>();
+// ✅ FIXED: Accept full FavoriteItem instead of just productId
+export const toggleFavorite = createEvent<FavoriteItem | number>();
+
 export const loadFavorites = createEvent();
 
 export const $favorites = createStore<FavoriteItem[]>([]).on(
   toggleFavorite,
-  (state, productId) => {
+  (state, payload) => {
+    // Handle both full item and just ID
+    const productId = typeof payload === "number" ? payload : payload.productId;
     const exists = state.find((item) => item.productId === productId);
-    return exists
-      ? state.filter((item) => item.productId !== productId)
-      : [
-          ...state,
-          { id: Date.now(), productId, title: "", image: "", price: 0 },
-        ];
+
+    if (exists) {
+      // Remove
+      return state.filter((item) => item.productId !== productId);
+    } else {
+      // Add - create full item if only ID provided
+      const newItem: FavoriteItem =
+        typeof payload === "number"
+          ? {
+              id: Date.now(),
+              productId: payload,
+              title: "",
+              image: "",
+              price: 0,
+            }
+          : payload;
+
+      return [...state, newItem];
+    }
   }
 );
 
 export const $favoritesCount = $favorites.map((items) => items.length);
 
-// ✅ Factory for per-product stores
-export const $isFavorite = (productId: number) =>
+export const $isFavorite = (productId: string | number) =>
   $favorites.map((items) => items.some((item) => item.productId === productId));
 
-// Persistence effects
+// Persistence (unchanged)
 const persistFavoritesFx = createEffect<void, void, void>(() => {
   if (typeof window !== "undefined") {
-    const items = $favorites.getState();
-    localStorage.setItem("favorites", JSON.stringify(items));
+    localStorage.setItem("favorites", JSON.stringify($favorites.getState()));
   }
 });
 
@@ -41,19 +56,10 @@ const loadFavoritesFx = createEffect<void, FavoriteItem[], void>(async () => {
   }
 });
 
-// Auto-save on toggle
-sample({
-  clock: toggleFavorite,
-  target: persistFavoritesFx,
-});
-
-// Load on app start
-sample({
-  clock: loadFavorites,
-  target: loadFavoritesFx,
-});
-
+sample({ clock: toggleFavorite, target: persistFavoritesFx });
+sample({ clock: loadFavorites, target: loadFavoritesFx });
 sample({
   clock: loadFavoritesFx.doneData,
+  fn: (items) => items,
   target: $favorites,
 });

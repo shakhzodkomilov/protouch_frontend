@@ -1,6 +1,6 @@
 export interface FavoriteItem {
   id: number;
-  productId: number;
+  productId: string | number;
   title: string;
   image: string;
   price: number;
