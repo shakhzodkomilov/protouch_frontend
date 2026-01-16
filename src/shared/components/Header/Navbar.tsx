@@ -1,96 +1,119 @@
-"use client"
-import { Box, Typography, Button, Container } from "@mui/material"
-const Navbar = () => {
-  return (
-    <Box>
-    <Box
-      sx={{
-        width:"100%",
-        bgcolor: "#fff",
-        height: 70,
-        display: "flex",
-        alignItems: "center",
-        justifyContent:"space-between"
-      }}
-    >
-        <img src="/LOGOPROTOUCH.svg" alt="Logo" height={40} />
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent:"space-between", width: "100%"}}>
-        {/* Logo */}
+"use client";
 
-        {/* Center phone */}
-        <Box sx={{ flex: 1, display: "flex", gap:3, justifyContent: "center" }}>
-          <Typography
-            sx={{
-              fontWeight: 600,
-              color: "#4E4E4E",
-              fontSize: "14px",
-              whiteSpace: "nowrap",
-              display:"flex",
-              alignItems:"center",
-              gap:1,    
-            }}
-          >
-            <img src={"/call-outline.svg"}/>
-             +998 97 778 23 47
-          </Typography>
-                    <Typography
-            sx={{
-              fontWeight: 600,
-              color: "#4E4E4E",
-              fontSize: "14px",
-              whiteSpace: "nowrap",
-              display:"flex",
-              alignItems:"center",
-              gap:1,    
-            }}
-          >
-            <img src={"/call-outline.svg"}/>
-             +998 95 170 05 71
-          </Typography>
-            <Typography
-            sx={{
-              fontWeight: 600,
-              color: "#4E4E4E",
-              fontSize: "14px",
-              whiteSpace: "nowrap",
-              display:"flex",
-              alignItems:"center",
-              gap:1,    
-            }}
-          >
-            <img src="/location.svg" alt="" />
-              Tashkent City, Tong Yulduzi 
-          </Typography>
+import { Box, Typography, Button, Link as MuiLink } from "@mui/material";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+const Navbar = () => {
+  const router = useRouter();
+
+  return (
+    <Box sx={{ width: "100%", bgcolor: "#fff" }}>
+      <Box
+        sx={{
+          maxWidth: "1800px",
+          mx: "auto",
+          px: 3,
+          height: 70,
+          display: "flex",
+          alignItems: "center",
+          gap: 3,
+        }}
+      >
+        {/* LOGO */}
+        <Box sx={{ flexShrink: 0 }}>
+          <Image
+            src="/LOGOPROTOUCH.svg"
+            alt="Protouch"
+            width={250}
+            height={40}
+            style={{ cursor: "pointer" }}
+            onClick={() => router.push("/")}
+            priority
+          />
         </Box>
 
-        {/* Right menu */}
+        {/* CENTER CONTACTS */}
+        <Box
+          sx={{
+            flex: 1,
+            display: "flex",
+            justifyContent: "center",
+            gap: 3,
+          }}
+        >
+          {/* Phone 1 */}
+          <MuiLink href="tel:+998977782347" underline="none" sx={contactStyle}>
+            <Image src="/call-outline.svg" alt="call" width={18} height={18} />
+            +998 97 778 23 47
+          </MuiLink>
+
+          {/* Phone 2 */}
+          <MuiLink href="tel:+998951700571" underline="none" sx={contactStyle}>
+            <Image src="/call-outline.svg" alt="call" width={18} height={18} />
+            +998 95 170 05 71
+          </MuiLink>
+
+          {/* Location */}
+          <MuiLink
+            href="https://yandex.uz/maps/-/CLdXa09U"
+            target="_blank"
+            rel="noopener noreferrer"
+            underline="none"
+            sx={contactStyle}
+          >
+            <Image src="/location.svg" alt="location" width={18} height={18} />
+            Tashkent City, Tong Yulduzi
+          </MuiLink>
+        </Box>
+
+        {/* RIGHT MENU */}
         <Box sx={{ display: "flex", gap: 1 }}>
-          {["Акции", "Доставка", "О нас", "Государственные закупки", "Юр. лицам"].map((item) => (
+          {[
+            { title: "Акции", href: "/sales" },
+            { title: "Доставка", href: "/delivery" },
+            { title: "О нас", href: "/about" },
+            { title: "Гос. закупки", href: "/tenders" },
+            { title: "Юр. лицам", href: "/business" },
+          ].map((item) => (
             <Button
-              key={item}
+              key={item.title}
+              component={Link}
+              href={item.href}
               sx={{
                 fontWeight: 500,
                 color: "#4E4E4E",
                 textTransform: "none",
                 borderRadius: 1,
                 px: 2,
-                boxShadow: "none",
-                fontSize:16,
+                fontSize: 16,
                 "&:hover": {
-                  boxShadow: "none",
-                  bgcolor: "rgba(25,118,210,0.05)",
-
+                  bgcolor: "rgba(36,159,252,0.08)",
                 },
               }}
             >
-              {item}
+              {item.title}
             </Button>
           ))}
         </Box>
       </Box>
     </Box>
-    </Box>
-  )
-}
+  );
+};
 
-export default Navbar
+const contactStyle = {
+  fontWeight: 600,
+  color: "#4E4E4E",
+  fontSize: 14,
+  display: "flex",
+  alignItems: "center",
+  gap: 1,
+  whiteSpace: "nowrap",
+  cursor: "pointer",
+  "&:hover": {
+    color: "#249FFC",
+  },
+};
+
+export default Navbar;

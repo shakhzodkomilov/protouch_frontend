@@ -1,15 +1,16 @@
-import "./globals.css"
-import ThemeProviderClient from "./ThemeProviderClient"
+import "./globals.css";
+import ThemeProviderClient from "./ThemeProviderClient";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html suppressHydrationWarning>
       <body>
-        <ThemeProviderClient>
-          {children}
-          1
-        </ThemeProviderClient>
+        <ThemeProviderClient>{children}</ThemeProviderClient>
       </body>
     </html>
-  )
+  );
 }

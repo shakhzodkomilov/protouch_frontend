@@ -1,7 +1,8 @@
-"use client"
-import { AppBar, Container } from "@mui/material"
-import Navbar from "./Navbar"
-import NavbarCotalog from "./NavbarCotalog"
+"use client";
+import { AppBar, Container } from "@mui/material";
+import Navbar from "./Navbar";
+import NavbarCotalog from "./NavbarCotalog";
+import HeaderBanner from "./HeaderBanner";
 
 export default function Header() {
   return (
@@ -14,17 +15,18 @@ export default function Header() {
         boxShadow: "none",
       }}
     >
+      <HeaderBanner />
       <Container
         maxWidth={false}
         sx={{
           maxWidth: "1800px",
           mx: "auto",
-          px: 2,
+          // px: 2,
         }}
       >
         <Navbar />
-        <NavbarCotalog/>
+        <NavbarCotalog />
       </Container>
     </AppBar>
-  )
+  );
 }

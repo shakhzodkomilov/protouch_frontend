@@ -2,19 +2,15 @@
 
 import { Box, IconButton, Typography } from "@mui/material";
 import Image from "next/image";
-import { useRef } from "react";
+import React, { useRef } from "react";
 
-const Brends = () => {
-  const brends = [
-    { img: "/dahua.svg" },
-    { img: "/galaxyhub.svg" },
-    { img: "/huawei.svg" },
-    { img: "/minrray.svg" },
-    { img: "/porurobotics.svg" },
-    { img: "/vlinka.svg" },
-    { img: "/vlinka.svg" },
-    { img: "/vlinka.svg" },
-    { img: "/vlinka.svg" },
+const Banners = () => {
+  const banners = [
+    { img: "/Banner2.svg" },
+    { img: "/Banner1.svg" },
+    { img: "/Banner3.svg" },
+    { img: "/Banner3.svg" },
+    { img: "/Banner3.svg" },
   ];
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -28,17 +24,19 @@ const Brends = () => {
   };
 
   return (
-    <Box sx={{ mt: "84px" }}>
-      <Typography sx={{ fontSize: "34px", fontWeight: 600, color: "#000" }}>
-        Бренды
+    <Box sx={{ mt: "50px" }}>
+      <Typography sx={{ fontSize: 34, fontWeight: 600, color: "#000" }}>
+        Статьи и новости
       </Typography>
-      <Box sx={{ position: "relative", mt: "34px" }}>
+
+      <Box sx={{ position: "relative", mt: 3 }}>
+        {/* LEFT ARROW */}
         <IconButton
           onClick={() => scroll("left")}
           sx={{
             position: "absolute",
             left: -20,
-            top: "60%",
+            top: "50%",
             transform: "translateY(-50%)",
             zIndex: 10,
             bgcolor: "#fff",
@@ -47,14 +45,16 @@ const Brends = () => {
             height: 40,
           }}
         >
-          <Image src="/arrowleft.svg" width="32" height="32" alt="arrow left" />
+          <Image src="/arrowleft.svg" width={32} height={32} alt="arrow left" />
         </IconButton>
+
+        {/* RIGHT ARROW */}
         <IconButton
           onClick={() => scroll("right")}
           sx={{
             position: "absolute",
             right: -20,
-            top: "60%",
+            top: "50%",
             transform: "translateY(-50%)",
             zIndex: 10,
             bgcolor: "#fff",
@@ -65,40 +65,49 @@ const Brends = () => {
         >
           <Image
             src="/arrowright.svg"
-            width="32"
-            height="32"
+            width={32}
+            height={32}
             alt="arrow right"
           />
         </IconButton>
+
+        {/* SCROLL CONTAINER */}
         <Box
           ref={scrollRef}
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: 2,
+            gap: 1,
             overflowX: "auto",
             scrollBehavior: "smooth",
             scrollbarWidth: "none",
             "&::-webkit-scrollbar": { display: "none" },
-            pt: "20px",
+            pt: 2,
           }}
         >
-          {brends.map((item, i) => (
+          {banners.map((item, i) => (
             <Box
               key={i}
               sx={{
-                minWidth: "280px",
-                height: "100px",
-                p: "24px 28px",
-                borderRadius: "18px",
-                border: "1px solid #DDDDDD",
+                minWidth: 300,
+                height: 250,
+                borderRadius: "16px",
+                p: 2,
+                color: "#fff",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
                 flexShrink: 0,
+                position: "relative",
               }}
             >
-              <img src={item.img} />
+              <Image
+                src={item.img}
+                width={480}
+                height={218}
+                alt={`Banner ${i + 1}`}
+                style={{ objectFit: "cover", borderRadius: "16px" }}
+              />
             </Box>
           ))}
         </Box>
@@ -106,4 +115,5 @@ const Brends = () => {
     </Box>
   );
 };
-export default Brends;
+
+export default Banners;

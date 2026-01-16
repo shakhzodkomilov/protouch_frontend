@@ -1,8 +1,8 @@
-import { API } from "../../../shared/config/base"
+import { BASE_URL } from "../../config/base"
 import { Product } from "../model/types"
 
 export async function getAllProducts(): Promise<Product[]> {
-  const res = await fetch(`${API}/products`, {
+  const res = await fetch(`${BASE_URL}/products`, {
     cache: "no-store",
   })
 
@@ -16,7 +16,7 @@ export async function getAllProducts(): Promise<Product[]> {
 export async function getProductsByCategory(
   category: string
 ): Promise<Product[]> {
-  const res = await fetch(`${API}/products/category/${category}`, {
+  const res = await fetch(`${BASE_URL}/products/category/${category}`, {
     cache: "no-store",
   })
   if (!res.ok) {

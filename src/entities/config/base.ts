@@ -1,7 +1,7 @@
-export const API = process.env.NEXT_PUBLIC_API_URL
+export const  BASE_URL = process.env.NEXT_PUBLIC_API_URL as string;
 
 export async function getProducts() {
-  const res = await fetch(`${API}/products`, {
+  const res = await fetch(`${BASE_URL}/products`, {
     cache: "no-store",
   })
 
