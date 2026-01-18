@@ -169,14 +169,14 @@ export default function CatalogPage(props: {
                       lineHeight: "1.4em",
                     }}
                   >
-                    {item.title || item.short_description}
+                    {item.short_description}
                   </Typography>
                   <Typography
                     sx={{
                       fontWeight: 700,
                       fontSize: 18,
                       mt: 2,
-                      color: "#249FFC",
+                      color: "#000",
                     }}
                   >
                     {new Intl.NumberFormat("ru-RU").format(Number(item.price))}{" "}

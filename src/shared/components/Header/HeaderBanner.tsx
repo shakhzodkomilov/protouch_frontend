@@ -1,5 +1,4 @@
 import { Box, Container, Button } from "@mui/material";
-import VerticalText from "./VerticalText";
 
 const HeaderBanner = () => {
   return (
@@ -49,7 +48,7 @@ const HeaderBanner = () => {
               justifyContent: "center",
             }}
           >
-            <VerticalText />
+            ИНТЕРАКТИВНОЕ и AV ОБОРУДОВАНИЕ
           </Button>
 
           <Button

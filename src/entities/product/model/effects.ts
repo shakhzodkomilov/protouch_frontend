@@ -3,12 +3,13 @@ import { createEffect } from "effector";
 import { BASE_URL } from "../../config/base";
 import { CategoryType, PaginationType, ProductDetailType } from "./types";
 
+// --- Kategoriyalar ---
 export const getCategoriesFx = createEffect<
   { is_carousel?: string; lang?: string },
   CategoryType[]
 >(async (params) => {
   const { data } = await axios.get(`${BASE_URL}/api/v1/products/categories/`, {
-    params,
+    params: { lang: "ru", ...params },
   });
   return data;
 });
@@ -23,7 +24,9 @@ export const getProductsFx = createEffect<
   },
   PaginationType
 >(async (params) => {
-  const { data } = await axios.get(`${BASE_URL}/api/v1/products/`, { params });
+  const { data } = await axios.get(`${BASE_URL}/api/v1/products/`, {
+    params: { lang: "ru", ...params },
+  });
   return data;
 });
 
@@ -33,33 +36,32 @@ export const getProductDetailFx = createEffect<
 >(async ({ product_id, lang }) => {
   const { data } = await axios.get(
     `${BASE_URL}/api/v1/products/product/${product_id}/`,
-    { params: { lang } }
+    { params: { lang: lang || "ru" } },
   );
-  return data;
-});
 
+  // ✅ Parse string prices to numbers
+  return {
+    ...data,
+    price: Number(data.price),
+  };
+});
 export const getSalesHitsFx = createEffect<{ lang?: string }, PaginationType>(
   async ({ lang }) => {
     const { data } = await axios.get(`${BASE_URL}/api/v1/products/`, {
-      params: {
-        is_bestseller: true,
-        lang,
-      },
+      params: { is_bestseller: true, lang: lang || "ru" },
     });
     return data;
-  }
+  },
 );
 
+// --- New arrivals ---
 export const getNewArrivalsFx = createEffect<{ lang?: string }, PaginationType>(
   async ({ lang }) => {
     const { data } = await axios.get(`${BASE_URL}/api/v1/products/`, {
-      params: {
-        is_new: true,
-        lang,
-      },
+      params: { is_new: true, lang: lang || "ru" },
     });
     return data;
-  }
+  },
 );
 
 export const getProductsByCategoryFx = createEffect<
@@ -71,31 +73,21 @@ export const getProductsByCategoryFx = createEffect<
       page,
       ...(slugs && { slug: slugs }),
       brand: "",
-      ...(lang && { lang }),
+      lang: lang || "ru",
     },
   });
   return data;
 });
-export const loadProductsFx = createEffect(
-  async ({ lang, search }: { lang: string; search?: string }) => {
-    const response = await axios.get(`${BASE_URL}/products`, {
-      params: {
-        lang,
-        search: search || undefined, // Send search query to backend
-      },
-    });
-    return response.data;
-  }
-);
+
 export const searchProductsFx = createEffect<
-  { lang: string; search: string; page?: number },
+  { lang?: string; search: string; page?: number },
   PaginationType
 >(async ({ lang, search, page = 1 }) => {
   const { data } = await axios.get(`${BASE_URL}/api/v1/products/`, {
     params: {
       page,
-      title: search || undefined, // Use 'title' param for search (matches your store event)
-      lang,
+      title: search || undefined,
+      lang: lang || "ru",
     },
   });
   return data;

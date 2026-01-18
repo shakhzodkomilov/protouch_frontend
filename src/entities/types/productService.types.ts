@@ -38,13 +38,12 @@ export type ProductType = {
   title: string;
   short_description: string;
   slug: string;
-  price: string;
+  price: number; // ✅ CHANGED: string → number
   is_in_stock: boolean;
   is_pre_order: boolean;
   image: string;
-  discount: DiscountType;
+  discount: DiscountType | null; // ✅ Make optional
 };
-
 export type PaginationType = {
   count: number;
   next: string | null;
@@ -66,16 +65,15 @@ export type ProductDetailType = {
   id: string;
   title: string;
   slug: string;
-  price: string;
+  price: number; // ✅ CHANGED: string → number
   short_description: string;
   description: string;
   is_in_stock: boolean;
   is_pre_order: boolean;
-  discount: DiscountType;
+  discount: DiscountType | null; // ✅ Make optional
   images: Array<ImageType>;
   details: Array<Detail>;
 };
-
 export type ProductsResponse = {
   id: string;
   title: string;

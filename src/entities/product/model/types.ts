@@ -44,13 +44,15 @@ export interface PaginationType {
   results: Product[];
 }
 
+// src/entities/product/model/types.ts
 export interface ProductDetailType {
   id: string;
   title: string;
-  price: number;
+  price: number; // ✅ Ensure number
   images: Image[];
   category: CategoryType;
   short_description: string;
   is_in_stock: boolean;
   is_pre_order: boolean;
+  image?: string; // ✅ Optional fallback
 }

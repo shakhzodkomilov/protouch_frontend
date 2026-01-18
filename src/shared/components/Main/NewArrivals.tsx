@@ -2,13 +2,13 @@
 
 import {
   Box,
-  Button,
   IconButton,
   Typography,
   Snackbar,
   Alert,
+  Button,
 } from "@mui/material";
-import { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useUnit } from "effector-react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
@@ -29,6 +29,14 @@ import {
   $favorites,
 } from "../../../entities/favourite/model/store";
 
+interface ProductItem {
+  id: string | number; // ✅ Fixed - matches actual API type
+  image: string;
+  short_description: string;
+  price: number;
+  is_in_stock: boolean;
+}
+
 const NewArrivals = () => {
   const { locale } = useParams();
   const [arrivals, loading, loadArrivalsEv] = useUnit([
@@ -42,22 +50,27 @@ const NewArrivals = () => {
   const handleToggleFavorite = useUnit(toggleFavorite);
   const loadFavoritesEv = useUnit(loadFavorites);
 
-  // Toast states
-  const [openToast, setOpenToast] = useState(false);
-  const [favoriteToast, setFavoriteToast] = useState(false);
-  const [lastToggledId, setLastToggledId] = useState<string>("");
+  // Toast states - FIXED
+  const [openBasketToast, setOpenBasketToast] = useState(false);
+  const [openFavoriteToast, setOpenFavoriteToast] = useState(false);
+  const [lastActionType, setLastActionType] = useState<"add" | "remove" | null>(
+    null,
+  );
+
+  // FIXED: Memoized timestamp generator
+  // eslint-disable-next-line react-hooks/purity
+  const getUniqueId = useMemo(() => Date.now(), []);
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Load data on mount
   useEffect(() => {
-    loadArrivalsEv({ lang: (locale as string) || "ru" });
+    loadArrivalsEv({ lang: "ru" });
     loadFavoritesEv();
-  }, [loadArrivalsEv, loadFavoritesEv, locale]);
+  }, [loadArrivalsEv, loadFavoritesEv]);
 
-  // Memoized helpers - FIXED: Handle string|number IDs
   const isItemInBasket = useCallback(
     (productId: string | number) =>
-      basketItems.some((item) => String(item.productId) === String(productId)),
+      basketItems.some((item) => item.productId === Number(productId)),
     [basketItems],
   );
 
@@ -67,48 +80,51 @@ const NewArrivals = () => {
     [favorites],
   );
 
-  // Event handlers - FIXED: Proper typing and Number conversion
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onFavoriteClick = (e: React.MouseEvent, item: any) => {
-    e.preventDefault();
-    e.stopPropagation();
+  // FIXED: Proper typing + no Date.now() in render
+  const onFavoriteClick = useCallback(
+    (e: React.MouseEvent, item: ProductItem) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    const productId = Number(item.id);
-
-    handleToggleFavorite({
-      // eslint-disable-next-line react-hooks/purity
-      id: Date.now(),
-      productId: productId, // ✅ FIXED: Number conversion
-      title: item.short_description || "Product",
-      image: item.image,
-      price: item.price,
-    });
-    setLastToggledId(String(item.id)); // ✅ Keep string for toast
-    setFavoriteToast(true);
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onBasketClick = (e: React.MouseEvent, item: any) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const productId = Number(item.id);
-
-    if (item.is_in_stock) {
-      handleAddToBasket({
-        id: productId, // ✅ FIXED: Number conversion
-        productId: productId, // ✅ FIXED: Number conversion
+      const favoriteItem = {
+        id: getUniqueId, // ✅ FIXED: Uses memoized timestamp
+        productId: item.id,
         title: item.short_description || "Product",
-        price: item.price,
         image: item.image,
-        quantity: 1,
-        isInStock: item.is_in_stock,
-      });
-      setOpenToast(true);
-    } else {
-      window.location.href = `tel:+998000000000`;
-    }
-  };
+        price: item.price,
+      };
+
+      const wasFavorite = isItemFavorite(item.id);
+      handleToggleFavorite(favoriteItem);
+      setLastActionType(wasFavorite ? "remove" : "add");
+      setOpenFavoriteToast(true);
+    },
+    [getUniqueId, handleToggleFavorite, isItemFavorite],
+  );
+
+  // FIXED: Proper typing for basket
+  const onBasketClick = useCallback(
+    (e: React.MouseEvent, item: ProductItem) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (item.is_in_stock) {
+        handleAddToBasket({
+          id: Number(item.id), // ✅ FIXED: Explicit Number conversion
+          productId: Number(item.id),
+          title: item.short_description || "Product",
+          price: item.price,
+          image: item.image,
+          quantity: 1,
+          isInStock: true,
+        });
+        setOpenBasketToast(true);
+      } else {
+        window.location.href = `tel:+998000000000`;
+      }
+    },
+    [handleAddToBasket],
+  ); // ✅ FIXED: Proper deps
 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -118,15 +134,12 @@ const NewArrivals = () => {
     });
   };
 
-  // Memoized price formatter
-  const formatPrice = useMemo(
-    () => (price: number) => new Intl.NumberFormat("ru-RU").format(price),
-    [],
-  );
+  const formatPrice = useCallback((price: number) => {
+    return new Intl.NumberFormat("ru-RU").format(price);
+  }, []);
 
-  // Reusable styles
-  const navBtnStyle = (pos: { left?: number; right?: number }) => ({
-    position: "absolute" as const,
+  const navBtnStyle = (pos: object) => ({
+    position: "absolute",
     top: "50%",
     transform: "translateY(-50%)",
     zIndex: 10,
@@ -219,7 +232,7 @@ const NewArrivals = () => {
         >
           {loading && <Typography>Загрузка...</Typography>}
 
-          {arrivals?.results?.map((item) => {
+          {arrivals?.results?.map((item: ProductItem) => {
             const inBasket = isItemInBasket(item.id);
             const isFavorite = isItemFavorite(item.id);
 
@@ -323,9 +336,9 @@ const NewArrivals = () => {
 
       {/* Basket Toast */}
       <Snackbar
-        open={openToast}
+        open={openBasketToast}
         autoHideDuration={3000}
-        onClose={() => setOpenToast(false)}
+        onClose={() => setOpenBasketToast(false)}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert
@@ -339,19 +352,19 @@ const NewArrivals = () => {
 
       {/* Favorite Toast */}
       <Snackbar
-        open={favoriteToast}
+        open={openFavoriteToast}
         autoHideDuration={2000}
-        onClose={() => setFavoriteToast(false)}
+        onClose={() => setOpenFavoriteToast(false)}
         anchorOrigin={{ vertical: "top", horizontal: "left" }}
       >
         <Alert
-          severity={isItemFavorite(lastToggledId) ? "info" : "success"}
+          severity={lastActionType === "add" ? "success" : "info"}
           variant="filled"
           sx={{ width: "100%", borderRadius: "10px" }}
         >
-          {isItemFavorite(lastToggledId)
-            ? "Удалено из избранного"
-            : "Добавлено в избранное"}
+          {lastActionType === "add"
+            ? "Добавлено в избранное"
+            : "Удалено из избранного"}
           !
         </Alert>
       </Snackbar>

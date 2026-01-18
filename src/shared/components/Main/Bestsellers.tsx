@@ -16,7 +16,13 @@ import Image from "next/image";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import DoneIcon from "@mui/icons-material/Done";
-
+interface ProductItem {
+  id: number | string;
+  short_description?: string;
+  image: string;
+  price: number;
+  is_in_stock: boolean;
+}
 import {
   $newArrivals,
   $loadingArrivals,
@@ -28,78 +34,78 @@ import {
   loadFavorites,
   $favorites,
 } from "../../../entities/favourite/model/store";
-import {
-  ProductType,
-  PaginationType,
-} from "../../../entities/types/productService.types";
-
 const BestSellers = () => {
   const { locale } = useParams();
-
-  // Effector Units with explicit typing
-  const arrivals = useUnit($newArrivals) as unknown as PaginationType | null;
-  const loading = useUnit($loadingArrivals);
-  const loadArrivalsEv = useUnit(loadArrivals);
-
+  const [arrivals, loading, loadArrivalsEv] = useUnit([
+    $newArrivals,
+    $loadingArrivals,
+    loadArrivals,
+  ]);
   const { items: basketItems } = useUnit($basket);
-  const favorites = useUnit($favorites);
+  const favorites = useUnit($favorites); // ✅ Full list
   const handleAddToBasket = useUnit(addToBasket);
   const handleToggleFavorite = useUnit(toggleFavorite);
   const loadFavoritesEv = useUnit(loadFavorites);
 
   const [openToast, setOpenToast] = useState(false);
   const [favoriteToast, setFavoriteToast] = useState(false);
-  const [lastToggledId, setLastToggledId] = useState<string>("");
+  const [lastToggledId, setLastToggledId] = useState<number>(0); // ✅ Track last toggle
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    loadArrivalsEv({ lang: (locale as string) || "ru" });
+    loadArrivalsEv({ lang: "ru" });
     loadFavoritesEv();
-  }, [loadArrivalsEv, loadFavoritesEv, locale]);
+  }, [loadArrivalsEv, loadFavoritesEv]);
 
   const isItemInBasket = useCallback(
-    (productId: string) => {
-      return basketItems.some((item) => String(item.productId) === productId);
+    (productId: number | string) => {
+      // number | string qo'shildi
+      return basketItems.some(
+        (item) => String(item.productId) === String(productId),
+      );
     },
     [basketItems],
   );
-
   const isItemFavorite = useCallback(
-    (productId: string) => {
-      return favorites.some((item) => String(item.productId) === productId);
+    (productId: number | string) => {
+      return favorites.some(
+        (item) => String(item.productId) === String(productId),
+      );
     },
     [favorites],
   );
 
-  const onFavoriteClick = (e: React.MouseEvent, item: ProductType) => {
+  const onFavoriteClick = (e: React.MouseEvent, item: ProductItem) => {
     e.preventDefault();
     e.stopPropagation();
 
-    setLastToggledId(item.id);
+    // Renderni buzmaslik uchun vaqtni aynan shu yerda oling
+    const timestampId = Number(new Date());
 
     handleToggleFavorite({
-      // eslint-disable-next-line react-hooks/purity
-      id: Date.now(),
-      productId: Number(item.id),
-      title: item.title || item.short_description || "Product",
+      id: timestampId, // Date.now() o'rniga
+      productId: item.id,
+      title: item.short_description || "Product",
       image: item.image,
-      // ✅ XATONI TUZATISH: string ni number ga o'giramiz
-      price: Number(item.price),
+      price: item.price,
     });
     setFavoriteToast(true);
   };
 
-  const onBasketClick = (e: React.MouseEvent, item: ProductType) => {
+  const onBasketClick = (e: React.MouseEvent, item: ProductItem) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (item.is_in_stock) {
+      // String bo'lsa raqamga o'tkazamiz, number bo'lsa o'zi qoladi
+      const numericId =
+        typeof item.id === "string" ? parseInt(item.id, 10) : item.id;
+
       handleAddToBasket({
-        id: Number(item.id),
-        productId: Number(item.id),
-        title: item.title || item.short_description || "Product",
-        // ✅ XATONI TUZATISH: string ni number ga o'giramiz
-        price: Number(item.price),
+        id: numericId, // Endi bu aniq number
+        productId: numericId, // Endi bu aniq number
+        title: item.short_description || "Product",
+        price: item.price,
         image: item.image,
         quantity: 1,
         isInStock: item.is_in_stock,
@@ -151,7 +157,7 @@ const BestSellers = () => {
         >
           {loading && <Typography>Загрузка...</Typography>}
 
-          {arrivals?.results?.map((item: ProductType) => {
+          {arrivals?.results?.map((item) => {
             const inBasket = isItemInBasket(item.id);
             const isFavorite = isItemFavorite(item.id);
             return (
@@ -213,15 +219,12 @@ const BestSellers = () => {
 
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography sx={descriptionStyle}>
-                      {item.title || item.short_description}
+                      {item.short_description}
                     </Typography>
                     <Typography
                       sx={{ color: "#000", fontWeight: 700, fontSize: "20px" }}
                     >
-                      {new Intl.NumberFormat("ru-RU").format(
-                        Number(item.price),
-                      )}{" "}
-                      сум
+                      {new Intl.NumberFormat("ru-RU").format(item.price)} сум
                     </Typography>
                   </Box>
 
@@ -271,7 +274,7 @@ const BestSellers = () => {
         </Alert>
       </Snackbar>
 
-      {/* Favorite Toast */}
+      {/* Favorite Toast - FIXED */}
       <Snackbar
         open={favoriteToast}
         autoHideDuration={2000}
@@ -279,13 +282,13 @@ const BestSellers = () => {
         anchorOrigin={{ vertical: "top", horizontal: "left" }}
       >
         <Alert
-          severity={isItemFavorite(lastToggledId) ? "success" : "info"}
+          severity={isItemFavorite(lastToggledId) ? "info" : "success"}
           variant="filled"
           sx={{ width: "100%", borderRadius: "10px" }}
         >
           {isItemFavorite(lastToggledId)
-            ? "Добавлено в избранное"
-            : "Удалено из избранного"}
+            ? "Удалено из избранного"
+            : "Добавлено в избранное"}
           !
         </Alert>
       </Snackbar>
@@ -293,7 +296,7 @@ const BestSellers = () => {
   );
 };
 
-// Styles
+// All your existing styles...
 const navBtnStyle = (pos: object) => ({
   position: "absolute",
   top: "50%",
@@ -320,7 +323,7 @@ const cardStyle = {
   flexDirection: "column",
   transition: "transform 0.2s",
   "&:hover": { transform: "translateY(-5px)" },
-} as const;
+};
 
 const statusBadgeStyle = (isInStock: boolean) => ({
   padding: "4px 12px",
@@ -341,7 +344,7 @@ const descriptionStyle = {
   WebkitLineClamp: 2,
   overflow: "hidden",
   lineHeight: "1.4em",
-} as const;
+};
 
 const actionBtnStyle = {
   minWidth: "54px",
@@ -353,6 +356,6 @@ const actionBtnStyle = {
   bottom: "15px",
   boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
   transition: "all 0.3s ease",
-} as const;
+};
 
 export default BestSellers;
