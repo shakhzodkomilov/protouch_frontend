@@ -1,0 +1,10 @@
+
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Disallow: /src/
+Disallow: /private/
+Disallow: /temp/
+Allow: /
+
+Sitemap: https://protouch.uz/sitemap.xml
