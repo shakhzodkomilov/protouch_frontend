@@ -6,9 +6,12 @@ import {
   getSalesHitsFx,
   getNewArrivalsFx,
   getProductsByCategoryFx,
-  searchProductsFx, // ✅ Added import
+  searchProductsFx,
 } from "./effects";
 import { CategoryType, PaginationType, ProductDetailType } from "./types";
+
+// ✅ Fixed: Proper error types
+type ErrorType = string | { message?: string };
 
 export const loadCategories = createEvent<{
   is_carousel?: string;
@@ -22,7 +25,6 @@ export const loadProducts = createEvent<{
   title?: string;
 }>();
 export const loadProductsByCategory = createEvent<{
-  // ✅ Fixed: slugs instead of slug
   slugs: string;
   page: number;
   lang?: string;
@@ -42,7 +44,7 @@ export const loadProductDetail = createEvent<{
 
 export const $searchProducts = createStore<PaginationType | null>(null).on(
   searchProductsFx.doneData,
-  (_, data) => data
+  (_, data) => data,
 );
 
 export const $searchLoading = searchProductsFx.pending;
@@ -50,30 +52,26 @@ export const $searchLoading = searchProductsFx.pending;
 // Stores
 export const $categories = createStore<CategoryType[]>([]).on(
   getCategoriesFx.doneData,
-  (_, data) => data
+  (_, data) => data,
 );
 
 export const $products = createStore<PaginationType | null>(null)
   .on(getProductsFx.doneData, (_, data) => data)
-  .on(
-    // ✅ Added: also updates from category effect
-    getProductsByCategoryFx.doneData,
-    (_, data) => data
-  );
+  .on(getProductsByCategoryFx.doneData, (_, data) => data);
 
 export const $bestSellers = createStore<PaginationType | null>(null).on(
   getSalesHitsFx.doneData,
-  (_, data) => data
+  (_, data) => data,
 );
 
 export const $newArrivals = createStore<PaginationType | null>(null).on(
   getNewArrivalsFx.doneData,
-  (_, data) => data
+  (_, data) => data,
 );
 
 export const $productDetail = createStore<ProductDetailType | null>(null).on(
   getProductDetailFx.doneData,
-  (_, data) => data
+  (_, data) => data,
 );
 
 // Loading flags
@@ -83,35 +81,46 @@ export const $loadingSellers = getSalesHitsFx.pending;
 export const $loadingArrivals = getNewArrivalsFx.pending;
 export const $loadingProductDetail = getProductDetailFx.pending;
 
-// Errors
+// ✅ Fixed: Proper ErrorType instead of any
 export const $errorCategories = createStore<string | null>(null).on(
   getCategoriesFx.failData,
-  (_, e: any) => e?.message || "Error loading categories"
+  (_, e: ErrorType) =>
+    (e && typeof e === "object" && "message" in e
+      ? e.message
+      : "Error loading categories") as string,
 );
 
 export const $errorProducts = createStore<string | null>(null)
   .on(
     getProductsFx.failData,
-    (_, e: any) => e?.message || "Error loading products"
+    (_, e: ErrorType) =>
+      (e && typeof e === "object" && "message" in e
+        ? e.message
+        : "Error loading products") as string,
   )
   .on(
-    // ✅ Added: category errors too
     getProductsByCategoryFx.failData,
-    (_, e: any) => e?.message || "Error loading products"
+    (_, e: ErrorType) =>
+      (e && typeof e === "object" && "message" in e
+        ? e.message
+        : "Error loading products") as string,
   );
 
 export const $errorProductDetail = createStore<string | null>(null).on(
   getProductDetailFx.failData,
-  (_, e: any) => e?.message || "Error loading product"
+  (_, e: ErrorType) =>
+    (e && typeof e === "object" && "message" in e
+      ? e.message
+      : "Error loading product") as string,
 );
 
-// Triggers ✅ Added missing sample
+// Triggers
 sample({ clock: loadCategories, target: getCategoriesFx });
 sample({ clock: loadProducts, target: getProductsFx });
 sample({ clock: loadSellers, target: getSalesHitsFx });
 sample({ clock: loadArrivals, target: getNewArrivalsFx });
 sample({ clock: loadProductDetail, target: getProductDetailFx });
-sample({ clock: loadProductsByCategory, target: getProductsByCategoryFx }); // ✅ Critical fix
+sample({ clock: loadProductsByCategory, target: getProductsByCategoryFx });
 sample({
   clock: searchProducts,
   target: searchProductsFx,

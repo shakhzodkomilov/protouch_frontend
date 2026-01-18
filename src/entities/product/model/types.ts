@@ -25,6 +25,8 @@ export interface CategoryType {
 }
 
 export interface Product {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  results: any;
   id: number | string;
   title: string;
   short_description: string;

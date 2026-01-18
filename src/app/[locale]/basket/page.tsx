@@ -40,6 +40,7 @@ export default function BasketPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     loadBasketEv();
   }, [loadBasketEv]);
@@ -202,7 +203,9 @@ export default function BasketPage() {
                             variant="h6"
                             sx={{ fontWeight: 700, color: "#000" }}
                           >
-                            {new Intl.NumberFormat("ru-RU").format(item.price)}{" "}
+                            {new Intl.NumberFormat("ru-RU").format(
+                              item.price,
+                            )}{" "}
                           </Typography>
                           <Typography variant="h6" sx={{ fontWeight: 700 }}>
                             Сум

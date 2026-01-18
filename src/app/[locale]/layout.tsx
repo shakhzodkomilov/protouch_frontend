@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     siteName: "Protouch",
     images: [
       {
-        url: "/faviconn.png",
+        url: "/icons/iconn.png",
         width: 1200,
         height: 630,
       },
@@ -22,12 +22,10 @@ export const metadata: Metadata = {
     locale: "ru_RU",
     type: "website",
   },
-
   twitter: {
     card: "summary_large_image",
-    images: ["/faviconn.png"],
+    images: ["/icons/iconn.png"],
   },
-
   alternates: {
     languages: {
       uz: "https://protouch.uz/uz",
@@ -37,20 +35,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function LocaleLayout({
-  children,
-  params: { locale },
-}: {
+// Define the type for params as a Promise
+type Props = {
   children: React.ReactNode;
-  params: { locale: string };
-}) {
+  params: Promise<{ locale: string }>;
+};
+
+export default async function LocaleLayout({ children, params }: Props) {
+  // Await the params before using them
+  const { locale } = await params;
+
+  // Fetch messages for next-intl
   const messages = await getMessages({ locale });
 
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
-      <Header />
-      {children}
-      <Footer />
-    </NextIntlClientProvider>
+    <html lang={locale}>
+      <body>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </NextIntlClientProvider>
+      </body>
+    </html>
   );
 }

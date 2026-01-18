@@ -42,54 +42,62 @@ const NewArrivals = () => {
   const handleToggleFavorite = useUnit(toggleFavorite);
   const loadFavoritesEv = useUnit(loadFavorites);
 
-  // Toast states (same as Bestsellers)
+  // Toast states
   const [openToast, setOpenToast] = useState(false);
   const [favoriteToast, setFavoriteToast] = useState(false);
-  const [lastToggledId, setLastToggledId] = useState<number>(0);
+  const [lastToggledId, setLastToggledId] = useState<string>("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Load data on mount
   useEffect(() => {
-    loadArrivalsEv({ lang: "ru" }); // TODO: Use locale instead of hardcoded "ru"
+    loadArrivalsEv({ lang: (locale as string) || "ru" });
     loadFavoritesEv();
-  }, [loadArrivalsEv, loadFavoritesEv]);
+  }, [loadArrivalsEv, loadFavoritesEv, locale]);
 
-  // Memoized helpers (same as Bestsellers)
+  // Memoized helpers - FIXED: Handle string|number IDs
   const isItemInBasket = useCallback(
-    (productId: number) =>
-      basketItems.some((item) => item.productId === productId),
-    [basketItems]
+    (productId: string | number) =>
+      basketItems.some((item) => String(item.productId) === String(productId)),
+    [basketItems],
   );
 
   const isItemFavorite = useCallback(
-    (productId: number) =>
-      favorites.some((item) => item.productId === productId),
-    [favorites]
+    (productId: string | number) =>
+      favorites.some((item) => String(item.productId) === String(productId)),
+    [favorites],
   );
 
-  // Event handlers (identical to Bestsellers)
+  // Event handlers - FIXED: Proper typing and Number conversion
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onFavoriteClick = (e: React.MouseEvent, item: any) => {
     e.preventDefault();
     e.stopPropagation();
+
+    const productId = Number(item.id);
+
     handleToggleFavorite({
+      // eslint-disable-next-line react-hooks/purity
       id: Date.now(),
-      productId: item.id,
+      productId: productId, // ✅ FIXED: Number conversion
       title: item.short_description || "Product",
       image: item.image,
       price: item.price,
     });
-    setLastToggledId(item.id); // ✅ Fixed toast tracking
+    setLastToggledId(String(item.id)); // ✅ Keep string for toast
     setFavoriteToast(true);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const onBasketClick = (e: React.MouseEvent, item: any) => {
     e.preventDefault();
     e.stopPropagation();
 
+    const productId = Number(item.id);
+
     if (item.is_in_stock) {
       handleAddToBasket({
-        id: item.id,
-        productId: item.id,
+        id: productId, // ✅ FIXED: Number conversion
+        productId: productId, // ✅ FIXED: Number conversion
         title: item.short_description || "Product",
         price: item.price,
         image: item.image,
@@ -98,7 +106,6 @@ const NewArrivals = () => {
       });
       setOpenToast(true);
     } else {
-      // TODO: Replace with useRouter for SPA navigation
       window.location.href = `tel:+998000000000`;
     }
   };
@@ -111,15 +118,15 @@ const NewArrivals = () => {
     });
   };
 
-  // Memoized price formatter (performance fix)
+  // Memoized price formatter
   const formatPrice = useMemo(
     () => (price: number) => new Intl.NumberFormat("ru-RU").format(price),
-    []
+    [],
   );
 
-  // Reusable styles (same as Bestsellers)
-  const navBtnStyle = (pos: object) => ({
-    position: "absolute",
+  // Reusable styles
+  const navBtnStyle = (pos: { left?: number; right?: number }) => ({
+    position: "absolute" as const,
     top: "50%",
     transform: "translateY(-50%)",
     zIndex: 10,
@@ -144,7 +151,7 @@ const NewArrivals = () => {
     flexDirection: "column",
     transition: "transform 0.2s",
     "&:hover": { transform: "translateY(-5px)" },
-  };
+  } as const;
 
   const statusBadgeStyle = (isInStock: boolean) => ({
     padding: "4px 12px",
@@ -165,7 +172,7 @@ const NewArrivals = () => {
     WebkitLineClamp: 2,
     overflow: "hidden",
     lineHeight: "1.4em",
-  };
+  } as const;
 
   const actionBtnStyle = {
     minWidth: "54px",
@@ -177,7 +184,7 @@ const NewArrivals = () => {
     bottom: "15px",
     boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
     transition: "all 0.3s ease",
-  };
+  } as const;
 
   return (
     <Box sx={{ mt: "84px" }}>

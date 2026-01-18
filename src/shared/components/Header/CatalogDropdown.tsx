@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useUnit } from "effector-react";
-import { useRouter, useParams } from "next/navigation"; // ✅ ADD THESE
+import { useRouter, useParams } from "next/navigation";
 import {
   Paper,
   Box,
@@ -15,12 +15,33 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import { $categories } from "../../../entities/product/model";
-import { CategoryType } from "../../../entities/types/productService.types";
+import { CategoryType as ProductServiceCategoryType } from "../../../entities/types/productService.types";
+
+// ✅ FIXED: Create compatible type from model store
+type ModelCategoryType = {
+  id: string;
+  title: string;
+  image?: {
+    url: string;
+  };
+  children?: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    children?: Array<{
+      id: string;
+      title: string;
+      slug: string;
+    }>;
+  }>;
+};
 
 interface CatalogDropdownProps {
   isOpen: boolean;
-  activeCategory: CategoryType | null;
-  onCategoryHover: (category: CategoryType) => void;
+  activeCategory: ProductServiceCategoryType | ModelCategoryType | null;
+  onCategoryHover: (
+    category: ProductServiceCategoryType | ModelCategoryType,
+  ) => void;
   onClose: () => void;
 }
 
@@ -32,7 +53,7 @@ export const CatalogDropdown: React.FC<CatalogDropdownProps> = ({
 }) => {
   const router = useRouter();
   const { locale } = useParams();
-  const categories = useUnit($categories);
+  const categories = useUnit($categories) as ModelCategoryType[];
 
   if (!isOpen || categories.length === 0) return null;
 
@@ -82,7 +103,7 @@ export const CatalogDropdown: React.FC<CatalogDropdownProps> = ({
                     },
                   }}
                 >
-                  {cat.image && (
+                  {cat.image?.url && (
                     <ListItemIcon sx={{ minWidth: 35 }}>
                       <Image
                         src={cat.image.url}
@@ -111,11 +132,11 @@ export const CatalogDropdown: React.FC<CatalogDropdownProps> = ({
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)", // ✅ Reduced from 6 for better UX
+              gridTemplateColumns: "repeat(4, 1fr)",
               gap: 3,
             }}
           >
-            {activeCategory?.children?.map((child: any) => (
+            {activeCategory?.children?.map((child) => (
               <Box key={child.id}>
                 <Typography
                   variant="body1"
@@ -130,11 +151,11 @@ export const CatalogDropdown: React.FC<CatalogDropdownProps> = ({
                       textDecoration: "underline",
                     },
                   }}
-                  onClick={() => handleCategoryClick(child.slug)} // ✅ FIXED NAVIGATION
+                  onClick={() => handleCategoryClick(child.slug)}
                 >
                   {child.title}
                 </Typography>
-                {child.children?.map((subChild: any) => (
+                {child.children?.map((subChild) => (
                   <Typography
                     key={subChild.id}
                     variant="body2"
@@ -145,7 +166,7 @@ export const CatalogDropdown: React.FC<CatalogDropdownProps> = ({
                       cursor: "pointer",
                       "&:hover": { color: "#2196f3" },
                     }}
-                    onClick={() => handleCategoryClick(subChild.slug)} // ✅ Subchild navigation too
+                    onClick={() => handleCategoryClick(subChild.slug)}
                   >
                     {subChild.title}
                   </Typography>
@@ -165,7 +186,7 @@ export const CatalogDropdown: React.FC<CatalogDropdownProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          bgcolor: "rgba(0,0,0,0.3)", // ✅ Better overlay
+          bgcolor: "rgba(0,0,0,0.3)",
           zIndex: -1,
         }}
       />

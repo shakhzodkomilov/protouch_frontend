@@ -1,9 +1,3 @@
-// import Image from "next/image";
-
-// export default function Home() {
-//   return (
-//     <>
-//     <h1>1</h1>
-//     </>
-//   );
-// }
+export default function Home() {
+  return <div>Главная страница</div>;
+}

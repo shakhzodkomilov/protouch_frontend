@@ -79,7 +79,7 @@ export default function AboutUs() {
           </List>
 
           <Typography variant="body1" sx={{ mb: 3, lineHeight: 1.7 }}>
-            Комплексные решения "под ключ" с гарантией и поддержкой.
+            Комплексные решения &quot;под ключ&quot; с гарантией и поддержкой.
           </Typography>
 
           <Typography

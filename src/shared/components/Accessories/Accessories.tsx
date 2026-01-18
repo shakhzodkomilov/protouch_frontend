@@ -7,9 +7,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import {
   $loadingArrivals,
-  $loadingProducts,
   $newArrivals,
-  $products,
   loadArrivals,
 } from "../../../entities/product/model";
 import Image from "next/image";
@@ -54,7 +52,7 @@ const Accessories = () => {
             height: 40,
           }}
         >
-          <img src="/arrowleft.svg" width="32" />
+          <Image src="/arrowleft.svg" width={32} height={32} alt="left" />
         </IconButton>
         <IconButton
           onClick={() => scroll("right")}
@@ -70,7 +68,7 @@ const Accessories = () => {
             height: 40,
           }}
         >
-          <img src="/arrowright.svg" width="32" />
+          <Image src="/arrowright.svg" width={32} height={32} alt="right" />
         </IconButton>
         <Box
           ref={scrollRef}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useUnit } from "effector-react";
@@ -38,59 +38,65 @@ import {
 
 export default function ProductDetailPage() {
   type ProductImage = {
-    id: string;
+    id: string | number;
     url: string;
   };
 
   const { id, locale } = useParams();
   const pathname = usePathname();
-  const [arrivals, loading, loadProductDetailEv] = useUnit([
-    $productDetail,
-    $loadingProductDetail,
-    loadProductDetail,
-  ]);
+  const product = useUnit($productDetail);
+  const loading = useUnit($loadingProductDetail);
+  const loadProductDetailEv = useUnit(loadProductDetail);
 
   // State management
   const [openToast, setOpenToast] = useState(false);
   const [favoriteToast, setFavoriteToast] = useState(false);
-  const [lastToggledId, setLastToggledId] = useState<number>(0);
   const [activeImage, setActiveImage] = useState(0);
 
   // Global state
-  const { items: basketItems } = useUnit($basket);
+  const basket = useUnit($basket);
+  const basketItems = basket?.items || [];
   const favorites = useUnit($favorites);
   const handleAddToBasket = useUnit(addToBasket);
   const handleToggleFavorite = useUnit(toggleFavorite);
   const loadFavoritesEv = useUnit(loadFavorites);
 
-  const product = arrivals;
+  // ✅ Normalize IDs and Images
+  const productId = useMemo(
+    () => (product?.id ? Number(product.id) : null),
+    [product],
+  );
+  const images: ProductImage[] = useMemo(
+    () => product?.images ?? [],
+    [product],
+  );
 
-  // ✅ Memoized helpers (same as list components)
-  const isItemInBasket = useCallback(() => {
-    return (
-      product?.id && basketItems.some((item) => item.productId === product.id)
-    );
-  }, [product?.id, basketItems]);
+  const inBasket = useMemo(() => {
+    if (!productId) return false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return basketItems.some((item: any) => item.productId === productId);
+  }, [productId, basketItems]);
 
-  const isItemFavorite = useCallback(() => {
-    return (
-      product?.id && favorites.some((item) => item.productId === product.id)
-    );
-  }, [product?.id, favorites]);
+  const isFavorite = useMemo(() => {
+    if (!productId) return false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return favorites.some((item: any) => item.productId === productId);
+  }, [productId, favorites]);
 
-  const onFavoriteClick = (e: React.MouseEvent, productData: any) => {
+  const onFavoriteClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!product) return;
 
     handleToggleFavorite({
       id: Date.now(),
-      productId: productData.id,
-      title: productData.short_description || "Product",
-      image: productData.image || productData.images?.[0]?.url,
-      price: productData.price,
-    });
+      productId: Number(product.id),
+      title: product.title || "Product",
+      image: images[0]?.url || "/placeholder.jpg",
+      price: product.price,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any); // Model bilan ziddiyatni oldini olish uchun
 
-    setLastToggledId(productData.id);
     setFavoriteToast(true);
   };
 
@@ -99,11 +105,11 @@ export default function ProductDetailPage() {
 
     if (product.is_in_stock) {
       handleAddToBasket({
-        id: product.id,
-        productId: product.id,
+        id: Number(product.id),
+        productId: Number(product.id),
         title: product.title || "Product",
         price: product.price,
-        image: product.image || product.images?.[0]?.url,
+        image: images[0]?.url || "/placeholder.jpg",
         quantity: 1,
         isInStock: product.is_in_stock,
       });
@@ -113,19 +119,12 @@ export default function ProductDetailPage() {
     }
   };
 
-  // Load product & favorites
   useEffect(() => {
     if (id && locale) {
       loadProductDetailEv({ product_id: id as string, lang: locale as string });
       loadFavoritesEv();
     }
   }, [id, locale, loadProductDetailEv, loadFavoritesEv]);
-
-  // Price formatter (performance fix)
-  const formatPrice = useMemo(
-    () => (price: number) => new Intl.NumberFormat("ru-RU").format(price),
-    []
-  );
 
   if (loading || !product) {
     return (
@@ -134,8 +133,6 @@ export default function ProductDetailPage() {
       </Container>
     );
   }
-
-  const images: ProductImage[] = product.images ?? [];
 
   const getBreadcrumbs = () => {
     const localePath = pathname.split("/")[1];
@@ -147,17 +144,12 @@ export default function ProductDetailPage() {
     ];
   };
 
-  const inBasket = isItemInBasket();
-  const isFavorite = isItemFavorite();
-
   return (
     <Box sx={{ width: "100%", height: "auto", bgcolor: "#FAFAFA" }}>
       <Container maxWidth={false} sx={{ py: 4, maxWidth: "1800px" }}>
-        {/* Breadcrumbs */}
         <Box sx={{ mb: 4 }}>
           <Breadcrumbs
             separator={<NavigateNextOutlinedIcon fontSize="small" />}
-            aria-label="breadcrumb"
           >
             {getBreadcrumbs().map((crumb, index) =>
               index === getBreadcrumbs().length - 1 ? (
@@ -176,21 +168,15 @@ export default function ProductDetailPage() {
                   <Chip
                     label={crumb.label}
                     clickable
-                    sx={{
-                      fontSize: 16,
-                      color: "#000",
-                      fontWeight: 500,
-                      bgcolor: "transparent",
-                      "&:hover": { bgcolor: "#f5f5f5" },
-                    }}
+                    sx={{ fontSize: 16, bgcolor: "transparent" }}
                   />
                 </Link>
-              )
+              ),
             )}
           </Breadcrumbs>
         </Box>
 
-        <Box sx={{ bgcolor: "#fff", py: 4, px: 6, borderRadius: 3, gap: 4 }}>
+        <Box sx={{ bgcolor: "#fff", py: 4, px: 6, borderRadius: 3 }}>
           <Typography
             sx={{ fontSize: 28, fontWeight: 600, mb: 4, color: "#000" }}
           >
@@ -199,19 +185,16 @@ export default function ProductDetailPage() {
 
           <Box
             sx={{
-              bgcolor: "#fff",
-              py: 4,
-              px: 6,
-              borderRadius: 3,
               display: "flex",
               gap: 6,
               justifyContent: "space-between",
+              flexWrap: { xs: "wrap", lg: "nowrap" },
             }}
           >
             {/* LEFT GALLERY */}
             <Box sx={{ display: "flex", gap: 2, width: "100%", maxWidth: 600 }}>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                {images.map((img: ProductImage, i: number) => (
+                {images.map((img, i) => (
                   <Box
                     key={img.id || i}
                     onClick={() => setActiveImage(i)}
@@ -219,15 +202,15 @@ export default function ProductDetailPage() {
                       width: 70,
                       height: 70,
                       borderRadius: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
                       cursor: "pointer",
                       p: 1,
                       border:
                         i === activeImage
                           ? "2px solid #249FFC"
                           : "1px solid #ddd",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
                     <Image
@@ -249,8 +232,13 @@ export default function ProductDetailPage() {
                   border: "1px solid #eee",
                 }}
               >
+                {/* ✅ FIXED: image o'rniga images[0].url ishlatildi */}
                 <Image
-                  src={images[activeImage]?.url || product.image || ""}
+                  src={
+                    images[activeImage]?.url ||
+                    images[0]?.url ||
+                    "/placeholder.jpg"
+                  }
                   fill
                   style={{ objectFit: "contain" }}
                   alt={product.title}
@@ -260,9 +248,7 @@ export default function ProductDetailPage() {
 
             {/* MIDDLE DESCRIPTION */}
             <Box sx={{ flex: 1, maxWidth: 400 }}>
-              <Typography
-                sx={{ fontSize: 18, fontWeight: 600, mb: 2, color: "#000" }}
-              >
+              <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 2 }}>
                 Описание
               </Typography>
               <Typography sx={{ color: "#555", fontSize: 14, lineHeight: 1.8 }}>
@@ -270,12 +256,7 @@ export default function ProductDetailPage() {
               </Typography>
               <Button
                 endIcon={<NavigateNextOutlinedIcon />}
-                sx={{
-                  mt: 3,
-                  color: "#000",
-                  fontWeight: 600,
-                  textTransform: "none",
-                }}
+                sx={{ mt: 3, color: "#000", textTransform: "none" }}
               >
                 Подробнее
               </Button>
@@ -289,8 +270,6 @@ export default function ProductDetailPage() {
                 p: 3,
                 borderRadius: 3,
                 maxWidth: 380,
-                display: "flex",
-                flexDirection: "column",
               }}
             >
               <Typography
@@ -302,23 +281,20 @@ export default function ProductDetailPage() {
               >
                 {product.is_in_stock ? "• В наличии" : "• Нет в наличии"}
               </Typography>
-
-              <Typography
-                sx={{ fontSize: 32, fontWeight: 700, mb: 2, color: "#000" }}
-              >
-                {formatPrice(product.price)} сум
+              <Typography sx={{ fontSize: 32, fontWeight: 700, mb: 2 }}>
+                {new Intl.NumberFormat("ru-RU").format(product.price)} сум
               </Typography>
 
               <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
                 <Button variant="outlined" fullWidth sx={actionBtnStyle}>
-                  <Image src="/scale.svg" width={24} height={24} alt="scale" />
+                  <Image src="/scale.svg" width={24} height={24} alt="scale" />{" "}
                   Сравнить
                 </Button>
                 <Button
                   variant="outlined"
                   fullWidth
                   sx={actionBtnStyle}
-                  onClick={(e) => onFavoriteClick(e, product)}
+                  onClick={onFavoriteClick}
                 >
                   {isFavorite ? (
                     <FavoriteIcon sx={{ color: "#FF5F5F" }} />
@@ -329,7 +305,6 @@ export default function ProductDetailPage() {
                 </Button>
               </Box>
 
-              {/* DYNAMIC BASKET BUTTON */}
               <Button
                 fullWidth
                 onClick={onBasketClick}
@@ -338,11 +313,9 @@ export default function ProductDetailPage() {
                   color: "#fff",
                   py: 1.5,
                   borderRadius: 3,
-                  fontSize: 16,
                   mb: 2,
-                  display: "flex",
-                  gap: 1,
                   textTransform: "none",
+                  gap: 1,
                   "&:hover": { bgcolor: inBasket ? "#2e8b40" : "#1E8BD8" },
                 }}
               >
@@ -358,113 +331,26 @@ export default function ProductDetailPage() {
                 )}
                 {inBasket ? "Добавлено" : "Добавить в корзину"}
               </Button>
-
-              <Button
-                fullWidth
-                sx={{
-                  bgcolor: "#25C261",
-                  color: "#fff",
-                  py: 1.5,
-                  borderRadius: 3,
-                  textTransform: "none",
-                  "&:hover": { bgcolor: "#1FA754" },
-                }}
-              >
-                <DescriptionOutlinedIcon sx={{ mr: 1 }} /> Купить как юр. лицо
-              </Button>
-            </Box>
-          </Box>
-
-          {/* Info Blocks */}
-          <Box
-            sx={{
-              width: "100%",
-              bgcolor: "#f4f4f4",
-              borderRadius: 3,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              color: "#000",
-            }}
-          >
-            <InfoItem
-              icon="/Pickup.svg"
-              title="Самовывоз"
-              desc="г. Ташкент, Сергелийский р-н., 4-й пр-д. Дарё Буйи"
-            />
-            <Divider orientation="vertical" flexItem sx={{ my: 4 }} />
-            <InfoItem
-              icon="/Delivery.svg"
-              title="Доставка"
-              desc="по г. Ташкент бесплатно в течении 3-х дней"
-            />
-            <Divider orientation="vertical" flexItem sx={{ my: 4 }} />
-            <Box
-              sx={{
-                textAlign: "center",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 1,
-                width: "33%",
-              }}
-            >
-              <Typography>Появились вопросы о товаре?</Typography>
-              <Button
-                variant="contained"
-                startIcon={<TelegramIcon />}
-                sx={{
-                  bgcolor: "#249FFC",
-                  color: "#fff",
-                  borderRadius: 4,
-                  px: 4,
-                }}
-              >
-                Telegram
-              </Button>
             </Box>
           </Box>
         </Box>
-
         <Accessories />
       </Container>
 
-      {/* ✅ FIXED TOASTS - Same as list components */}
+      {/* TOASTS */}
       <Snackbar
         open={openToast}
         autoHideDuration={3000}
         onClose={() => setOpenToast(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <Alert
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%", borderRadius: "10px" }}
-        >
+        <Alert severity="success" variant="filled">
           Товар успешно добавлен в корзину!
-        </Alert>
-      </Snackbar>
-
-      <Snackbar
-        open={favoriteToast}
-        autoHideDuration={2000}
-        onClose={() => setFavoriteToast(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-      >
-        <Alert
-          severity={isItemFavorite() ? "info" : "success"}
-          variant="filled"
-          sx={{ width: "100%", borderRadius: "10px" }}
-        >
-          {isItemFavorite() ? "Удалено из избранного" : "Добавлено в избранное"}
-          !
         </Alert>
       </Snackbar>
     </Box>
   );
 }
 
-// Sub-components & Styles (unchanged)
 const InfoItem = ({
   icon,
   title,
@@ -501,7 +387,6 @@ const actionBtnStyle = {
   color: "#000",
   display: "flex",
   flexDirection: "column",
-  alignItems: "center",
   fontSize: 12,
   py: 1,
   border: "1px solid #ddd",

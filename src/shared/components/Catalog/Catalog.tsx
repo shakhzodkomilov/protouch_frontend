@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useStore, useEvent, useUnit } from "effector-react";
+import React from "react";
+import { useUnit } from "effector-react";
 import {
   Box,
-  Grid,
   Typography,
   Card,
   CardMedia,
@@ -11,21 +12,16 @@ import {
   Chip,
   Button,
   Paper,
-  useTheme,
 } from "@mui/material";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { CategoryType } from "../../../entities/types/productService.types";
-
 import Image from "next/image";
 import { $categories, loadCategories } from "../../../entities/product/model";
-import React from "react";
+import { CategoryType } from "../../../entities/product/model/types";
 
 const Catalog = () => {
-  const theme = useTheme();
-  const categories = useUnit($categories);
-  const loadCatalog = useEvent(loadCategories);
+  const categories = useUnit($categories) as CategoryType[];
+  const loadCatalog = useUnit(loadCategories);
 
-  // Load categories on mount
   React.useEffect(() => {
     loadCatalog({ lang: "ru" });
   }, [loadCatalog]);
@@ -39,7 +35,6 @@ const Catalog = () => {
           sx={{
             fontWeight: 700,
             fontSize: { xs: "2.5rem", md: "3.5rem" },
-            lineHeight: 1.2,
             mb: 2,
             background: "linear-gradient(135deg, #2196f3 0%, #21cbf3 100%)",
             WebkitBackgroundClip: "text",
@@ -50,35 +45,37 @@ const Catalog = () => {
         </Typography>
         <Typography
           variant="h6"
-          sx={{
-            color: "#666",
-            maxWidth: 600,
-            mx: "auto",
-            fontSize: { xs: "1.1rem", md: "1.3rem" },
-          }}
+          sx={{ color: "#666", maxWidth: 600, mx: "auto" }}
         >
           Выберите категорию для просмотра ассортимента
         </Typography>
       </Box>
 
-      {/* Categories Grid */}
+      {/* CSS GRID CONTAINER */}
       <Box sx={{ maxWidth: 1400, mx: "auto", px: { xs: 2, md: 4 } }}>
-        <Grid container spacing={3}>
+        <Box
+          sx={{
+            display: "grid",
+            gap: 3, // MUI spacing={3} bilan bir xil
+            gridTemplateColumns: {
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(3, 1fr)",
+              lg: "repeat(4, 1fr)",
+            },
+          }}
+        >
           {categories.map((category, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={category.id}>
-              <CategoryCard category={category} index={index} />
-            </Grid>
+            <CategoryCard key={category.id} category={category} index={index} />
           ))}
-        </Grid>
+        </Box>
 
-        {/* Carousel Categories (is_carousel=true) */}
-        {categories.filter((c) => c.is_carousel).length > 0 && (
-          <>
-            <Box sx={{ mt: 12, mb: 4 }}>
-              <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
-                Популярные категории
-              </Typography>
-            </Box>
+        {/* Carousel Categories */}
+        {categories.filter((c: any) => c.is_carousel).length > 0 && (
+          <Box sx={{ mt: 10 }}>
+            <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+              Популярные категории
+            </Typography>
             <Box
               sx={{
                 display: "flex",
@@ -90,24 +87,28 @@ const Catalog = () => {
               }}
             >
               {categories
-                .filter((c) => c.is_carousel)
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .filter((c: any) => c.is_carousel)
                 .map((category) => (
                   <CarouselCategoryCard key={category.id} category={category} />
                 ))}
             </Box>
-          </>
+          </Box>
         )}
       </Box>
     </Box>
   );
 };
 
-interface CategoryCardProps {
+// --- Sub-components (O'zgarishsiz qoldi, faqat Grid olib tashlandi) ---
+
+const CategoryCard = ({
+  category,
+  index,
+}: {
   category: CategoryType;
   index: number;
-}
-
-const CategoryCard = ({ category, index }: CategoryCardProps) => {
+}) => {
   return (
     <Card
       sx={{
@@ -117,33 +118,26 @@ const CategoryCard = ({ category, index }: CategoryCardProps) => {
         transition: "all 0.3s ease",
         position: "relative",
         overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
         "&:hover": {
           transform: "translateY(-12px)",
           boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
-          "& .category-bg": {
-            transform: "scale(1.05)",
-          },
         },
       }}
     >
-      {/* Background Gradient */}
       <Box
-        className="category-bg"
         sx={{
           position: "absolute",
           top: 0,
           left: 0,
           right: 0,
           height: "120px",
-          background: `linear-gradient(135deg, ${getGradientColor(
-            index
-          )} 0%, rgba(33,150,243,0.8) 100%)`,
-          transition: "transform 0.3s ease",
+          background: `linear-gradient(135deg, ${getGradientColor(index)} 0%, rgba(33,150,243,0.8) 100%)`,
           zIndex: 1,
         }}
       />
 
-      {/* Category Image */}
       {category.image && (
         <Box sx={{ position: "relative", height: 180, zIndex: 2, p: 2 }}>
           <CardMedia
@@ -161,33 +155,24 @@ const CategoryCard = ({ category, index }: CategoryCardProps) => {
         </Box>
       )}
 
-      {/* Content */}
-      <CardContent sx={{ p: 3, pt: 0, zIndex: 2, position: "relative" }}>
+      <CardContent
+        sx={{ p: 3, pt: 0, zIndex: 2, position: "relative", flexGrow: 1 }}
+      >
         <Typography
           variant="h6"
-          sx={{
-            fontWeight: 700,
-            mb: 1.5,
-            lineHeight: 1.3,
-            fontSize: "1.1rem",
-          }}
+          sx={{ fontWeight: 700, mb: 1.5, fontSize: "1.1rem" }}
         >
           {category.title}
         </Typography>
 
         {category.children && category.children.length > 0 && (
-          <Box sx={{ mb: 2 }}>
+          <Box sx={{ mb: 2, display: "flex", flexWrap: "wrap", gap: 0.5 }}>
             {category.children.slice(0, 2).map((child) => (
               <Chip
                 key={child.id}
                 label={child.title}
                 size="small"
-                sx={{
-                  fontSize: "0.75rem",
-                  bgcolor: "rgba(255,255,255,0.9)",
-                  color: "#333",
-                  mb: 0.5,
-                }}
+                sx={{ fontSize: "0.75rem", bgcolor: "#f0f0f0" }}
               />
             ))}
           </Box>
@@ -197,15 +182,12 @@ const CategoryCard = ({ category, index }: CategoryCardProps) => {
           variant="contained"
           endIcon={<KeyboardArrowRightIcon />}
           sx={{
-            mt: 1,
-            px: 3,
-            borderRadius: 2,
+            mt: "auto", // Tugmani doim pastga tushiradi
             textTransform: "none",
-            fontWeight: 600,
+            borderRadius: 2,
             bgcolor: "#2196f3",
-            "&:hover": { bgcolor: "#1e88e5" },
           }}
-          onClick={() => navigateToCategory(category.slug)}
+          onClick={() => (window.location.href = `/catalog/${category.slug}`)}
         >
           Подробнее
         </Button>
@@ -224,13 +206,11 @@ const CarouselCategoryCard = ({ category }: { category: CategoryType }) => {
         position: "relative",
         overflow: "hidden",
         cursor: "pointer",
+        flexShrink: 0,
         transition: "all 0.3s ease",
-        "&:hover": {
-          transform: "scale(1.02)",
-          boxShadow: "0 12px 32px rgba(0,0,0,0.2)",
-        },
+        "&:hover": { transform: "scale(1.02)" },
       }}
-      onClick={() => navigateToCategory(category.slug)}
+      onClick={() => (window.location.href = `/catalog/${category.slug}`)}
     >
       {category.image && (
         <Image
@@ -238,7 +218,6 @@ const CarouselCategoryCard = ({ category }: { category: CategoryType }) => {
           alt={category.title}
           fill
           style={{ objectFit: "cover" }}
-          sizes="280px"
         />
       )}
       <Box
@@ -249,11 +228,10 @@ const CarouselCategoryCard = ({ category }: { category: CategoryType }) => {
           right: 0,
           bgcolor: "rgba(0,0,0,0.7)",
           color: "white",
-          p: 3,
-          pb: 2,
+          p: 2,
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+        <Typography variant="h6" sx={{ fontWeight: 700 }}>
           {category.title}
         </Typography>
         <Typography variant="body2">
@@ -264,22 +242,9 @@ const CarouselCategoryCard = ({ category }: { category: CategoryType }) => {
   );
 };
 
-// Utils
 const getGradientColor = (index: number) => {
-  const colors = [
-    "#667eea",
-    "#764ba2",
-    "#f093fb",
-    "#f5576c",
-    "#4facfe",
-    "#00f2fe",
-  ];
+  const colors = ["#667eea", "#764ba2", "#f093fb", "#f5576c", "#4facfe"];
   return colors[index % colors.length];
-};
-
-const navigateToCategory = (slug: string) => {
-  // Replace with your router logic
-  window.location.href = `/catalog/${slug}`;
 };
 
 export default Catalog;

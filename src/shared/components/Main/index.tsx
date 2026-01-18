@@ -10,7 +10,6 @@ import Image from "next/image";
 import Banners from "./Banners";
 import Recommend from "./Recommend";
 import { useParams } from "next/navigation";
-import { url } from "inspector";
 
 const cards = [
   {

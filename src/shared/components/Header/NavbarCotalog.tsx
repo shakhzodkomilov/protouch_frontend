@@ -26,35 +26,37 @@ import SearchIcon from "@mui/icons-material/Search";
 import ScaleIcon from "@mui/icons-material/Scale";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 
 import {
   $categories,
   loadCategories,
-  $searchProducts, // ✅ FIXED: Use search store
-  $searchLoading, // ✅ FIXED: Use search loading
-  searchProducts, // ✅ FIXED: Use search event
+  $searchProducts,
+  $searchLoading,
+  searchProducts,
 } from "../../../entities/product/model";
 import { $basket } from "../../../entities/basket/model/store";
 import { $favoritesCount } from "../../../entities/favourite/model/store";
-import { CategoryType } from "../../../entities/types/productService.types";
+import {
+  CategoryType,
+  ProductType,
+  PaginationType,
+} from "../../../entities/types/productService.types";
 import { CatalogDropdown } from "./CatalogDropdown";
 
 const NavbarCatalog = () => {
   const { locale } = useParams();
   const router = useRouter();
 
-  // Effector Units ✅ FIXED
-  const categories = useUnit($categories);
+  // Effector Units
+  const categories = useUnit($categories) as CategoryType[];
   const { totalCount } = useUnit($basket);
-  const favoritesCount = useUnit($favoritesCount); // ✅ Added
-  const [searchProductsData, searchLoading, searchProductsEv] = useUnit([
-    // ✅ Renamed
+  const favoritesCount = useUnit($favoritesCount);
+  const searchProductsData = useUnit(
     $searchProducts,
-    $searchLoading,
-    searchProducts,
-  ]);
+  ) as unknown as PaginationType | null;
+  const searchLoading = useUnit($searchLoading);
+  const searchProductsEv = useUnit(searchProducts);
 
   // UI State
   const [isOpen, setIsOpen] = useState(false);
@@ -79,11 +81,11 @@ const NavbarCatalog = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Live Search Effect (Debounced) ✅ FIXED
+  // Live Search Effect (Debounced)
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchQuery.trim().length >= 2) {
-        searchProductsEv({ lang: locale as string, search: searchQuery }); // ✅ Fixed event
+        searchProductsEv({ lang: locale as string, search: searchQuery });
         setShowResults(true);
       } else {
         setShowResults(false);
@@ -93,21 +95,27 @@ const NavbarCatalog = () => {
     return () => clearTimeout(timer);
   }, [searchQuery, locale, searchProductsEv]);
 
+  // FIXED: Logic moved here to prevent cascading renders in useEffect
   const handleCatalogClick = () => {
     if (!isOpen) {
-      loadCategories({ lang: "ru" });
+      loadCategories({ lang: (locale as string) || "ru" });
       setIsOpen(true);
-      if (categories.length > 0) setActiveCategory(categories[0]);
+      // Immediately set the first category if it exists
+      if (categories.length > 0) {
+        setActiveCategory(categories[0]);
+      }
     } else {
       setIsOpen(false);
     }
   };
 
+  // Sync active category only when categories load while the menu is already open
   useEffect(() => {
-    if (categories.length > 0 && !activeCategory) {
+    if (isOpen && categories.length > 0 && !activeCategory) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveCategory(categories[0]);
     }
-  }, [categories]);
+  }, [categories, isOpen, activeCategory]);
 
   const handleCategoryHover = (category: CategoryType) => {
     setActiveCategory(category);
@@ -126,7 +134,9 @@ const NavbarCatalog = () => {
   };
 
   return (
-    <Box sx={{ position: "relative", zIndex: 100, width: "100%" }}>
+    <Box
+      sx={{ position: "relative", bgcolor: "#fff", zIndex: 100, width: "100%" }}
+    >
       <AppBar
         position="static"
         elevation={0}
@@ -188,7 +198,7 @@ const NavbarCatalog = () => {
               )}
             </Box>
 
-            {/* Live Search Results Dropdown ✅ FIXED */}
+            {/* Live Search Results Dropdown */}
             {showResults && (
               <Paper
                 elevation={4}
@@ -206,10 +216,11 @@ const NavbarCatalog = () => {
                 }}
               >
                 <List sx={{ p: 0 }}>
-                  {searchProductsData?.results?.length > 0 ? ( // ✅ FIXED: PaginationType
+                  {searchProductsData?.results &&
+                  searchProductsData.results.length > 0 ? (
                     searchProductsData.results
                       .slice(0, 10)
-                      .map((product: any) => (
+                      .map((product: ProductType) => (
                         <Link
                           key={product.id}
                           href={`/${locale}/product/${product.id}`}
@@ -230,12 +241,10 @@ const NavbarCatalog = () => {
                                 }}
                               />
                               <ListItemText
-                                primary={
-                                  product.title || product.short_description
-                                }
+                                primary={product.title}
                                 secondary={`${new Intl.NumberFormat(
                                   "ru-RU",
-                                ).format(product.price)} сум`}
+                                ).format(Number(product.price))} сум`}
                                 primaryTypographyProps={{
                                   fontWeight: 600,
                                   fontSize: "14px",
@@ -254,7 +263,7 @@ const NavbarCatalog = () => {
                   ) : !searchLoading ? (
                     <Box sx={{ p: 3, textAlign: "center" }}>
                       <Typography sx={{ color: "#999", fontSize: "14px" }}>
-                        Ничего не найдено по запросу "{searchQuery}"
+                        Ничего не найдено по запросу `{searchQuery}`
                       </Typography>
                     </Box>
                   ) : null}
@@ -263,7 +272,7 @@ const NavbarCatalog = () => {
             )}
           </Box>
 
-          {/* Right Icons ✅ FIXED */}
+          {/* Right Icons */}
           <Box sx={{ display: "flex", gap: 2 }}>
             <HeaderIcon icon={<ScaleIcon />} label="Сравнение" />
 
@@ -302,15 +311,13 @@ const NavbarCatalog = () => {
   );
 };
 
-const HeaderIcon = ({
-  icon,
-  label,
-  onClick,
-}: {
+interface HeaderIconProps {
   icon: React.ReactNode;
   label: string;
   onClick?: () => void;
-}) => (
+}
+
+const HeaderIcon = ({ icon, label, onClick }: HeaderIconProps) => (
   <Box
     onClick={onClick}
     sx={{

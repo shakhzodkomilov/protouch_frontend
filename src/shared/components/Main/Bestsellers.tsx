@@ -7,7 +7,6 @@ import {
   Typography,
   Snackbar,
   Alert,
-  useMemo,
 } from "@mui/material";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useUnit } from "effector-react";
@@ -29,67 +28,78 @@ import {
   loadFavorites,
   $favorites,
 } from "../../../entities/favourite/model/store";
+import {
+  ProductType,
+  PaginationType,
+} from "../../../entities/types/productService.types";
+
 const BestSellers = () => {
   const { locale } = useParams();
-  const [arrivals, loading, loadArrivalsEv] = useUnit([
-    $newArrivals,
-    $loadingArrivals,
-    loadArrivals,
-  ]);
+
+  // Effector Units with explicit typing
+  const arrivals = useUnit($newArrivals) as unknown as PaginationType | null;
+  const loading = useUnit($loadingArrivals);
+  const loadArrivalsEv = useUnit(loadArrivals);
+
   const { items: basketItems } = useUnit($basket);
-  const favorites = useUnit($favorites); // ✅ Full list
+  const favorites = useUnit($favorites);
   const handleAddToBasket = useUnit(addToBasket);
   const handleToggleFavorite = useUnit(toggleFavorite);
   const loadFavoritesEv = useUnit(loadFavorites);
 
   const [openToast, setOpenToast] = useState(false);
   const [favoriteToast, setFavoriteToast] = useState(false);
-  const [lastToggledId, setLastToggledId] = useState<number>(0); // ✅ Track last toggle
+  const [lastToggledId, setLastToggledId] = useState<string>("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    loadArrivalsEv({ lang: "ru" });
+    loadArrivalsEv({ lang: (locale as string) || "ru" });
     loadFavoritesEv();
-  }, [loadArrivalsEv, loadFavoritesEv]);
+  }, [loadArrivalsEv, loadFavoritesEv, locale]);
 
   const isItemInBasket = useCallback(
-    (productId: number) => {
-      return basketItems.some((item) => item.productId === productId);
+    (productId: string) => {
+      return basketItems.some((item) => String(item.productId) === productId);
     },
-    [basketItems]
+    [basketItems],
   );
 
   const isItemFavorite = useCallback(
-    (productId: number) => {
-      return favorites.some((item) => item.productId === productId);
+    (productId: string) => {
+      return favorites.some((item) => String(item.productId) === productId);
     },
-    [favorites]
+    [favorites],
   );
 
-  const onFavoriteClick = (e: React.MouseEvent, item: any) => {
+  const onFavoriteClick = (e: React.MouseEvent, item: ProductType) => {
     e.preventDefault();
     e.stopPropagation();
-    // ✅ Full product data
+
+    setLastToggledId(item.id);
+
     handleToggleFavorite({
+      // eslint-disable-next-line react-hooks/purity
       id: Date.now(),
-      productId: item.id,
-      title: item.short_description || "Product",
+      productId: Number(item.id),
+      title: item.title || item.short_description || "Product",
       image: item.image,
-      price: item.price,
+      // ✅ XATONI TUZATISH: string ni number ga o'giramiz
+      price: Number(item.price),
     });
     setFavoriteToast(true);
   };
 
-  const onBasketClick = (e: React.MouseEvent, item: any) => {
+  const onBasketClick = (e: React.MouseEvent, item: ProductType) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (item.is_in_stock) {
       handleAddToBasket({
-        id: item.id,
-        productId: item.id,
-        title: item.short_description || "Product",
-        price: item.price,
+        id: Number(item.id),
+        productId: Number(item.id),
+        title: item.title || item.short_description || "Product",
+        // ✅ XATONI TUZATISH: string ni number ga o'giramiz
+        price: Number(item.price),
         image: item.image,
         quantity: 1,
         isInStock: item.is_in_stock,
@@ -141,7 +151,7 @@ const BestSellers = () => {
         >
           {loading && <Typography>Загрузка...</Typography>}
 
-          {arrivals?.results?.map((item) => {
+          {arrivals?.results?.map((item: ProductType) => {
             const inBasket = isItemInBasket(item.id);
             const isFavorite = isItemFavorite(item.id);
             return (
@@ -203,12 +213,15 @@ const BestSellers = () => {
 
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography sx={descriptionStyle}>
-                      {item.short_description}
+                      {item.title || item.short_description}
                     </Typography>
                     <Typography
                       sx={{ color: "#000", fontWeight: 700, fontSize: "20px" }}
                     >
-                      {new Intl.NumberFormat("ru-RU").format(item.price)} сум
+                      {new Intl.NumberFormat("ru-RU").format(
+                        Number(item.price),
+                      )}{" "}
+                      сум
                     </Typography>
                   </Box>
 
@@ -258,7 +271,7 @@ const BestSellers = () => {
         </Alert>
       </Snackbar>
 
-      {/* Favorite Toast - FIXED */}
+      {/* Favorite Toast */}
       <Snackbar
         open={favoriteToast}
         autoHideDuration={2000}
@@ -266,13 +279,13 @@ const BestSellers = () => {
         anchorOrigin={{ vertical: "top", horizontal: "left" }}
       >
         <Alert
-          severity={isItemFavorite(lastToggledId) ? "info" : "success"}
+          severity={isItemFavorite(lastToggledId) ? "success" : "info"}
           variant="filled"
           sx={{ width: "100%", borderRadius: "10px" }}
         >
           {isItemFavorite(lastToggledId)
-            ? "Удалено из избранного"
-            : "Добавлено в избранное"}
+            ? "Добавлено в избранное"
+            : "Удалено из избранного"}
           !
         </Alert>
       </Snackbar>
@@ -280,7 +293,7 @@ const BestSellers = () => {
   );
 };
 
-// All your existing styles...
+// Styles
 const navBtnStyle = (pos: object) => ({
   position: "absolute",
   top: "50%",
@@ -307,7 +320,7 @@ const cardStyle = {
   flexDirection: "column",
   transition: "transform 0.2s",
   "&:hover": { transform: "translateY(-5px)" },
-};
+} as const;
 
 const statusBadgeStyle = (isInStock: boolean) => ({
   padding: "4px 12px",
@@ -328,7 +341,7 @@ const descriptionStyle = {
   WebkitLineClamp: 2,
   overflow: "hidden",
   lineHeight: "1.4em",
-};
+} as const;
 
 const actionBtnStyle = {
   minWidth: "54px",
@@ -340,6 +353,6 @@ const actionBtnStyle = {
   bottom: "15px",
   boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
   transition: "all 0.3s ease",
-};
+} as const;
 
 export default BestSellers;

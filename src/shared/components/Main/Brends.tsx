@@ -98,7 +98,7 @@ const Brends = () => {
                 flexShrink: 0,
               }}
             >
-              <img src={item.img} />
+              <Image src={item.img} alt="brand" width={100} height={50} />
             </Box>
           ))}
         </Box>

@@ -9,9 +9,7 @@ import {
   Box,
   Button,
   InputBase,
-  IconButton,
   Typography,
-  Badge,
   Paper,
   List,
   ListItem,
@@ -19,33 +17,36 @@ import {
   ListItemText,
   CircularProgress,
 } from "@mui/material";
-// ... (existing icons)
 import SearchIcon from "@mui/icons-material/Search";
 import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close";
-import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
-
 import {
   $products,
   loadProducts,
   $loadingProducts,
 } from "../../../entities/product/model";
 import { $basket } from "../../../entities/basket/model/store";
+import Image from "next/image";
 
 const NavbarCatalog = () => {
-  const { locale } = useParams();
+  const params = useParams();
+  const locale = params?.locale as string;
   const [searchQuery, setSearchQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const { totalCount } = useUnit($basket);
-  const [products, loading, fetchProducts] = useUnit([
-    $products,
-    $loadingProducts,
-    loadProducts,
-  ]);
+  // Global state
+  const basket = useUnit($basket);
+  const productsResponse = useUnit($products);
+  const loading = useUnit($loadingProducts);
+  const fetchProducts = useUnit(loadProducts);
 
-  // Handle clicking outside to close search results
+  // Xatolikni to'g'irlash: productsResponse ichidan results massivini olamiz
+  // Odatda PaginationType { results: [...], count: number, ... } ko'rinishida bo'ladi
+  const productsList = Array.isArray(productsResponse)
+    ? productsResponse
+    : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (productsResponse as any)?.results || [];
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -59,16 +60,20 @@ const NavbarCatalog = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // LIVE SEARCH LOGIC (Debounced)
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       if (searchQuery.trim().length >= 2) {
-        fetchProducts({ lang: locale as string, search: searchQuery });
+        // Xatolikni to'g'irlash: 'search' o'rniga model qabul qiladigan 'title' ishlatamiz
+        fetchProducts({
+          lang: locale,
+          title: searchQuery, // Agar modelda 'search' bo'lmasa, 'title' dan foydalanamiz
+          page: 1,
+        });
         setShowResults(true);
       } else {
         setShowResults(false);
       }
-    }, 500); // Wait 500ms after last keystroke
+    }, 500);
 
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, locale, fetchProducts]);
@@ -81,11 +86,10 @@ const NavbarCatalog = () => {
         sx={{ bgcolor: "#fff", color: "#000" }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, py: 1 }}>
-          <Button /* ... Catalog Button Props ... */>
-            <MenuIcon /> Каталог
+          <Button variant="contained" startIcon={<MenuIcon />}>
+            Каталог
           </Button>
 
-          {/* SEARCH BAR CONTAINER */}
           <Box ref={searchRef} sx={{ flex: 1, position: "relative" }}>
             <Box
               sx={{
@@ -108,7 +112,6 @@ const NavbarCatalog = () => {
               {loading && <CircularProgress size={20} sx={{ ml: 1 }} />}
             </Box>
 
-            {/* LIVE RESULTS DROPDOWN */}
             {showResults && (
               <Paper
                 sx={{
@@ -124,8 +127,10 @@ const NavbarCatalog = () => {
                 }}
               >
                 <List>
-                  {products.length > 0 ? (
-                    products.slice(0, 8).map((product) => (
+                  {/* productsList.length endi ishlaydi, chunki u massiv ekanligi aniqlandi */}
+                  {productsList.length > 0 ? (
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    productsList.slice(0, 8).map((product: any) => (
                       <Link
                         key={product.id}
                         href={`/${locale}/product/${product.id}`}
@@ -141,21 +146,21 @@ const NavbarCatalog = () => {
                                 position: "relative",
                               }}
                             >
-                              <img
-                                src={product.image}
+                              <Image
+                                src={
+                                  product.image ||
+                                  product.images?.[0]?.url ||
+                                  "/placeholder.jpg"
+                                }
                                 alt=""
-                                style={{
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "contain",
-                                }}
+                                fill
+                                sizes="40px"
+                                style={{ objectFit: "contain" }}
                               />
                             </Box>
                             <ListItemText
                               primary={product.title}
-                              secondary={`${new Intl.NumberFormat(
-                                "ru-RU"
-                              ).format(product.price)} сум`}
+                              secondary={`${new Intl.NumberFormat("ru-RU").format(product.price)} сум`}
                               primaryTypographyProps={{
                                 fontSize: "14px",
                                 fontWeight: 500,
@@ -176,8 +181,6 @@ const NavbarCatalog = () => {
               </Paper>
             )}
           </Box>
-
-          {/* ... Right Icons ... */}
         </Box>
       </AppBar>
     </Box>

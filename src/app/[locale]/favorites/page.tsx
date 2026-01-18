@@ -2,19 +2,11 @@
 
 import { useParams } from "next/navigation";
 import { useUnit } from "effector-react";
-import {
-  Box,
-  Container,
-  Typography,
-  Grid,
-  IconButton,
-  Button,
-} from "@mui/material";
+import { Box, Container, Typography, IconButton, Button } from "@mui/material";
 import { useEffect, useCallback, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import DoneIcon from "@mui/icons-material/Done";
 import {
   $favorites,
@@ -23,8 +15,19 @@ import {
 } from "../../../entities/favourite/model/store";
 import { $basket, addToBasket } from "../../../entities/basket/model/store";
 
+// ✅ Proper FavoriteItem type
+type FavoriteItem = {
+  id: number; // string olib tashlandi, faqat number qoldi
+  productId: string | number;
+  title: string;
+  image: string;
+  price: number;
+};
+
 const cardStyle = {
-  width: 300,
+  width: "100%", // CSS Grid o'zi o'lchamni boshqaradi
+  maxWidth: "320px",
+  margin: "0 auto",
   minHeight: "480px",
   borderRadius: 3,
   p: 2,
@@ -36,7 +39,7 @@ const cardStyle = {
   flexDirection: "column",
   transition: "transform 0.2s",
   "&:hover": { transform: "translateY(-5px)" },
-};
+} as const;
 
 const statusBadgeStyle = (isInStock: boolean) => ({
   padding: "4px 12px",
@@ -57,7 +60,7 @@ const descriptionStyle = {
   WebkitLineClamp: 2,
   overflow: "hidden",
   lineHeight: "1.4em",
-};
+} as const;
 
 const actionBtnStyle = {
   minWidth: "54px",
@@ -69,12 +72,16 @@ const actionBtnStyle = {
   bottom: "15px",
   boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
   transition: "all 0.3s ease",
-};
+} as const;
 
 export default function FavoritesPage() {
-  const { locale } = useParams();
-  const favorites = useUnit($favorites);
-  const basketItems = useUnit($basket);
+  const params = useParams();
+  const locale = params?.locale;
+
+  const favorites = useUnit($favorites) as FavoriteItem[];
+  const basket = useUnit($basket);
+  const basketItems = basket?.items || [];
+
   const handleToggleFavorite = useUnit(toggleFavorite);
   const loadFavoritesEv = useUnit(loadFavorites);
   const handleAddToBasket = useUnit(addToBasket);
@@ -87,30 +94,29 @@ export default function FavoritesPage() {
 
   const isItemInBasket = useCallback(
     (productId: string | number) => {
-      return basketItems.items.some((item) => item.productId === productId);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return basketItems.some((item: any) => item.productId === productId);
     },
-    [basketItems.items]
+    [basketItems],
   );
 
-  const onFavoriteClick = (e: React.MouseEvent, productId: string | number) => {
+  const onFavoriteClick = (e: React.MouseEvent, item: FavoriteItem) => {
     e.preventDefault();
     e.stopPropagation();
-    handleToggleFavorite({
-      id: Date.now(),
-      productId,
-      title: "Product", // Fallback
-      image: "/placeholder.jpg", // Fallback
-      price: 0,
-    });
-    setOpenToast(true);
-  };
 
-  const onBasketClick = (e: React.MouseEvent, item: any) => {
+    // toggleFavorite funksiyasiga yuborishda 'as any' ishlatamiz
+    // bu modeldagi va sahifadagi tiplar o'rtasidagi ziddiyatni hal qiladi
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    handleToggleFavorite(item as any);
+    setOpenToast(true);
+    setTimeout(() => setOpenToast(false), 3000);
+  };
+  const onBasketClick = (e: React.MouseEvent, item: FavoriteItem) => {
     e.preventDefault();
     e.stopPropagation();
     handleAddToBasket({
-      id: item.productId,
-      productId: item.productId,
+      id: Number(item.productId),
+      productId: Number(item.productId),
       title: item.title || "Product",
       price: item.price || 0,
       image: item.image || "/placeholder.jpg",
@@ -159,141 +165,150 @@ export default function FavoritesPage() {
             Избранные товары ({favorites.length})
           </Typography>
 
-          <Grid container spacing={7}>
+          {/* GRID O'RNIGA BOX + CSS GRID: Xatolikni yo'qotadi */}
+          <Box
+            sx={{
+              display: "grid",
+              gap: 4,
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(3, 1fr)",
+                lg: "repeat(4, 1fr)",
+              },
+              width: "100%",
+            }}
+          >
             {favorites.map((item) => {
               const inBasket = isItemInBasket(item.productId);
-              const isFavorite = true; // Always true on favorites page
 
               return (
-                <Grid item xs={12} sm={6} md={3} key={item.id}>
-                  <Link
-                    href={`/${locale}/product/${item.productId}`}
-                    style={{ textDecoration: "none" }}
-                  >
-                    <Box sx={cardStyle}>
+                <Link
+                  key={item.id}
+                  href={`/${locale}/product/${item.productId}`}
+                  style={{ textDecoration: "none" }}
+                >
+                  <Box sx={cardStyle}>
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <Typography sx={statusBadgeStyle(true)}>
+                        В избранном
+                      </Typography>
                       <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Typography sx={statusBadgeStyle(true)}>
-                          В избранном
-                        </Typography>
-                        <Box
-                          sx={{ display: "flex", gap: 1, alignItems: "center" }}
-                        >
-                          <Image
-                            src="/scale.svg"
-                            height={24}
-                            width={24}
-                            alt="compare"
-                          />
-                          <IconButton
-                            size="small"
-                            onClick={(e) => onFavoriteClick(e, item.productId)}
-                            sx={{
-                              p: 0.25,
-                              color: "#ff4444",
-                              "&:hover": {
-                                color: "#cc0000",
-                                backgroundColor: "transparent",
-                              },
-                            }}
-                          >
-                            <FavoriteIcon sx={{ fontSize: 26 }} />
-                          </IconButton>
-                        </Box>
-                      </Box>
-
-                      <Box
-                        sx={{
-                          position: "relative",
-                          width: "100%",
-                          height: "230px",
-                          my: 2,
-                        }}
+                        sx={{ display: "flex", gap: 1, alignItems: "center" }}
                       >
                         <Image
-                          src={item.image || "/placeholder-product.jpg"}
-                          alt={item.title || "Product"}
-                          fill
-                          style={{ objectFit: "contain" }}
+                          src="/scale.svg"
+                          height={24}
+                          width={24}
+                          alt="compare"
                         />
-                      </Box>
-
-                      <Box sx={{ flexGrow: 1 }}>
-                        <Typography sx={descriptionStyle}>
-                          {item.title || "Название недоступно"}
-                        </Typography>
-                        <Typography
+                        <IconButton
+                          size="small"
+                          onClick={(e) => onFavoriteClick(e, item)}
                           sx={{
-                            color: "#000",
-                            fontWeight: 700,
-                            fontSize: "20px",
+                            p: 0.25,
+                            color: "#ff4444",
+                            "&:hover": {
+                              backgroundColor: "transparent",
+                              color: "#cc0000",
+                            },
                           }}
                         >
-                          {item.price > 0
-                            ? new Intl.NumberFormat("ru-RU").format(
-                                item.price
-                              ) + " сум"
-                            : "Цена недоступна"}
-                        </Typography>
+                          <FavoriteIcon sx={{ fontSize: 26 }} />
+                        </IconButton>
                       </Box>
+                    </Box>
 
-                      <Button
-                        onClick={(e) => onBasketClick(e, item)}
+                    <Box
+                      sx={{
+                        position: "relative",
+                        width: "100%",
+                        height: "230px",
+                        my: 2,
+                      }}
+                    >
+                      <Image
+                        src={item.image || "/placeholder-product.jpg"}
+                        alt={item.title || "Product"}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 300px"
+                        style={{ objectFit: "contain" }}
+                      />
+                    </Box>
+
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography sx={descriptionStyle}>
+                        {item.title || "Название недоступно"}
+                      </Typography>
+                      <Typography
                         sx={{
-                          ...actionBtnStyle,
-                          bgcolor: inBasket ? "#3BB351" : "#249FFC",
-                          "&:hover": {
-                            bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
-                          },
+                          color: "#000",
+                          fontWeight: 700,
+                          fontSize: "20px",
                         }}
                       >
-                        {inBasket ? (
-                          <DoneIcon sx={{ color: "#fff", fontSize: 30 }} />
-                        ) : (
-                          <Image
-                            src="/basketIcon.svg"
-                            alt="basket"
-                            width={26}
-                            height={26}
-                          />
-                        )}
-                      </Button>
+                        {item.price > 0
+                          ? new Intl.NumberFormat("ru-RU").format(item.price) +
+                            " сум"
+                          : "Цена недоступна"}
+                      </Typography>
                     </Box>
-                  </Link>
-                </Grid>
+
+                    <Button
+                      onClick={(e) => onBasketClick(e, item)}
+                      sx={{
+                        ...actionBtnStyle,
+                        bgcolor: inBasket ? "#3BB351" : "#249FFC",
+                        "&:hover": {
+                          bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
+                        },
+                      }}
+                    >
+                      {inBasket ? (
+                        <DoneIcon sx={{ color: "#fff", fontSize: 30 }} />
+                      ) : (
+                        <Image
+                          src="/basketIcon.svg"
+                          alt="basket"
+                          width={26}
+                          height={26}
+                        />
+                      )}
+                    </Button>
+                  </Box>
+                </Link>
               );
             })}
-          </Grid>
+          </Box>
         </Container>
       </Box>
 
-      {/* Toast */}
+      {/* ✅ FIXED Toast notification */}
       {openToast && (
         <Box
           sx={{
             position: "fixed",
-            bottom: 20,
+            bottom: 40,
             left: "50%",
             transform: "translateX(-50%)",
             zIndex: 9999,
           }}
         >
-          <Button
-            variant="contained"
+          <Box
             sx={{
-              bgcolor: "#3BB351",
+              bgcolor: "#333",
               color: "white",
-              borderRadius: 2,
+              borderRadius: "30px",
               px: 4,
-              py: 1,
+              py: 1.5,
+              boxShadow: "0px 4px 15px rgba(0,0,0,0.2)",
+              fontWeight: 500,
             }}
           >
-            Удалено из избранного
-          </Button>
+            Обновлено в избранном
+          </Box>
         </Box>
       )}
     </>
