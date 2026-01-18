@@ -1,5 +1,5 @@
-import { Box, Container, Button } from "@mui/material"
-import VerticalText from "./VerticalText"
+import { Box, Container, Button } from "@mui/material";
+import VerticalText from "./VerticalText";
 
 const HeaderBanner = () => {
   return (
@@ -16,11 +16,24 @@ const HeaderBanner = () => {
       }}
     >
       <Container maxWidth="lg">
-         <Box
-          width="100%"
-          sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+        <Box
+          width="90%"
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
         >
-          <Button sx={{ borderRadius: "14px", padding: "6px 12px", fontWeight: 600, bgcolor: "#FDEC1A", color: "#E8240F" }}>
+          <Button
+            sx={{
+              borderRadius: "14px",
+              padding: "12px 18px",
+              fontWeight: 600,
+              bgcolor: "#FDEC1A",
+              fontSize: "16px",
+              color: "#E8240F",
+            }}
+          >
             АРЕНДА
           </Button>
 
@@ -39,13 +52,22 @@ const HeaderBanner = () => {
             <VerticalText />
           </Button>
 
-          <Button sx={{ borderRadius: "14px", padding: "6px 12px", fontWeight: 600, bgcolor: "#FDEC1A", color: "#E8240F" }}>
+          <Button
+            sx={{
+              borderRadius: "14px",
+              padding: "12px 18px",
+              fontWeight: 600,
+              bgcolor: "#FDEC1A",
+              fontSize: "16px",
+              color: "#E8240F",
+            }}
+          >
             ПРОКАТ
           </Button>
         </Box>
       </Container>
     </Box>
-  )
-}
+  );
+};
 
-export default HeaderBanner
+export default HeaderBanner;

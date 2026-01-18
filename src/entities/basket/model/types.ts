@@ -1,4 +1,3 @@
-// src/entities/basket/model/types.ts
 export interface BasketItem {
   id: number;
   productId: number;

@@ -15,6 +15,7 @@ import {
   Breadcrumbs,
   Divider,
 } from "@mui/material";
+
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -24,6 +25,7 @@ import {
   $basket,
   $basketLoading,
   loadBasket,
+  removeFromBasket,
   updateQuantity,
 } from "../../../entities/basket/model/store";
 
@@ -34,7 +36,7 @@ export default function BasketPage() {
 
   const loadBasketEv = useUnit(loadBasket);
   const updateBasketQty = useUnit(updateQuantity);
-
+  const removeBasketItem = useUnit(removeFromBasket);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -44,11 +46,14 @@ export default function BasketPage() {
 
   const handleQuantityChange = (productId: number, delta: number) => {
     const item = items.find((i) => i.productId === productId);
-    if (item) {
-      const newQty = item.quantity + delta;
-      if (newQty >= 1) {
-        updateBasketQty({ productId, quantity: newQty });
-      }
+    if (!item) return;
+
+    const newQty = item.quantity + delta;
+
+    if (newQty <= 0) {
+      removeBasketItem(productId);
+    } else {
+      updateBasketQty({ productId, quantity: newQty });
     }
   };
 
@@ -82,6 +87,7 @@ export default function BasketPage() {
               borderRadius: 4,
               border: "1px dashed #ccc",
               elevation: 0,
+              color: "#000",
             }}
           >
             <Typography variant="h6">Ваша корзина пуста</Typography>

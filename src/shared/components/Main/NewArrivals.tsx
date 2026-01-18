@@ -1,30 +1,107 @@
 "use client";
 
-import { Box, Button, IconButton, Typography } from "@mui/material";
-import { useEffect, useRef } from "react";
+import {
+  Box,
+  Button,
+  IconButton,
+  Typography,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useUnit } from "effector-react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
+import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import DoneIcon from "@mui/icons-material/Done";
+
 import {
   $newArrivals,
   $loadingArrivals,
   loadArrivals,
 } from "../../../entities/product/model";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import Link from "next/link";
-import { useParams } from "next/navigation";
+import { addToBasket, $basket } from "../../../entities/basket/model/store";
+import {
+  toggleFavorite,
+  loadFavorites,
+  $favorites,
+} from "../../../entities/favourite/model/store";
 
 const NewArrivals = () => {
-  const [arrivals, loading, load] = useUnit([
+  const { locale } = useParams();
+  const [arrivals, loading, loadArrivalsEv] = useUnit([
     $newArrivals,
     $loadingArrivals,
     loadArrivals,
   ]);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const { locale } = useParams();
+  const { items: basketItems } = useUnit($basket);
+  const favorites = useUnit($favorites);
+  const handleAddToBasket = useUnit(addToBasket);
+  const handleToggleFavorite = useUnit(toggleFavorite);
+  const loadFavoritesEv = useUnit(loadFavorites);
 
+  // Toast states (same as Bestsellers)
+  const [openToast, setOpenToast] = useState(false);
+  const [favoriteToast, setFavoriteToast] = useState(false);
+  const [lastToggledId, setLastToggledId] = useState<number>(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Load data on mount
   useEffect(() => {
-    load({ lang: "ru" });
-  }, [load]);
+    loadArrivalsEv({ lang: "ru" }); // TODO: Use locale instead of hardcoded "ru"
+    loadFavoritesEv();
+  }, [loadArrivalsEv, loadFavoritesEv]);
+
+  // Memoized helpers (same as Bestsellers)
+  const isItemInBasket = useCallback(
+    (productId: number) =>
+      basketItems.some((item) => item.productId === productId),
+    [basketItems]
+  );
+
+  const isItemFavorite = useCallback(
+    (productId: number) =>
+      favorites.some((item) => item.productId === productId),
+    [favorites]
+  );
+
+  // Event handlers (identical to Bestsellers)
+  const onFavoriteClick = (e: React.MouseEvent, item: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleToggleFavorite({
+      id: Date.now(),
+      productId: item.id,
+      title: item.short_description || "Product",
+      image: item.image,
+      price: item.price,
+    });
+    setLastToggledId(item.id); // ✅ Fixed toast tracking
+    setFavoriteToast(true);
+  };
+
+  const onBasketClick = (e: React.MouseEvent, item: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (item.is_in_stock) {
+      handleAddToBasket({
+        id: item.id,
+        productId: item.id,
+        title: item.short_description || "Product",
+        price: item.price,
+        image: item.image,
+        quantity: 1,
+        isInStock: item.is_in_stock,
+      });
+      setOpenToast(true);
+    } else {
+      // TODO: Replace with useRouter for SPA navigation
+      window.location.href = `tel:+998000000000`;
+    }
+  };
 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
@@ -34,216 +111,245 @@ const NewArrivals = () => {
     });
   };
 
+  // Memoized price formatter (performance fix)
+  const formatPrice = useMemo(
+    () => (price: number) => new Intl.NumberFormat("ru-RU").format(price),
+    []
+  );
+
+  // Reusable styles (same as Bestsellers)
+  const navBtnStyle = (pos: object) => ({
+    position: "absolute",
+    top: "50%",
+    transform: "translateY(-50%)",
+    zIndex: 10,
+    bgcolor: "#fff",
+    boxShadow: 2,
+    width: 50,
+    height: 50,
+    ...pos,
+    "&:hover": { bgcolor: "#f5f5f5" },
+  });
+
+  const cardStyle = {
+    width: 300,
+    minHeight: "480px",
+    borderRadius: 3,
+    p: 2,
+    boxShadow: "0px 4px 20px rgba(0,0,0,0.08)",
+    bgcolor: "#fff",
+    flexShrink: 0,
+    display: "flex",
+    position: "relative",
+    flexDirection: "column",
+    transition: "transform 0.2s",
+    "&:hover": { transform: "translateY(-5px)" },
+  };
+
+  const statusBadgeStyle = (isInStock: boolean) => ({
+    padding: "4px 12px",
+    borderRadius: "8px",
+    fontSize: "14px",
+    fontWeight: 500,
+    color: isInStock ? "#3BB351" : "#FF5F5F",
+    bgcolor: isInStock ? "#D6F2DB" : "#FFE4E4",
+  });
+
+  const descriptionStyle = {
+    fontWeight: 600,
+    fontSize: "16px",
+    color: "#4E4E4E",
+    mb: 1,
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: 2,
+    overflow: "hidden",
+    lineHeight: "1.4em",
+  };
+
+  const actionBtnStyle = {
+    minWidth: "54px",
+    width: "54px",
+    height: "54px",
+    borderRadius: "50%",
+    position: "absolute",
+    right: "15px",
+    bottom: "15px",
+    boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
+    transition: "all 0.3s ease",
+  };
+
   return (
     <Box sx={{ mt: "84px" }}>
-      <Typography sx={{ fontSize: 34, fontWeight: 600, color: "#000" }}>
+      <Typography sx={{ fontSize: "34px", fontWeight: 600, color: "#000" }}>
         Новые поступления
       </Typography>
 
-      <Box sx={{ position: "relative", mt: "34px", px: "0px" }}>
-        {/* LEFT */}
+      <Box sx={{ position: "relative", mt: "34px" }}>
         <IconButton
           onClick={() => scroll("left")}
-          sx={{
-            position: "absolute",
-            left: -20,
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 10,
-            bgcolor: "#fff",
-            boxShadow: 2,
-            width: 40,
-            height: 40,
-          }}
+          sx={navBtnStyle({ left: -20 })}
         >
-          <Image src="/arrowleft.svg" width="32" height="32" alt="arrow left" />
+          <Image src="/arrowleft.svg" width={32} height={32} alt="left" />
         </IconButton>
         <IconButton
           onClick={() => scroll("right")}
-          sx={{
-            position: "absolute",
-            right: -20,
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 10,
-            bgcolor: "#fff",
-            boxShadow: 2,
-            width: 40,
-            height: 40,
-          }}
+          sx={navBtnStyle({ right: -20 })}
         >
-          <Image
-            src="/arrowright.svg"
-            width="32"
-            height="32"
-            alt="arrow right"
-          />
+          <Image src="/arrowright.svg" width={32} height={32} alt="right" />
         </IconButton>
+
         <Box
           ref={scrollRef}
           sx={{
             display: "flex",
             gap: 2,
             overflowX: "auto",
-            scrollBehavior: "smooth",
             py: 2,
+            px: 1,
             "&::-webkit-scrollbar": { display: "none" },
           }}
         >
-          {loading && <Typography>Loading...</Typography>}
+          {loading && <Typography>Загрузка...</Typography>}
 
-          {arrivals?.results.map((item) => (
-            <Link
-              key={item.id}
-              href={`/${locale}/product/${item.id}`}
-              style={{ textDecoration: "none" }}
-            >
-              <Box
+          {arrivals?.results?.map((item) => {
+            const inBasket = isItemInBasket(item.id);
+            const isFavorite = isItemFavorite(item.id);
+
+            return (
+              <Link
                 key={item.id}
-                sx={{
-                  width: 300,
-                  minHeight: "480px",
-                  borderRadius: 3,
-                  p: 2,
-                  boxShadow: 3,
-                  color: "#000",
-                  bgcolor: "#fff",
-                  flexShrink: 0,
-                  display: "flex",
-                  position: "relative",
-                  flexDirection: "column",
-                }}
+                href={`/${locale}/product/${item.id}`}
+                style={{ textDecoration: "none" }}
               >
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  {item.is_in_stock ? (
-                    <Typography
-                      sx={{
-                        width: "auto",
-                        padding: "4px 8px",
-                        borderRadius: "8px",
-                        color: "#3BB351",
-                        bgcolor: "#D6F2DB",
-                        fontSize: "14px",
-                        border: "0px solid #DDDDDD",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      В наличии
+                <Box sx={cardStyle}>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography sx={statusBadgeStyle(item.is_in_stock)}>
+                      {item.is_in_stock ? "В наличии" : "Нет в наличии"}
                     </Typography>
-                  ) : (
-                    <Typography
-                      sx={{
-                        width: "auto",
-                        padding: "4px 8px",
-                        borderRadius: "8px",
-                        color: "#FF5F5F",
-                        bgcolor: "#FFE4E4",
-                        fontSize: "14px",
-                        border: "none",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      Нет в наличии
-                    </Typography>
-                  )}
-
-                  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                    <Image
-                      src={"/scale.svg"}
-                      height={"24"}
-                      width={"24"}
-                      alt="scales"
-                    />
-                    <FavoriteBorderIcon sx={{ color: "#4E4E4E" }} />
+                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                      <Image
+                        src="/scale.svg"
+                        height={24}
+                        width={24}
+                        alt="compare"
+                      />
+                      <IconButton
+                        size="small"
+                        onClick={(e) => onFavoriteClick(e, item)}
+                        sx={{
+                          p: 0.25,
+                          color: isFavorite ? "#ff4444" : "#4E4E4E",
+                          "&:hover": {
+                            color: isFavorite ? "#cc0000" : "#ff4444",
+                            backgroundColor: "transparent",
+                          },
+                        }}
+                      >
+                        {isFavorite ? (
+                          <FavoriteIcon sx={{ fontSize: 26 }} />
+                        ) : (
+                          <FavoriteBorderOutlinedIcon sx={{ fontSize: 26 }} />
+                        )}
+                      </IconButton>
+                    </Box>
                   </Box>
-                </Box>
-                <Box
-                  sx={{
-                    position: "relative",
-                    width: "100%",
-                    height: "230px",
-                    mb: 2,
-                  }}
-                >
-                  <Image
-                    src={item.image}
-                    alt={item.title || "product image"}
-                    fill
-                    sizes="240px"
-                    style={{ objectFit: "contain" }}
-                  />
-                </Box>
 
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                    height: "100px",
-                  }}
-                >
-                  <Box>
-                    <Typography
-                      sx={{
-                        fontWeight: 600,
-                        mt: 1,
-                        fontSize: "16px",
-                        color: "#4E4E4E",
-                        display: "-webkit-box",
-                        WebkitBoxOrient: "vertical",
-                        WebkitLineClamp: 2,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        lineHeight: "1.4em",
-                      }}
-                    >
+                  <Box
+                    sx={{
+                      position: "relative",
+                      width: "100%",
+                      height: "230px",
+                      my: 2,
+                    }}
+                  >
+                    <Image
+                      src={item.image}
+                      alt="product"
+                      fill
+                      style={{ objectFit: "contain" }}
+                    />
+                  </Box>
+
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography sx={descriptionStyle}>
                       {item.short_description}
                     </Typography>
+                    <Typography
+                      sx={{ color: "#000", fontWeight: 700, fontSize: "20px" }}
+                    >
+                      {formatPrice(item.price)} сум
+                    </Typography>
                   </Box>
 
-                  <Typography
-                    sx={{ color: "#000", fontWeight: 700, fontSize: 18 }}
+                  <Button
+                    onClick={(e) => onBasketClick(e, item)}
+                    sx={{
+                      ...actionBtnStyle,
+                      bgcolor: inBasket ? "#3BB351" : "#249FFC",
+                      "&:hover": { bgcolor: inBasket ? "#2e8b40" : "#1a8ae5" },
+                    }}
                   >
-                    {new Intl.NumberFormat("ru-RU").format(item.price)} сум
-                  </Typography>
+                    {inBasket ? (
+                      <DoneIcon sx={{ color: "#fff", fontSize: 30 }} />
+                    ) : (
+                      <Image
+                        src={
+                          item.is_in_stock
+                            ? "/basketIcon.svg"
+                            : "/call-outline_white.svg"
+                        }
+                        alt="icon"
+                        width={26}
+                        height={26}
+                      />
+                    )}
+                  </Button>
                 </Box>
-                <Button
-                  sx={{
-                    bgcolor: "#249FFC",
-                    width: "50px",
-                    height: "60px",
-                    borderRadius: "100%",
-                    position: "absolute",
-                    right: "10px",
-                    bottom: "10px",
-                  }}
-                >
-                  {item.is_in_stock ? (
-                    <Image
-                      src={"/basketIcon.svg"}
-                      alt="BasketIcon"
-                      width={30}
-                      height={30}
-                    />
-                  ) : (
-                    <Image
-                      src={"/call-outline_white.svg"}
-                      alt="BasketIcon"
-                      width={30}
-                      height={30}
-                    />
-                  )}
-                </Button>
-              </Box>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </Box>
       </Box>
+
+      {/* Basket Toast */}
+      <Snackbar
+        open={openToast}
+        autoHideDuration={3000}
+        onClose={() => setOpenToast(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%", borderRadius: "10px" }}
+        >
+          Товар успешно добавлен в корзину!
+        </Alert>
+      </Snackbar>
+
+      {/* Favorite Toast */}
+      <Snackbar
+        open={favoriteToast}
+        autoHideDuration={2000}
+        onClose={() => setFavoriteToast(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Alert
+          severity={isItemFavorite(lastToggledId) ? "info" : "success"}
+          variant="filled"
+          sx={{ width: "100%", borderRadius: "10px" }}
+        >
+          {isItemFavorite(lastToggledId)
+            ? "Удалено из избранного"
+            : "Добавлено в избранное"}
+          !
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
+
 export default NewArrivals;

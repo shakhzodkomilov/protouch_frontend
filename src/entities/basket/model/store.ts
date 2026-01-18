@@ -4,7 +4,7 @@ import {
   removeFromBasketFx,
   updateQuantityFx,
   getBasketFx,
-} from "./effects.ts";
+} from "./effects";
 import { BasketItem, BasketState } from "./types";
 
 export const addToBasket = createEvent<BasketItem>();
@@ -15,12 +15,16 @@ export const updateQuantity = createEvent<{
 }>();
 export const loadBasket = createEvent();
 
-const initialState: BasketState = { items: [], totalCount: 0, totalPrice: 0 };
+const initialState: BasketState = {
+  items: [],
+  totalCount: 0,
+  totalPrice: 0,
+};
 
-const updateTotals = (items: BasketItem[]) => ({
+const updateTotals = (items: BasketItem[]): BasketState => ({
   items,
-  totalCount: items.reduce((sum, item) => sum + item.quantity, 0),
-  totalPrice: items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+  totalCount: items.reduce((sum, i) => sum + i.quantity, 0),
+  totalPrice: items.reduce((sum, i) => sum + i.price * i.quantity, 0),
 });
 
 export const $basket = createStore<BasketState>(initialState).on(
@@ -33,7 +37,6 @@ export const $basket = createStore<BasketState>(initialState).on(
   (_, items) => updateTotals(items)
 );
 
-// Trigger effects when events are called
 sample({ clock: loadBasket, target: getBasketFx });
 sample({ clock: addToBasket, target: addToBasketFx });
 sample({ clock: removeFromBasket, target: removeFromBasketFx });

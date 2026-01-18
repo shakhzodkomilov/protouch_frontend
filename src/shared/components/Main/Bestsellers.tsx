@@ -47,13 +47,11 @@ const BestSellers = () => {
   const [lastToggledId, setLastToggledId] = useState<number>(0); // ✅ Track last toggle
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Load favorites on mount
   useEffect(() => {
     loadArrivalsEv({ lang: "ru" });
     loadFavoritesEv();
   }, [loadArrivalsEv, loadFavoritesEv]);
 
-  // ✅ Memoized helper functions
   const isItemInBasket = useCallback(
     (productId: number) => {
       return basketItems.some((item) => item.productId === productId);
@@ -146,7 +144,6 @@ const BestSellers = () => {
           {arrivals?.results?.map((item) => {
             const inBasket = isItemInBasket(item.id);
             const isFavorite = isItemFavorite(item.id);
-
             return (
               <Link
                 key={item.id}
@@ -250,7 +247,7 @@ const BestSellers = () => {
         open={openToast}
         autoHideDuration={3000}
         onClose={() => setOpenToast(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
         <Alert
           severity="success"
@@ -266,7 +263,7 @@ const BestSellers = () => {
         open={favoriteToast}
         autoHideDuration={2000}
         onClose={() => setFavoriteToast(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
       >
         <Alert
           severity={isItemFavorite(lastToggledId) ? "info" : "success"}

@@ -73,7 +73,7 @@ const Navbar = () => {
           {[
             { title: "Акции", href: "/sales" },
             { title: "Доставка", href: "/delivery" },
-            { title: "О нас", href: "/about" },
+            { title: "О нас", href: "/about-us" },
             { title: "Гос. закупки", href: "/tenders" },
             { title: "Юр. лицам", href: "/business" },
           ].map((item) => (

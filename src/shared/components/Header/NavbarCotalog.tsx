@@ -59,7 +59,7 @@ const NavbarCatalog = () => {
   // UI State
   const [isOpen, setIsOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<CategoryType | null>(
-    null
+    null,
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
@@ -234,7 +234,7 @@ const NavbarCatalog = () => {
                                   product.title || product.short_description
                                 }
                                 secondary={`${new Intl.NumberFormat(
-                                  "ru-RU"
+                                  "ru-RU",
                                 ).format(product.price)} сум`}
                                 primaryTypographyProps={{
                                   fontWeight: 600,
