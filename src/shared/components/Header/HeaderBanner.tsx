@@ -12,6 +12,9 @@ const HeaderBanner = () => {
         display: "flex",
         alignItems: "center",
         color: "white",
+        "@media (max-width:1100px)": {
+          display: "none",
+        },
       }}
     >
       <Container maxWidth="lg">

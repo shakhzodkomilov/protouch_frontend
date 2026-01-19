@@ -9,7 +9,17 @@ const Navbar = () => {
   const router = useRouter();
 
   return (
-    <Box sx={{ width: "100%", bgcolor: "#fff" }}>
+    <Box
+      sx={{
+        width: "100%",
+        bgcolor: "#fff",
+        zIndex: "250",
+        "@media (max-width:900px)": {
+          width: "100%",
+          position: "fixed",
+        },
+      }}
+    >
       <Box
         sx={{
           maxWidth: "1800px",
@@ -21,8 +31,65 @@ const Navbar = () => {
           gap: 3,
         }}
       >
+        <Box
+          sx={{
+            width: "100%",
+            display: "none",
+            "@media (max-width:900px)": {
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            },
+          }}
+        >
+          <MuiLink
+            href="tel:+998977782347"
+            underline="none"
+            display={"none"}
+            sx={{
+              ...contactStyleResponsive,
+              "@media (max-width:900px)": {
+                display: "flex",
+              },
+            }}
+          >
+            <Image src="/call-outline.svg" alt="call" width={30} height={30} />
+          </MuiLink>
+          <Image
+            src="/LOGOPROTOUCH.svg"
+            alt="Protouch"
+            width={250}
+            height={40}
+            style={{ cursor: "pointer" }}
+            onClick={() => router.push("/")}
+            priority
+          />
+          <MuiLink
+            href="https://yandex.uz/maps/-/CLdXa09U"
+            target="_blank"
+            rel="noopener noreferrer"
+            underline="none"
+            display={"none"}
+            sx={{
+              ...contactStyleResponsive,
+              "@media (max-width:900px)": {
+                display: "flex",
+              },
+            }}
+          >
+            <Image src="/location.svg" alt="location" width={30} height={30} />
+          </MuiLink>
+        </Box>
         {/* LOGO */}
-        <Box sx={{ flexShrink: 0 }}>
+        <Box
+          sx={{
+            flexShrink: 0,
+            cursor: "pointer",
+            "@media (max-width:900px)": {
+              display: "none",
+            },
+          }}
+        >
           <Image
             src="/LOGOPROTOUCH.svg"
             alt="Protouch"
@@ -41,6 +108,9 @@ const Navbar = () => {
             display: "flex",
             justifyContent: "center",
             gap: 3,
+            "@media (max-width:900px)": {
+              display: "none",
+            },
           }}
         >
           {/* Phone 1 */}
@@ -69,7 +139,15 @@ const Navbar = () => {
         </Box>
 
         {/* RIGHT MENU */}
-        <Box sx={{ display: "flex", gap: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            "@media (max-width:1360px)": {
+              display: "none",
+            },
+          }}
+        >
           {[
             { title: "Акции", href: "/sales" },
             { title: "Доставка", href: "/delivery" },
@@ -107,6 +185,18 @@ const contactStyle = {
   color: "#4E4E4E",
   fontSize: 14,
   display: "flex",
+  alignItems: "center",
+  gap: 1,
+  whiteSpace: "nowrap",
+  cursor: "pointer",
+  "&:hover": {
+    color: "#249FFC",
+  },
+};
+const contactStyleResponsive = {
+  fontWeight: 600,
+  color: "#4E4E4E",
+  fontSize: 14,
   alignItems: "center",
   gap: 1,
   whiteSpace: "nowrap",

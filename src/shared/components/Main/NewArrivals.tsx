@@ -208,13 +208,23 @@ const NewArrivals = () => {
       <Box sx={{ position: "relative", mt: "34px" }}>
         <IconButton
           onClick={() => scroll("left")}
-          sx={navBtnStyle({ left: -20 })}
+          sx={navBtnStyle({
+            left: -20,
+            "@media (max-width:900px)": {
+              display: "none",
+            },
+          })}
         >
           <Image src="/arrowleft.svg" width={32} height={32} alt="left" />
         </IconButton>
         <IconButton
           onClick={() => scroll("right")}
-          sx={navBtnStyle({ right: -20 })}
+          sx={navBtnStyle({
+            right: -20,
+            "@media (max-width:900px)": {
+              display: "none",
+            },
+          })}
         >
           <Image src="/arrowright.svg" width={32} height={32} alt="right" />
         </IconButton>

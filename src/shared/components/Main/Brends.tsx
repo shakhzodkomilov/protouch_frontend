@@ -45,6 +45,9 @@ const Brends = () => {
             boxShadow: 2,
             width: 40,
             height: 40,
+            "@media (max-width:900px)": {
+              display: "none",
+            },
           }}
         >
           <Image src="/arrowleft.svg" width="32" height="32" alt="arrow left" />
@@ -61,6 +64,9 @@ const Brends = () => {
             boxShadow: 2,
             width: 40,
             height: 40,
+            "@media (max-width:900px)": {
+              display: "none",
+            },
           }}
         >
           <Image

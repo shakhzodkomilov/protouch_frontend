@@ -225,13 +225,23 @@ const Recommend = () => {
       <Box sx={{ position: "relative", mt: "34px" }}>
         <IconButton
           onClick={() => scrollTop("left")}
-          sx={navBtnStyle({ left: 0 })}
+          sx={navBtnStyle({
+            left: 0,
+            "@media (max-width:900px)": {
+              display: "none",
+            },
+          })}
         >
           <Image src="/arrowleft.svg" width={40} height={40} alt="left" />
         </IconButton>
         <IconButton
           onClick={() => scrollTop("right")}
-          sx={navBtnStyle({ right: 0 })}
+          sx={navBtnStyle({
+            right: 0,
+            "@media (max-width:900px)": {
+              display: "none",
+            },
+          })}
         >
           <Image src="/arrowright.svg" width={40} height={40} alt="right" />
         </IconButton>
@@ -355,13 +365,23 @@ const Recommend = () => {
       <Box sx={{ position: "relative", mt: "34px" }}>
         <IconButton
           onClick={() => scrollBottom("left")}
-          sx={navBtnStyle({ left: 0 })}
+          sx={navBtnStyle({
+            left: 0,
+            "@media (max-width:900px)": {
+              display: "none",
+            },
+          })}
         >
           <Image src="/arrowleft.svg" width={40} height={40} alt="left" />
         </IconButton>
         <IconButton
           onClick={() => scrollBottom("right")}
-          sx={navBtnStyle({ right: 0 })}
+          sx={navBtnStyle({
+            right: 0,
+            "@media (max-width:900px)": {
+              display: "none",
+            },
+          })}
         >
           <Image src="/arrowright.svg" width={40} height={40} alt="right" />
         </IconButton>
@@ -382,91 +402,99 @@ const Recommend = () => {
             const isFavorite = isItemFavorite(item.id);
 
             return (
-              <Box key={String(item.id)} sx={cardStyle}>
-                {/* Same card content as above */}
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography sx={statusBadgeStyle(item.is_in_stock)}>
-                    {item.is_in_stock ? "В наличии" : "Нет в наличии"}
-                  </Typography>
-                  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                    <Image
-                      src="/scale.svg"
-                      height={24}
-                      width={24}
-                      alt="compare"
-                    />
-                    <IconButton
-                      size="small"
-                      onClick={(e) => onFavoriteClick(e, item)}
-                      sx={{
-                        p: 0.25,
-                        color: isFavorite ? "#ff4444" : "#4E4E4E",
-                        "&:hover": {
-                          color: isFavorite ? "#cc0000" : "#ff4444",
-                          backgroundColor: "transparent",
-                        },
-                      }}
-                    >
-                      {isFavorite ? (
-                        <FavoriteIcon sx={{ fontSize: 26 }} />
-                      ) : (
-                        <FavoriteBorderOutlinedIcon sx={{ fontSize: 26 }} />
-                      )}
-                    </IconButton>
-                  </Box>
-                </Box>
-
-                <Box
-                  sx={{
-                    position: "relative",
-                    width: "100%",
-                    height: "230px",
-                    my: 2,
-                  }}
-                >
-                  <Image
-                    src={item.image}
-                    alt="product"
-                    fill
-                    style={{ objectFit: "contain" }}
-                  />
-                </Box>
-
-                <Box sx={{ flexGrow: 1 }}>
-                  <Typography sx={descriptionStyle}>
-                    {item.short_description || "Product"}
-                  </Typography>
-                  <Typography
-                    sx={{ color: "#000", fontWeight: 700, fontSize: "20px" }}
+              <Link
+                key={String(item.id)}
+                href={`/${locale}/product/${item.id}`}
+                style={{ textDecoration: "none" }}
+              >
+                <Box key={String(item.id)} sx={cardStyle}>
+                  {/* Same card content as above */}
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    {formatPrice(item.price)} сум
-                  </Typography>
-                </Box>
+                    <Typography sx={statusBadgeStyle(item.is_in_stock)}>
+                      {item.is_in_stock ? "В наличии" : "Нет в наличии"}
+                    </Typography>
+                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                      <Image
+                        src="/scale.svg"
+                        height={24}
+                        width={24}
+                        alt="compare"
+                      />
+                      <IconButton
+                        size="small"
+                        onClick={(e) => onFavoriteClick(e, item)}
+                        sx={{
+                          p: 0.25,
+                          color: isFavorite ? "#ff4444" : "#4E4E4E",
+                          "&:hover": {
+                            color: isFavorite ? "#cc0000" : "#ff4444",
+                            backgroundColor: "transparent",
+                          },
+                        }}
+                      >
+                        {isFavorite ? (
+                          <FavoriteIcon sx={{ fontSize: 26 }} />
+                        ) : (
+                          <FavoriteBorderOutlinedIcon sx={{ fontSize: 26 }} />
+                        )}
+                      </IconButton>
+                    </Box>
+                  </Box>
 
-                <Button
-                  onClick={(e) => onBasketClick(e, item)}
-                  sx={{
-                    ...actionBtnStyle,
-                    bgcolor: inBasket ? "#3BB351" : "#249FFC",
-                    "&:hover": { bgcolor: inBasket ? "#2e8b40" : "#1a8ae5" },
-                  }}
-                >
-                  {inBasket ? (
-                    <DoneIcon sx={{ color: "#fff", fontSize: 30 }} />
-                  ) : (
+                  <Box
+                    sx={{
+                      position: "relative",
+                      width: "100%",
+                      height: "230px",
+                      my: 2,
+                    }}
+                  >
                     <Image
-                      src={
-                        item.is_in_stock
-                          ? "/basketIcon.svg"
-                          : "/call-outline_white.svg"
-                      }
-                      alt="icon"
-                      width={26}
-                      height={26}
+                      src={item.image}
+                      alt="product"
+                      fill
+                      style={{ objectFit: "contain" }}
                     />
-                  )}
-                </Button>
-              </Box>
+                  </Box>
+
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography sx={descriptionStyle}>
+                      {item.short_description || "Product"}
+                    </Typography>
+                    <Typography
+                      sx={{ color: "#000", fontWeight: 700, fontSize: "20px" }}
+                    >
+                      {formatPrice(item.price)} сум
+                    </Typography>
+                  </Box>
+
+                  <Button
+                    onClick={(e) => onBasketClick(e, item)}
+                    sx={{
+                      ...actionBtnStyle,
+                      bgcolor: inBasket ? "#3BB351" : "#249FFC",
+                      "&:hover": { bgcolor: inBasket ? "#2e8b40" : "#1a8ae5" },
+                    }}
+                  >
+                    {inBasket ? (
+                      <DoneIcon sx={{ color: "#fff", fontSize: 30 }} />
+                    ) : (
+                      <Image
+                        src={
+                          item.is_in_stock
+                            ? "/basketIcon.svg"
+                            : "/call-outline_white.svg"
+                        }
+                        alt="icon"
+                        width={26}
+                        height={26}
+                      />
+                    )}
+                  </Button>
+                </Box>
+              </Link>
             );
           })}
         </Box>

@@ -135,7 +135,12 @@ const NavbarCatalog = () => {
 
   return (
     <Box
-      sx={{ position: "relative", bgcolor: "#fff", zIndex: 100, width: "100%" }}
+      sx={{
+        position: "relative",
+        bgcolor: "#fff",
+        zIndex: 100,
+        width: "100%",
+      }}
     >
       <AppBar
         position="static"
@@ -156,6 +161,9 @@ const NavbarCatalog = () => {
           <Button
             onClick={handleCatalogClick}
             sx={{
+              "@media (max-width:900px)": {
+                display: "none",
+              },
               bgcolor: isOpen ? "#1e88e5" : "#2196f3",
               color: "#fff",
               px: 3,
@@ -174,7 +182,7 @@ const NavbarCatalog = () => {
           </Button>
 
           {/* Search Bar Container */}
-          <Box ref={searchRef} sx={{ flex: 1, position: "relative" }}>
+          <Box ref={searchRef} sx={{ flex: 1 }}>
             <Box
               sx={{
                 display: "flex",
@@ -183,6 +191,11 @@ const NavbarCatalog = () => {
                 height: "55px",
                 px: 2,
                 borderRadius: 2,
+                "@media (max-width:900px)": {
+                  mt: "60px",
+                  width: "100%",
+                  position: "fixed",
+                },
               }}
             >
               <SearchIcon sx={{ color: "#999", mr: 1 }} />
@@ -213,6 +226,11 @@ const NavbarCatalog = () => {
                   borderRadius: 2,
                   border: "1px solid #eee",
                   bgcolor: "#fff",
+                  "@media (max-width:900px)": {
+                    mt: "70px",
+                    width: "100%",
+                    position: "fixed",
+                  },
                 }}
               >
                 <List sx={{ p: 0 }}>
@@ -273,7 +291,15 @@ const NavbarCatalog = () => {
           </Box>
 
           {/* Right Icons */}
-          <Box sx={{ display: "flex", gap: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              "@media (max-width:900px)": {
+                display: "none",
+              },
+            }}
+          >
             <HeaderIcon icon={<ScaleIcon />} label="Сравнение" />
 
             <HeaderIcon

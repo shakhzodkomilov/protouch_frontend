@@ -226,6 +226,9 @@ const News = () => {
             boxShadow: 2,
             width: 40,
             height: 40,
+            "@media (max-width:900px)": {
+              display: "none",
+            },
           }}
         >
           <Image src="/arrowleft.svg" width="32" height="32" alt="arrow left" />
@@ -243,6 +246,9 @@ const News = () => {
             boxShadow: 2,
             width: 40,
             height: 40,
+            "@media (max-width:900px)": {
+              display: "none",
+            },
           }}
         >
           <Image
@@ -280,12 +286,13 @@ const News = () => {
                 color: "#fff",
                 display: "flex",
                 flexDirection: "column",
+
                 flexShrink: 0,
                 position: "relative",
                 transition: "transform 0.2s, box-shadow 0.2s",
                 "&:hover": {
                   transform: "translateY(-5px)",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+                  // boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
                 },
               }}
             >
@@ -362,6 +369,7 @@ const News = () => {
                   onClick={handleCloseModal}
                   sx={{
                     bgcolor: "#249FFC",
+                    color: "#fff",
                     "&:hover": { bgcolor: "#1a8ae5" },
                   }}
                 >

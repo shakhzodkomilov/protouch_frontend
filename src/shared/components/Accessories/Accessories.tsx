@@ -33,7 +33,18 @@ const Accessories = () => {
   };
 
   return (
-    <Box sx={{ mt: "84px", bgcolor: "#fff", py: 4, px: 6, borderRadius: 3 }}>
+    <Box
+      sx={{
+        mt: "84px",
+        bgcolor: "#fff",
+        py: 4,
+        px: 6,
+        borderRadius: 3,
+        "@media (max-width:1000px)": {
+          padding: "0 0 ",
+        },
+      }}
+    >
       <Typography sx={{ fontSize: "34px", fontWeight: 600, color: "#000" }}>
         Аксессуары{" "}
       </Typography>
@@ -50,6 +61,9 @@ const Accessories = () => {
             boxShadow: 2,
             width: 40,
             height: 40,
+            "@media (max-width:1000px)": {
+              display: "none",
+            },
           }}
         >
           <Image src="/arrowleft.svg" width={32} height={32} alt="left" />
@@ -66,6 +80,9 @@ const Accessories = () => {
             boxShadow: 2,
             width: 40,
             height: 40,
+            "@media (max-width:1000px)": {
+              display: "none",
+            },
           }}
         >
           <Image src="/arrowright.svg" width={32} height={32} alt="right" />
@@ -79,6 +96,9 @@ const Accessories = () => {
             scrollBehavior: "smooth",
             py: 2,
             "&::-webkit-scrollbar": { display: "none" },
+            "@media (max-width:1000px)": {
+              padding: "0 0",
+            },
           }}
         >
           {loading && <Typography>Loading...</Typography>}

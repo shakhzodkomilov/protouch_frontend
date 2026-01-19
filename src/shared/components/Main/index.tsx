@@ -67,6 +67,9 @@ export default function HomeCategories() {
             flexDirection: "column",
             justifyContent: "space-between",
             color: "#000",
+            "@media (max-width:900px)": {
+              display: "none",
+            },
           }}
         >
           <Box sx={{ width: "100%" }}>
@@ -102,12 +105,24 @@ export default function HomeCategories() {
 
         {/* SLIDER AREA */}
         <Box
-          sx={{ position: "relative", flex: 1, overflow: "hidden", px: "24px" }}
+          sx={{
+            position: "relative",
+            flex: 1,
+            overflow: "hidden",
+            px: "24px",
+            "@media (max-width:900px)": {
+              px: "0",
+              mt: 12,
+            },
+          }}
         >
           {/* LEFT BTN */}
           <IconButton
             onClick={() => scroll("left")}
             sx={{
+              "@media (max-width:900px)": {
+                display: "none",
+              },
               position: "absolute",
               left: 5,
               top: "50%",
@@ -131,6 +146,9 @@ export default function HomeCategories() {
           <IconButton
             onClick={() => scroll("right")}
             sx={{
+              "@media (max-width:900px)": {
+                display: "none",
+              },
               position: "absolute",
               right: 5,
               top: "50%",

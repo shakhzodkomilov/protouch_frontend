@@ -25,10 +25,6 @@ const Banners = () => {
 
   return (
     <Box sx={{ mt: "50px" }}>
-      <Typography sx={{ fontSize: 34, fontWeight: 600, color: "#000" }}>
-        Статьи и новости
-      </Typography>
-
       <Box sx={{ position: "relative", mt: 3 }}>
         {/* LEFT ARROW */}
         <IconButton
@@ -43,6 +39,9 @@ const Banners = () => {
             boxShadow: 2,
             width: 40,
             height: 40,
+            "@media (max-width:900px)": {
+              display: "none",
+            },
           }}
         >
           <Image src="/arrowleft.svg" width={32} height={32} alt="arrow left" />
@@ -61,6 +60,9 @@ const Banners = () => {
             boxShadow: 2,
             width: 40,
             height: 40,
+            "@media (max-width:900px)": {
+              display: "none",
+            },
           }}
         >
           <Image
@@ -92,7 +94,6 @@ const Banners = () => {
                 minWidth: 300,
                 height: 250,
                 borderRadius: "16px",
-                p: 2,
                 color: "#fff",
                 display: "flex",
                 justifyContent: "center",

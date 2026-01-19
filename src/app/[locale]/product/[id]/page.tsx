@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useUnit } from "effector-react";
@@ -49,6 +49,9 @@ export default function ProductDetailPage() {
     $loadingProductDetail,
     loadProductDetail,
   ]);
+
+  // ✅ ADDED: Ref for smooth scroll to Info Blocks
+  const infoBlocksRef = useRef<HTMLDivElement>(null);
 
   // State management
   const [openToast, setOpenToast] = useState(false);
@@ -124,6 +127,25 @@ export default function ProductDetailPage() {
     }
   }, [id, locale, loadProductDetailEv, loadFavoritesEv]);
 
+  // ✅ ADDED: Smooth scroll to Info Blocks on mobile (<1100px)
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1100 && infoBlocksRef.current) {
+        infoBlocksRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+          inline: "nearest",
+        });
+      }
+    };
+
+    // Check on mount and resize
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const formatPrice = useMemo(
     () => (price: number) => new Intl.NumberFormat("ru-RU").format(price),
     [],
@@ -151,7 +173,16 @@ export default function ProductDetailPage() {
 
   return (
     <Box sx={{ width: "100%", height: "auto", bgcolor: "#FAFAFA" }}>
-      <Container maxWidth={false} sx={{ py: 4, maxWidth: "1800px" }}>
+      <Container
+        maxWidth={false}
+        sx={{
+          py: 4,
+          maxWidth: "1800px",
+          "@media (max-width:1100px)": {
+            // display: "none",
+          },
+        }}
+      >
         {/* Breadcrumbs */}
         <Box sx={{ mb: 4 }}>
           <Breadcrumbs
@@ -189,7 +220,18 @@ export default function ProductDetailPage() {
           </Breadcrumbs>
         </Box>
 
-        <Box sx={{ bgcolor: "#fff", py: 4, px: 6, borderRadius: 3, gap: 4 }}>
+        <Box
+          sx={{
+            bgcolor: "#fff",
+            py: 4,
+            px: 6,
+            borderRadius: 3,
+            gap: 4,
+            "@media (max-width:1100px)": {
+              padding: "0 0",
+            },
+          }}
+        >
           <Typography
             sx={{ fontSize: 28, fontWeight: 600, mb: 4, color: "#000" }}
           >
@@ -205,11 +247,35 @@ export default function ProductDetailPage() {
               display: "flex",
               gap: 6,
               justifyContent: "space-between",
+              "@media (max-width:1100px)": {
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "0 0",
+              },
             }}
           >
             {/* LEFT GALLERY */}
-            <Box sx={{ display: "flex", gap: 2, width: "100%", maxWidth: 600 }}>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                width: "100%",
+                maxWidth: 600,
+                "@media (max-width:1100px)": {
+                  display: "unset",
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1,
+                  "@media (max-width:1100px)": {
+                    flexDirection: "column",
+                  },
+                }}
+              >
                 {images.map((img: ProductImage, i: number) => (
                   <Box
                     key={img.id || i}
@@ -258,13 +324,28 @@ export default function ProductDetailPage() {
             </Box>
 
             {/* MIDDLE DESCRIPTION */}
-            <Box sx={{ flex: 1, maxWidth: 400 }}>
+            <Box
+              sx={{
+                flex: 1,
+                maxWidth: 400,
+                "@media (max-width:1100px)": {
+                  maxWidth: "100%",
+                },
+              }}
+            >
               <Typography
                 sx={{ fontSize: 18, fontWeight: 600, mb: 2, color: "#000" }}
               >
                 Описание
               </Typography>
-              <Typography sx={{ color: "#555", fontSize: 14, lineHeight: 1.8 }}>
+              <Typography
+                sx={{
+                  textAlign: "left",
+                  color: "#555",
+                  fontSize: 14,
+                  lineHeight: 1.8,
+                }}
+              >
                 {product.short_description}
               </Typography>
               <Button
@@ -283,13 +364,17 @@ export default function ProductDetailPage() {
             {/* RIGHT BUY CARD */}
             <Box
               sx={{
-                flex: 1,
+                flex: "0 0 auto",
                 bgcolor: "#FAFAFA",
                 p: 3,
                 borderRadius: 3,
                 maxWidth: 380,
-                display: "flex",
-                flexDirection: "column",
+                width: "100%",
+
+                "@media (max-width:1100px)": {
+                  maxWidth: 600,
+                  width: "100%",
+                },
               }}
             >
               <Typography
@@ -374,8 +459,9 @@ export default function ProductDetailPage() {
             </Box>
           </Box>
 
-          {/* Info Blocks */}
+          {/* ✅ FIXED: Info Blocks with smooth scroll ref + mobile horizontal scroll */}
           <Box
+            ref={infoBlocksRef}
             sx={{
               width: "100%",
               bgcolor: "#f4f4f4",
@@ -384,6 +470,17 @@ export default function ProductDetailPage() {
               justifyContent: "space-between",
               alignItems: "center",
               color: "#000",
+              "@media (max-width:1100px)": {
+                mt: 5,
+                // ✅ Horizontal scroll for mobile
+                overflowX: "auto",
+                scrollSnapType: "x mandatory",
+                WebkitOverflowScrolling: "touch",
+                "& > *": {
+                  flexShrink: 0,
+                  scrollSnapAlign: "start",
+                },
+              },
             }}
           >
             <InfoItem
@@ -400,12 +497,19 @@ export default function ProductDetailPage() {
             <Divider orientation="vertical" flexItem sx={{ my: 4 }} />
             <Box
               sx={{
+                bgcolor: "#fff",
                 textAlign: "center",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
+
                 gap: 1,
                 width: "33%",
+                "@media (max-width:1100px)": {
+                  width: "330px",
+                  height: "180px",
+                  pt: "40px",
+                },
               }}
             >
               <Typography>Появились вопросы о товаре?</Typography>
@@ -463,15 +567,8 @@ export default function ProductDetailPage() {
 }
 
 // Sub-components & Styles
-const InfoItem = ({
-  icon,
-  title,
-  desc,
-}: {
-  icon: string;
-  title: string;
-  desc: string;
-}) => (
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const InfoItem = ({ icon, title, desc }: any) => (
   <Box
     sx={{
       py: 4,
@@ -480,14 +577,21 @@ const InfoItem = ({
       flexDirection: "column",
       alignItems: "center",
       textAlign: "center",
-      flex: 1,
+      flex: "1",
+
+      "@media (max-width:1100px)": {
+        minWidth: 280, // ✅ important
+        flex: "0 0 auto",
+        scrollSnapAlign: "start",
+        bgcolor: "#fff",
+        borderRadius: 3,
+        px: 2,
+      },
     }}
   >
-    <Image src={icon} alt={title} width={150} height={40} />
-    <Typography variant="h6" sx={{ fontWeight: 600 }}>
-      {title}
-    </Typography>
-    <Typography sx={{ color: "#555", fontSize: 14, maxWidth: 300 }}>
+    <Image src={icon} alt={title} width={120} height={40} />
+    <Typography fontWeight={600}>{title}</Typography>
+    <Typography fontSize={14} color="#555">
       {desc}
     </Typography>
   </Box>

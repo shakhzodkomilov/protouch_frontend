@@ -1,9 +1,9 @@
-// src/app/[locale]/layout.tsx
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import Header from "../../shared/components/Header";
 import Footer from "../../shared/components/Footer/Footer";
+import { MobileBottomNav } from "../../shared/components/Bottom/MobileBottomNav";
 
 export const metadata: Metadata = {
   openGraph: {
@@ -42,10 +42,7 @@ type Props = {
 };
 
 export default async function LocaleLayout({ children, params }: Props) {
-  // Await the params before using them
   const { locale } = await params;
-
-  // Fetch messages for next-intl
   const messages = await getMessages({ locale });
 
   return (
@@ -55,6 +52,8 @@ export default async function LocaleLayout({ children, params }: Props) {
           <Header />
           <main>{children}</main>
           <Footer />
+          {/* Mobil menyu shu yerda */}
+          <MobileBottomNav />
         </NextIntlClientProvider>
       </body>
     </html>
