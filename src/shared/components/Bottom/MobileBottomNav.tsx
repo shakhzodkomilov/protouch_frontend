@@ -12,13 +12,13 @@ const items = [
   },
   {
     label: "Корзина",
-    icon: "/SearchCatalog.svg",
-    path: "/catalog",
+    icon: "/mobileBasket.svg",
+    path: "/catalogMobile",
   },
   {
     label: "Каталог",
-    icon: "/mobileBasket.svg", // MUI komponenti
-    path: "/catalog",
+    icon: "/SearchCatalog.svg", // MUI komponenti
+    path: "/catalogMobile",
   },
   {
     label: "Вход",

@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE_URL = process.env.SITE_URL ?? "https://protouch.uz";
+const SITE_URL = process.env.SITE_URL || "https://protouch.uz";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/auth", "/profile"],
+        disallow: ["/auth", "/profile", "/private"], 
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React from "react";
@@ -11,24 +10,127 @@ import {
   CardContent,
   Chip,
   Button,
-  Paper,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Container,
+  useMediaQuery,
+  useTheme,
+  Breadcrumbs,
 } from "@mui/material";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import Link from "next/link";
 import Image from "next/image";
 import { $categories, loadCategories } from "../../../entities/product/model";
 import { CategoryType } from "../../../entities/product/model/types";
 
-const Catalog = () => {
+const Catalog = ({
+  params,
+}: {
+  params?: { locale: string; slug?: string[] };
+}) => {
   const categories = useUnit($categories) as CategoryType[];
   const loadCatalog = useUnit(loadCategories);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  const locale = params?.locale || "ru";
+  const slug = params?.slug || [];
+  const currentCategoryName =
+    slug.length > 0 ? slug[slug.length - 1].replaceAll("-", " ") : null;
 
   React.useEffect(() => {
-    loadCatalog({ lang: "ru" });
-  }, [loadCatalog]);
+    loadCatalog({ lang: locale });
+  }, [loadCatalog, locale]);
 
+  // --- MOBILE VIEW (Matches Screenshots) ---
+  if (isMobile) {
+    return (
+      <Box sx={{ bgcolor: "#fff", minHeight: "100vh" }}>
+        {/* Breadcrumbs for nested level (Image 2) */}
+        {currentCategoryName && (
+          <Box sx={{ px: 2, py: 1.5, bgcolor: "#fff" }}>
+            <Breadcrumbs separator="/" sx={{ fontSize: "14px" }}>
+              <Link
+                href={`/${locale}/catalog`}
+                style={{ color: "#666", textDecoration: "none" }}
+              >
+                Каталог товаров
+              </Link>
+              <Typography sx={{ fontSize: "14px", color: "#249FFC" }}>
+                {currentCategoryName}
+              </Typography>
+            </Breadcrumbs>
+          </Box>
+        )}
+
+        <Typography
+          variant="h6"
+          sx={{
+            px: 2,
+            pt: 2,
+            pb: 1,
+            fontWeight: 700,
+            borderBottom: "2px solid #249FFC",
+            display: "inline-block",
+            mx: 2,
+            color: "#000",
+          }}
+        >
+          Каталог товаров
+        </Typography>
+
+        <List sx={{ width: "100%", p: 0, mt: 1 }}>
+          {categories.map((category) => (
+            <React.Fragment key={category.id}>
+              <Link
+                href={`/${locale}/catalog/${category.slug}`}
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                <ListItem disablePadding>
+                  <ListItemButton sx={{ py: 2, px: 2 }}>
+                    {/* Icon - Blue filter applied to match Image 1 */}
+                    {category.image && !currentCategoryName && (
+                      <ListItemIcon sx={{ minWidth: 40 }}>
+                        <Image
+                          src={category.image.url}
+                          alt=""
+                          width={24}
+                          height={24}
+                          style={{
+                            filter:
+                              "invert(53%) sepia(93%) saturate(1571%) hue-rotate(181deg) brightness(101%) contrast(98%)",
+                          }}
+                        />
+                      </ListItemIcon>
+                    )}
+                    <ListItemText
+                      primary={category.title}
+                      primaryTypographyProps={{
+                        fontSize: "15px",
+                        fontWeight: 500,
+                        color: "#1a1a1a",
+                      }}
+                    />
+                    <ChevronRightIcon sx={{ color: "#BDBDBD", fontSize: 20 }} />
+                  </ListItemButton>
+                </ListItem>
+              </Link>
+              <Divider sx={{ mx: 2, borderColor: "#f0f0f0" }} />
+            </React.Fragment>
+          ))}
+        </List>
+      </Box>
+    );
+  }
+
+  // --- DESKTOP VIEW (Your Original Grid) ---
   return (
     <Box sx={{ py: 8, bgcolor: "#f8f9fa" }}>
-      {/* Header */}
       <Box sx={{ textAlign: "center", mb: 6 }}>
         <Typography
           variant="h3"
@@ -43,22 +145,14 @@ const Catalog = () => {
         >
           Каталог товаров
         </Typography>
-        <Typography
-          variant="h6"
-          sx={{ color: "#666", maxWidth: 600, mx: "auto" }}
-        >
-          Выберите категорию для просмотра ассортимента
-        </Typography>
       </Box>
 
-      {/* CSS GRID CONTAINER */}
-      <Box sx={{ maxWidth: 1400, mx: "auto", px: { xs: 2, md: 4 } }}>
+      <Container maxWidth="xl">
         <Box
           sx={{
             display: "grid",
-            gap: 3, // MUI spacing={3} bilan bir xil
+            gap: 3,
             gridTemplateColumns: {
-              xs: "1fr",
               sm: "repeat(2, 1fr)",
               md: "repeat(3, 1fr)",
               lg: "repeat(4, 1fr)",
@@ -66,48 +160,29 @@ const Catalog = () => {
           }}
         >
           {categories.map((category, index) => (
-            <CategoryCard key={category.id} category={category} index={index} />
+            <CategoryCard
+              key={category.id}
+              category={category}
+              index={index}
+              locale={locale}
+            />
           ))}
         </Box>
-
-        {/* Carousel Categories */}
-        {categories.filter((c: any) => c.is_carousel).length > 0 && (
-          <Box sx={{ mt: 10 }}>
-            <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
-              Популярные категории
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                gap: 3,
-                overflowX: "auto",
-                pb: 2,
-                scrollbarWidth: "none",
-                "&::-webkit-scrollbar": { display: "none" },
-              }}
-            >
-              {categories
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .filter((c: any) => c.is_carousel)
-                .map((category) => (
-                  <CarouselCategoryCard key={category.id} category={category} />
-                ))}
-            </Box>
-          </Box>
-        )}
-      </Box>
+      </Container>
     </Box>
   );
 };
 
-// --- Sub-components (O'zgarishsiz qoldi, faqat Grid olib tashlandi) ---
+// --- Sub-components ---
 
 const CategoryCard = ({
   category,
   index,
+  locale,
 }: {
   category: CategoryType;
   index: number;
+  locale: string;
 }) => {
   return (
     <Card
@@ -137,7 +212,6 @@ const CategoryCard = ({
           zIndex: 1,
         }}
       />
-
       {category.image && (
         <Box sx={{ position: "relative", height: 180, zIndex: 2, p: 2 }}>
           <CardMedia
@@ -154,7 +228,6 @@ const CategoryCard = ({
           />
         </Box>
       )}
-
       <CardContent
         sx={{ p: 3, pt: 0, zIndex: 2, position: "relative", flexGrow: 1 }}
       >
@@ -164,81 +237,23 @@ const CategoryCard = ({
         >
           {category.title}
         </Typography>
-
-        {category.children && category.children.length > 0 && (
-          <Box sx={{ mb: 2, display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-            {category.children.slice(0, 2).map((child) => (
-              <Chip
-                key={child.id}
-                label={child.title}
-                size="small"
-                sx={{ fontSize: "0.75rem", bgcolor: "#f0f0f0" }}
-              />
-            ))}
-          </Box>
-        )}
-
         <Button
           variant="contained"
+          fullWidth
           endIcon={<KeyboardArrowRightIcon />}
           sx={{
-            mt: "auto", // Tugmani doim pastga tushiradi
+            mt: "auto",
             textTransform: "none",
             borderRadius: 2,
             bgcolor: "#2196f3",
           }}
-          onClick={() => (window.location.href = `/catalog/${category.slug}`)}
+          component={Link}
+          href={`/${locale}/catalog/${category.slug}`}
         >
           Подробнее
         </Button>
       </CardContent>
     </Card>
-  );
-};
-
-const CarouselCategoryCard = ({ category }: { category: CategoryType }) => {
-  return (
-    <Paper
-      sx={{
-        minWidth: 280,
-        height: 200,
-        borderRadius: 3,
-        position: "relative",
-        overflow: "hidden",
-        cursor: "pointer",
-        flexShrink: 0,
-        transition: "all 0.3s ease",
-        "&:hover": { transform: "scale(1.02)" },
-      }}
-      onClick={() => (window.location.href = `/catalog/${category.slug}`)}
-    >
-      {category.image && (
-        <Image
-          src={category.image.url}
-          alt={category.title}
-          fill
-          style={{ objectFit: "cover" }}
-        />
-      )}
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          bgcolor: "rgba(0,0,0,0.7)",
-          color: "white",
-          p: 2,
-        }}
-      >
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          {category.title}
-        </Typography>
-        <Typography variant="body2">
-          {category.children?.length || 0} подкатегорий
-        </Typography>
-      </Box>
-    </Paper>
   );
 };
 
