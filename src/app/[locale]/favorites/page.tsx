@@ -133,6 +133,9 @@ export default function FavoritesPage() {
           textAlign: "center",
           bgcolor: "#FAFAFA",
           minHeight: "100vh",
+          "@media (max-width:1000px)": {
+            mt: 5,
+          },
         }}
       >
         <Container maxWidth="md">

@@ -1,35 +1,43 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 
+/** * Navigatsiya elementlari ro'yxati.
+ * path: i18n dan keyingi qism (masalan: /ru/settings bo'lsa, path "/settings")
+ */
 const items = [
   {
     label: "Главная",
-    icon: "/homeMobile.svg", // SVG yo'li
-    path: "/Home",
+    icon: "/home.svg",
+    iconActive: "/homeActive.svg",
+    path: "",
   },
   {
     label: "Корзина",
     icon: "/mobileBasket.svg",
-    path: "/catalogMobile",
+    iconActive: "/basketActive.svg",
+    path: "/basket",
   },
   {
     label: "Каталог",
-    icon: "/SearchCatalog.svg", // MUI komponenti
+    icon: "/SearchCatalog.svg",
+    iconActive: "/catalogActive.svg",
     path: "/catalogMobile",
   },
   {
-    label: "Вход",
-    icon: "/userMobile.svg",
-    path: "/login",
+    label: "Настройки",
+    icon: "/settings.svg",
+    iconActive: "/settingsActive.svg",
+    path: "/settings",
   },
 ];
 
 export const MobileBottomNav = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const { locale } = useParams();
 
   return (
     <Box
@@ -48,55 +56,61 @@ export const MobileBottomNav = () => {
         justifyContent: "space-around",
         alignItems: "center",
         zIndex: 1300,
-        pt: 2,
-        pb: 2,
+        pb: 1, // Mobil telefonlarning pastki qismi uchun bo'shliq
       }}
     >
-      {items.map(({ label, icon: Icon, path }) => {
-        const isActive = pathname === path;
+      {items.map(({ label, icon, iconActive, path }) => {
+        // Dinamik to'liq yo'l: /ru/settings yoki /uz/basket
+        const fullPath = `/${locale}${path}`;
+
+        // Active holatini aniqlash:
+        // 1. Asosiy sahifa bo'lsa (path: ""), pathname to'liq mos kelishi kerak.
+        // 2. Boshqa sahifalar bo'lsa, pathname shu yo'l bilan boshlanishi kerak (ichki sahifalar uchun).
+        const isActive =
+          path === ""
+            ? pathname === `/${locale}`
+            : pathname.startsWith(fullPath);
 
         return (
           <Box
             key={label}
-            onClick={() => router.push(path)}
+            onClick={() => router.push(fullPath)}
             sx={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               cursor: "pointer",
-              color: isActive ? "#1e88e5" : "#9e9e9e",
               flex: 1,
+              transition: "all 0.2s ease",
             }}
           >
-            {/* SVG yoki MUI Icon ekanligini tekshirish */}
-
             <Box
               sx={{
-                width: 26,
-                height: 26,
+                width: 28,
+                height: 28,
                 position: "relative",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
+                mb: 0.5,
               }}
             >
               <Image
-                src={Icon as string}
+                src={isActive ? iconActive : icon}
                 alt={label}
-                width={30}
-                height={30}
+                width={28}
+                height={28}
                 style={{
-                  filter: isActive
-                    ? "invert(42%) sepia(93%) saturate(1352%) hue-rotate(185deg) brightness(95%) contrast(92%)"
-                    : "none",
+                  objectFit: "contain",
                 }}
               />
             </Box>
 
             <Typography
               sx={{
-                fontSize: 14,
-                mt: 0.5,
-                fontWeight: isActive ? 500 : 400,
+                fontSize: 12,
+                fontWeight: isActive ? 600 : 400,
+                color: isActive ? "#249FFC" : "#9e9e9e",
               }}
             >
               {label}

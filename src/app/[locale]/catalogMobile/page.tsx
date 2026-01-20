@@ -44,7 +44,7 @@ export default function MobileCatalogPage(props: {
   }
 
   return (
-    <Box sx={{ bgcolor: "#fff", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "#fff", minHeight: "100vh", mt: 14 }}>
       {/* breadcrumbs */}
       <Box sx={{ px: 2, py: 1.5, borderBottom: "1px solid #eee" }}>
         <Breadcrumbs separator="/" sx={{ fontSize: "14px" }}>
