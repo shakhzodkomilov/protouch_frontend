@@ -3,14 +3,16 @@ import { createEffect } from "effector";
 import { BASE_URL } from "../../config/base";
 import { CategoryType, PaginationType, ProductDetailType } from "./types";
 
-// --- Kategoriyalar ---
 export const getCategoriesFx = createEffect<
   { is_carousel?: string; lang?: string },
   CategoryType[]
 >(async (params) => {
-  const { data } = await axios.get(`${BASE_URL}/api/v1/products/categories/`, {
-    params: { lang: "ru", ...params },
-  });
+  const { data } = await axios.get(
+    `${BASE_URL}/api/v1/products/categories/?is_carousel=true`,
+    {
+      params: { lang: "ru", ...params },
+    },
+  );
   return data;
 });
 

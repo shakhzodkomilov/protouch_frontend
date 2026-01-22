@@ -10,13 +10,15 @@ import {
 } from "./effects";
 import { CategoryType, PaginationType, ProductDetailType } from "./types";
 
-// ✅ Fixed: Proper error types
+// ✅ Error turlari
 type ErrorType = string | { message?: string };
 
+// --- Events ---
 export const loadCategories = createEvent<{
   is_carousel?: string;
   lang?: string;
 }>();
+
 export const loadProducts = createEvent<{
   page: number;
   slug?: string;
@@ -24,11 +26,13 @@ export const loadProducts = createEvent<{
   lang?: string;
   title?: string;
 }>();
+
 export const loadProductsByCategory = createEvent<{
   slugs: string;
   page: number;
   lang?: string;
 }>();
+
 export const searchProducts = createEvent<{
   lang: string;
   search: string;
@@ -42,23 +46,41 @@ export const loadProductDetail = createEvent<{
   lang?: string;
 }>();
 
+// ✅ Store-ni tozalash eventi (Kategoriya almashganda kerak)
+export const clearProducts = createEvent();
+
+// --- Stores ---
+
+// 1. Qidiruv store
 export const $searchProducts = createStore<PaginationType | null>(null).on(
   searchProductsFx.doneData,
   (_, data) => data,
 );
-
 export const $searchLoading = searchProductsFx.pending;
 
-// Stores
+// 2. Kategoriyalar store
 export const $categories = createStore<CategoryType[]>([]).on(
   getCategoriesFx.doneData,
   (_, data) => data,
 );
 
+// 3. ASOSIY MAHSULOTLAR STORE (Infinite Scroll mantiqi bilan)
 export const $products = createStore<PaginationType | null>(null)
-  .on(getProductsFx.doneData, (_, data) => data)
-  .on(getProductsByCategoryFx.doneData, (_, data) => data);
+  .on(getProductsFx.doneData, (_, data) => data) // Oddiy yuklash
+  .on(getProductsByCategoryFx.doneData, (state, newData) => {
+    // ✅ Agar bu 1-sahifa bo'lsa (previous === null), yangi ma'lumotni to'liq o'zlashtiramiz
+    if (!state || newData.previous === null) {
+      return newData;
+    }
+    // ✅ Agar keyingi sahifalar kelsa (page 2, 3...), eski natijalarga yangisini qo'shamiz
+    return {
+      ...newData,
+      results: [...state.results, ...newData.results],
+    };
+  })
+  .reset(clearProducts); // ✅ Tozalash eventi chaqirilganda store null bo'ladi
 
+// 4. Boshqa storelar
 export const $bestSellers = createStore<PaginationType | null>(null).on(
   getSalesHitsFx.doneData,
   (_, data) => data,
@@ -74,54 +96,43 @@ export const $productDetail = createStore<ProductDetailType | null>(null).on(
   (_, data) => data,
 );
 
-// Loading flags
+// --- Loading Flags ---
 export const $loadingCategories = getCategoriesFx.pending;
-export const $loadingProducts = getProductsFx.pending;
+export const $loadingProducts = getProductsByCategoryFx.pending; // Katalog uchun asosiy loading
+export const $loadingGeneralProducts = getProductsFx.pending;
 export const $loadingSellers = getSalesHitsFx.pending;
 export const $loadingArrivals = getNewArrivalsFx.pending;
 export const $loadingProductDetail = getProductDetailFx.pending;
 
-// ✅ Fixed: Proper ErrorType instead of any
+// --- Error Stores ---
+const getErrorMessage = (e: ErrorType, defaultMsg: string) =>
+  (e && typeof e === "object" && "message" in e
+    ? e.message
+    : defaultMsg) as string;
+
 export const $errorCategories = createStore<string | null>(null).on(
   getCategoriesFx.failData,
-  (_, e: ErrorType) =>
-    (e && typeof e === "object" && "message" in e
-      ? e.message
-      : "Error loading categories") as string,
+  (_, e) => getErrorMessage(e, "Error loading categories"),
 );
 
 export const $errorProducts = createStore<string | null>(null)
-  .on(
-    getProductsFx.failData,
-    (_, e: ErrorType) =>
-      (e && typeof e === "object" && "message" in e
-        ? e.message
-        : "Error loading products") as string,
+  .on(getProductsFx.failData, (_, e) =>
+    getErrorMessage(e, "Error loading products"),
   )
-  .on(
-    getProductsByCategoryFx.failData,
-    (_, e: ErrorType) =>
-      (e && typeof e === "object" && "message" in e
-        ? e.message
-        : "Error loading products") as string,
+  .on(getProductsByCategoryFx.failData, (_, e) =>
+    getErrorMessage(e, "Error loading products"),
   );
 
 export const $errorProductDetail = createStore<string | null>(null).on(
   getProductDetailFx.failData,
-  (_, e: ErrorType) =>
-    (e && typeof e === "object" && "message" in e
-      ? e.message
-      : "Error loading product") as string,
+  (_, e) => getErrorMessage(e, "Error loading product"),
 );
 
-// Triggers
+// --- Triggers (Samples) ---
 sample({ clock: loadCategories, target: getCategoriesFx });
 sample({ clock: loadProducts, target: getProductsFx });
 sample({ clock: loadSellers, target: getSalesHitsFx });
 sample({ clock: loadArrivals, target: getNewArrivalsFx });
 sample({ clock: loadProductDetail, target: getProductDetailFx });
 sample({ clock: loadProductsByCategory, target: getProductsByCategoryFx });
-sample({
-  clock: searchProducts,
-  target: searchProductsFx,
-});
+sample({ clock: searchProducts, target: searchProductsFx });

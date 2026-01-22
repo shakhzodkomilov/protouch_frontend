@@ -1,7 +1,8 @@
 "use client";
 
-import { use, useEffect } from "react";
+import { use, useEffect, useState } from "react";
 import { useUnit } from "effector-react";
+import { useInView } from "react-intersection-observer"; // Sahifa oxirini tutish uchun
 import {
   Box,
   Container,
@@ -14,6 +15,7 @@ import {
   $loadingProducts,
   $products,
   loadProductsByCategory,
+  clearProducts,
 } from "../../../../entities/product/model";
 import Link from "next/link";
 import Image from "next/image";
@@ -33,11 +35,23 @@ export default function CatalogPage(props: {
   const joinedSlug = slugArray.join("/");
   const lastSlug = slugArray[slugArray.length - 1] || "";
 
+  // Effector units
   const products = useUnit($products) as unknown as PaginationType | null;
   const loading = useUnit($loadingProducts);
 
+  // Mahalliy sahifa holati
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Intersection Observer setup (Datchik)
+  const { ref, inView } = useInView({
+    threshold: 0.1, // Datchik 10% ko'rinsa ham ishlaydi
+  });
+
+  // 1. Kategoriya o'zgarganda hamma narsani tozalab, 1-sahifani yuklash
   useEffect(() => {
     if (joinedSlug && locale) {
+      clearProducts();
+      setCurrentPage(1);
       loadProductsByCategory({
         slugs: joinedSlug,
         page: 1,
@@ -46,7 +60,20 @@ export default function CatalogPage(props: {
     }
   }, [joinedSlug, locale]);
 
-  if (loading) {
+  // 2. Foydalanuvchi pastga yetganda keyingi sahifani chaqirish
+  useEffect(() => {
+    if (inView && products?.next && !loading) {
+      const nextPage = currentPage + 1;
+      setCurrentPage(nextPage);
+      loadProductsByCategory({
+        slugs: joinedSlug,
+        page: nextPage,
+        lang: locale as string,
+      });
+    }
+  }, [inView, products?.next, loading, joinedSlug, locale, currentPage]);
+
+  if (loading && currentPage === 1) {
     return (
       <Box sx={{ py: 10, display: "flex", justifyContent: "center" }}>
         <CircularProgress />
@@ -69,18 +96,15 @@ export default function CatalogPage(props: {
           {lastSlug.replaceAll("-", " ")}
         </Typography>
 
-        {/* GRID O'RNIGA BOX + CSS GRID:
-          Bu usul import xatolarini butunlay yo'qotadi 
-        */}
         <Box
           sx={{
             display: "grid",
-            gap: 4, // spacing o'rniga gap
+            gap: 4,
             gridTemplateColumns: {
-              xs: "1fr", // mobil: 1 ta ustun
-              sm: "repeat(2, 1fr)", // planshet: 2 ta ustun
-              md: "repeat(3, 1fr)", // kompyuter: 3 ta ustun
-              lg: "repeat(4, 1fr)", // katta monitor: 4 ta ustun
+              xs: "1fr",
+              sm: "repeat(2, 1fr)",
+              md: "repeat(3, 1fr)",
+              lg: "repeat(4, 1fr)",
             },
             width: "100%",
           }}
@@ -106,11 +130,10 @@ export default function CatalogPage(props: {
                   flexDirection: "column",
                   position: "relative",
                   transition: "transform 0.2s",
-                  "&:hover": {
-                    transform: "translateY(-5px)",
-                  },
+                  "&:hover": { transform: "translateY(-5px)" },
                 }}
               >
+                {/* Stock Status */}
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Typography
                     sx={{
@@ -125,7 +148,6 @@ export default function CatalogPage(props: {
                   >
                     {item.is_in_stock ? "В наличии" : "По запросу"}
                   </Typography>
-
                   <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                     <Image
                       src="/scale.svg"
@@ -139,6 +161,7 @@ export default function CatalogPage(props: {
                   </Box>
                 </Box>
 
+                {/* Product Image */}
                 <Box
                   sx={{
                     position: "relative",
@@ -156,6 +179,7 @@ export default function CatalogPage(props: {
                   />
                 </Box>
 
+                {/* Title & Price */}
                 <Box sx={{ mt: 2, flexGrow: 1 }}>
                   <Typography
                     sx={{
@@ -166,18 +190,12 @@ export default function CatalogPage(props: {
                       WebkitBoxOrient: "vertical",
                       WebkitLineClamp: 2,
                       overflow: "hidden",
-                      lineHeight: "1.4em",
                     }}
                   >
-                    {item.short_description}
+                    {item.title}
                   </Typography>
                   <Typography
-                    sx={{
-                      fontWeight: 700,
-                      fontSize: 18,
-                      mt: 2,
-                      color: "#000",
-                    }}
+                    sx={{ fontWeight: 700, fontSize: 18, mt: 2, color: "#000" }}
                   >
                     {new Intl.NumberFormat("ru-RU").format(Number(item.price))}{" "}
                     сум
@@ -194,7 +212,6 @@ export default function CatalogPage(props: {
                     bottom: 16,
                     right: 16,
                     minWidth: 0,
-                    padding: 0,
                     "&:hover": { bgcolor: "#1a8ae5" },
                   }}
                 >
@@ -206,7 +223,7 @@ export default function CatalogPage(props: {
                     }
                     width={24}
                     height={24}
-                    alt="basket"
+                    alt="action"
                   />
                 </Button>
               </Box>
@@ -214,7 +231,28 @@ export default function CatalogPage(props: {
           ))}
         </Box>
 
-        {products?.results && products.results.length === 0 && (
+        {/* --- Datchik: Sahifa oxiriga yetganda shu ko'rinadi --- */}
+        <Box
+          ref={ref}
+          sx={{
+            py: 6,
+            display: "flex",
+            justifyContent: "center",
+            width: "100%",
+          }}
+        >
+          {loading && currentPage > 1 && (
+            <CircularProgress size={30} sx={{ color: "#249FFC" }} />
+          )}
+          {!products?.next && products?.results?.length ? (
+            <Typography sx={{ color: "#999", fontSize: 14 }}>
+              Вы просмотрели все товары
+            </Typography>
+          ) : null}
+        </Box>
+
+        {/* Bo'sh holat */}
+        {products?.results && products.results.length === 0 && !loading && (
           <Box sx={{ mt: 10, textAlign: "center" }}>
             <Typography variant="h6" sx={{ color: "#999" }}>
               Ничего не найдено

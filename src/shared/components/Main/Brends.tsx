@@ -12,9 +12,22 @@ const Brends = () => {
     { img: "/minrray.svg" },
     { img: "/porurobotics.svg" },
     { img: "/vlinka.svg" },
-    { img: "/vlinka.svg" },
-    { img: "/vlinka.svg" },
-    { img: "/vlinka.svg" },
+    { img: "/iqonex.png" },
+    { img: "/hpBrend.png" },
+    { img: "/tenveoBrands.jpg" },
+    { img: "/minew.png" },
+    { img: "/dellBrend.png" },
+    { img: "/okvBrend.png" },
+    { img: "/lenovoBrend.png" },
+    { img: "/hevlettBrend.png" },
+    { img: "/shileBrand.png" },
+    { img: "/yealinkBrend.png" },
+    { img: "/unitreeBrend.png" },
+    { img: "/absenBrend.png" },
+    { img: "/ugreenBrend.png" },
+    { img: "/averBrend.png" },
+    { img: "/yamahaBrend.png" },
+    { img: "/boschBrend.png" },
   ];
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -94,17 +107,23 @@ const Brends = () => {
               key={i}
               sx={{
                 minWidth: "280px",
+                width: "100%",
                 height: "100px",
-                p: "24px 28px",
+                objectFit: "contain",
                 borderRadius: "18px",
                 border: "1px solid #DDDDDD",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                flexShrink: 0,
               }}
             >
-              <Image src={item.img} alt="brand" width={100} height={50} />
+              <Image
+                src={item.img}
+                alt="brand"
+                width={190}
+                height={60}
+                style={{ objectFit: "contain" }}
+              />
             </Box>
           ))}
         </Box>

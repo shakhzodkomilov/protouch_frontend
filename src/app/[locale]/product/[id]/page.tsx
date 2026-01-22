@@ -26,6 +26,8 @@ import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlin
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import DoneIcon from "@mui/icons-material/Done";
 import Accessories from "../../../../shared/components/Accessories/Accessories";
@@ -44,20 +46,21 @@ export default function ProductDetailPage() {
 
   const { id, locale } = useParams();
   const pathname = usePathname();
-  const [arrivals, loading, loadProductDetailEv] = useUnit([
+  const [product, loading, loadProductDetailEv] = useUnit([
     $productDetail,
     $loadingProductDetail,
     loadProductDetail,
   ]);
 
-  // ✅ ADDED: Ref for smooth scroll to Info Blocks
   const infoBlocksRef = useRef<HTMLDivElement>(null);
 
   // State management
   const [openToast, setOpenToast] = useState(false);
   const [favoriteToast, setFavoriteToast] = useState(false);
-  const [lastToggledId, setLastToggledId] = useState<number>(0);
   const [activeImage, setActiveImage] = useState(0);
+
+  // ✅ ADDED: Description state
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Global state
   const { items: basketItems } = useUnit($basket);
@@ -66,10 +69,6 @@ export default function ProductDetailPage() {
   const handleToggleFavorite = useUnit(toggleFavorite);
   const loadFavoritesEv = useUnit(loadFavorites);
 
-  const product = arrivals;
-
-  // ✅ FIXED: Proper useMemo with Number conversion
-  // 🔑 ID ni oldindan normalize qilamiz
   const productId = useMemo(() => {
     return product?.id ? Number(product.id) : null;
   }, [product]);
@@ -88,29 +87,25 @@ export default function ProductDetailPage() {
   const onFavoriteClick = (e: React.MouseEvent, productData: any) => {
     e.preventDefault();
     e.stopPropagation();
-
     handleToggleFavorite({
       id: Date.now(),
       productId: Number(productData.id),
-      title: productData.short_description || "Product",
+      title: productData.title || "Product",
       image: productData.image || productData.images?.[0]?.url,
       price: productData.price,
     });
-
-    setLastToggledId(Number(productData.id));
     setFavoriteToast(true);
   };
 
   const onBasketClick = () => {
     if (!product) return;
-
     if (product.is_in_stock) {
       handleAddToBasket({
         id: Number(product.id),
         productId: Number(product.id),
         title: product.title || "Product",
         price: product.price,
-        image: product.images?.[0]?.url || "/placeholder.jpg", // ✅ FIXED
+        image: product.images?.[0]?.url || "/placeholder.jpg",
         quantity: 1,
         isInStock: product.is_in_stock,
       });
@@ -127,29 +122,8 @@ export default function ProductDetailPage() {
     }
   }, [id, locale, loadProductDetailEv, loadFavoritesEv]);
 
-  // ✅ ADDED: Smooth scroll to Info Blocks on mobile (<1100px)
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 1100 && infoBlocksRef.current) {
-        infoBlocksRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-          inline: "nearest",
-        });
-      }
-    };
-
-    // Check on mount and resize
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const formatPrice = useMemo(
-    () => (price: number) => new Intl.NumberFormat("ru-RU").format(price),
-    [],
-  );
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("ru-RU").format(price);
 
   if (loading || !product) {
     return (
@@ -161,76 +135,29 @@ export default function ProductDetailPage() {
 
   const images: ProductImage[] = product.images ?? [];
 
-  const getBreadcrumbs = () => {
-    const localePath = pathname.split("/")[1];
-    const basePath = `/${localePath}`;
-    return [
-      { label: "Главная", href: `${basePath}` },
-      { label: "Хиты продаж", href: `${basePath}/catalog/sales-hits` },
-      { label: product.title, href: pathname },
-    ];
-  };
-
   return (
     <Box sx={{ width: "100%", height: "auto", bgcolor: "#FAFAFA" }}>
-      <Container
-        maxWidth={false}
-        sx={{
-          py: 4,
-          maxWidth: "1800px",
-          "@media (max-width:1100px)": {
-            // display: "none",
-          },
-        }}
-      >
+      <Container maxWidth={false} sx={{ py: 4, maxWidth: "1800px" }}>
         {/* Breadcrumbs */}
         <Box sx={{ mb: 4 }}>
           <Breadcrumbs
             separator={<NavigateNextOutlinedIcon fontSize="small" />}
-            aria-label="breadcrumb"
           >
-            {getBreadcrumbs().map((crumb, index) =>
-              index === getBreadcrumbs().length - 1 ? (
-                <Typography
-                  key={crumb.label}
-                  sx={{ fontWeight: 500, color: "#000", fontSize: 16 }}
-                >
-                  {crumb.label}
-                </Typography>
-              ) : (
-                <Link
-                  key={crumb.label}
-                  href={crumb.href}
-                  style={{ textDecoration: "none" }}
-                >
-                  <Chip
-                    label={crumb.label}
-                    clickable
-                    sx={{
-                      fontSize: 16,
-                      color: "#000",
-                      fontWeight: 500,
-                      bgcolor: "transparent",
-                      "&:hover": { bgcolor: "#f5f5f5" },
-                    }}
-                  />
-                </Link>
-              ),
-            )}
+            <Link href={`/${locale}`} style={{ textDecoration: "none" }}>
+              <Chip
+                label="Главная"
+                clickable
+                sx={{ bgcolor: "transparent", color: "#000" }}
+              />
+            </Link>
+            <Typography sx={{ color: "#000", fontWeight: 500 }}>
+              {product.title}
+            </Typography>
           </Breadcrumbs>
         </Box>
 
         <Box
-          sx={{
-            bgcolor: "#fff",
-            py: 4,
-            px: 6,
-            borderRadius: 3,
-            gap: 4,
-            "@media (max-width:1100px)": {
-              padding: "0 0",
-            },
-          }}
+          sx={{ bgcolor: "#fff", py: 4, px: { xs: 2, md: 6 }, borderRadius: 3 }}
         >
           <Typography
             sx={{ fontSize: 28, fontWeight: 600, mb: 4, color: "#000" }}
@@ -240,18 +167,10 @@ export default function ProductDetailPage() {
 
           <Box
             sx={{
-              bgcolor: "#fff",
-              py: 4,
-              px: 6,
-              borderRadius: 3,
               display: "flex",
               gap: 6,
+              flexDirection: { xs: "column", lg: "row" },
               justifyContent: "space-between",
-              "@media (max-width:1100px)": {
-                flexDirection: "column",
-                alignItems: "center",
-                padding: "0 0",
-              },
             }}
           >
             {/* LEFT GALLERY */}
@@ -261,24 +180,20 @@ export default function ProductDetailPage() {
                 gap: 2,
                 width: "100%",
                 maxWidth: 600,
-                "@media (max-width:1100px)": {
-                  display: "unset",
-                },
+                flexDirection: { xs: "column-reverse", sm: "row" },
               }}
             >
               <Box
                 sx={{
                   display: "flex",
-                  flexDirection: "column",
+                  flexDirection: { xs: "row", sm: "column" },
                   gap: 1,
-                  "@media (max-width:1100px)": {
-                    flexDirection: "column",
-                  },
+                  overflowX: "auto",
                 }}
               >
-                {images.map((img: ProductImage, i: number) => (
+                {images.map((img, i) => (
                   <Box
-                    key={img.id || i}
+                    key={img.id}
                     onClick={() => setActiveImage(i)}
                     sx={{
                       width: 70,
@@ -323,16 +238,8 @@ export default function ProductDetailPage() {
               </Box>
             </Box>
 
-            {/* MIDDLE DESCRIPTION */}
-            <Box
-              sx={{
-                flex: 1,
-                maxWidth: 400,
-                "@media (max-width:1100px)": {
-                  maxWidth: "100%",
-                },
-              }}
-            >
+            {/* MIDDLE DESCRIPTION - ✅ UPDATED WITH CLAMP LOGIC */}
+            <Box sx={{ flex: 1, maxWidth: { lg: 400 } }}>
               <Typography
                 sx={{ fontSize: 18, fontWeight: 600, mb: 2, color: "#000" }}
               >
@@ -344,37 +251,51 @@ export default function ProductDetailPage() {
                   color: "#555",
                   fontSize: 14,
                   lineHeight: 1.8,
+                  display: "-webkit-box",
+                  WebkitBoxOrient: "vertical",
+                  WebkitLineClamp: isExpanded ? "unset" : 5,
+                  overflow: "hidden",
+                  transition: "all 0.3s ease",
                 }}
               >
-                {product.short_description}
+                {product.description}
               </Typography>
-              <Button
-                endIcon={<NavigateNextOutlinedIcon />}
-                sx={{
-                  mt: 3,
-                  color: "#000",
-                  fontWeight: 600,
-                  textTransform: "none",
-                }}
-              >
-                Подробнее
-              </Button>
+
+              {product.description && product.description.length > 150 && (
+                <Button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  endIcon={
+                    isExpanded ? (
+                      <KeyboardArrowUpIcon />
+                    ) : (
+                      <KeyboardArrowDownIcon />
+                    )
+                  }
+                  sx={{
+                    mt: 1,
+                    color: "#249FFC",
+                    fontWeight: 600,
+                    textTransform: "none",
+                    p: 0,
+                    "&:hover": {
+                      bgcolor: "transparent",
+                      textDecoration: "underline",
+                    },
+                  }}
+                >
+                  {isExpanded ? "Свернуть" : "Подробнее"}
+                </Button>
+              )}
             </Box>
 
             {/* RIGHT BUY CARD */}
             <Box
               sx={{
-                flex: "0 0 auto",
                 bgcolor: "#FAFAFA",
                 p: 3,
                 borderRadius: 3,
-                maxWidth: 380,
+                maxWidth: { xs: "100%", lg: 380 },
                 width: "100%",
-
-                "@media (max-width:1100px)": {
-                  maxWidth: 600,
-                  width: "100%",
-                },
               }}
             >
               <Typography
@@ -413,7 +334,6 @@ export default function ProductDetailPage() {
                 </Button>
               </Box>
 
-              {/* DYNAMIC BASKET BUTTON */}
               <Button
                 fullWidth
                 onClick={onBasketClick}
@@ -459,7 +379,7 @@ export default function ProductDetailPage() {
             </Box>
           </Box>
 
-          {/* ✅ FIXED: Info Blocks with smooth scroll ref + mobile horizontal scroll */}
+          {/* INFO BLOCKS */}
           <Box
             ref={infoBlocksRef}
             sx={{
@@ -467,60 +387,61 @@ export default function ProductDetailPage() {
               bgcolor: "#f4f4f4",
               borderRadius: 3,
               display: "flex",
+              mt: 4,
               justifyContent: "space-between",
               alignItems: "center",
               color: "#000",
-              "@media (max-width:1100px)": {
-                mt: 5,
-                // ✅ Horizontal scroll for mobile
-                overflowX: "auto",
-                scrollSnapType: "x mandatory",
-                WebkitOverflowScrolling: "touch",
-                "& > *": {
-                  flexShrink: 0,
-                  scrollSnapAlign: "start",
-                },
-              },
+              overflowX: { xs: "auto", lg: "hidden" },
             }}
           >
             <InfoItem
               icon="/Pickup.svg"
               title="Самовывоз"
-              desc="г. Ташкент, Сергелийский р-н., 4-й пр-д. Дарё Буйи"
+              desc="г. Ташкент, Сергелийский р-н."
             />
-            <Divider orientation="vertical" flexItem sx={{ my: 4 }} />
+            <Divider
+              orientation="vertical"
+              flexItem
+              sx={{ my: 4, display: { xs: "none", lg: "block" } }}
+            />
             <InfoItem
               icon="/Delivery.svg"
               title="Доставка"
-              desc="по г. Ташкент бесплатно в течении 3-х дней"
+              desc="бесплатно в течении 3-х дней"
             />
-            <Divider orientation="vertical" flexItem sx={{ my: 4 }} />
+            <Divider
+              orientation="vertical"
+              flexItem
+              sx={{ my: 4, display: { xs: "none", lg: "block" } }}
+            />
             <Box
               sx={{
-                bgcolor: "#fff",
                 textAlign: "center",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-
                 gap: 1,
-                width: "33%",
-                "@media (max-width:1100px)": {
-                  width: "330px",
-                  height: "180px",
-                  pt: "40px",
-                },
+                flex: 1,
+                minWidth: 280,
               }}
             >
-              <Typography>Появились вопросы о товаре?</Typography>
+              <Typography>Есть вопросы?</Typography>
               <Button
                 variant="contained"
+                component="a"
+                href="https://t.me/ProTouchUz"
+                target="_blank"
+                rel="noopener noreferrer"
                 startIcon={<TelegramIcon />}
                 sx={{
                   bgcolor: "#249FFC",
-                  color: "#fff",
                   borderRadius: 4,
                   px: 4,
+                  color: "#fff",
+                  textTransform: "none",
+                  "&:hover": {
+                    bgcolor: "#1E8BD8",
+                  },
                 }}
               >
                 Telegram
@@ -532,7 +453,7 @@ export default function ProductDetailPage() {
         <Accessories />
       </Container>
 
-      {/* FIXED TOASTS */}
+      {/* TOASTS */}
       <Snackbar
         open={openToast}
         autoHideDuration={3000}
@@ -544,7 +465,7 @@ export default function ProductDetailPage() {
           variant="filled"
           sx={{ width: "100%", borderRadius: "10px" }}
         >
-          Товар успешно добавлен в корзину!
+          Товар в корзине!
         </Alert>
       </Snackbar>
 
@@ -559,39 +480,30 @@ export default function ProductDetailPage() {
           variant="filled"
           sx={{ width: "100%", borderRadius: "10px" }}
         >
-          {isFavorite ? "Удалено из избранного" : "Добавлено в избранное"}!
+          {isFavorite ? "Добавлено в избранное" : "Удалено из избранного"}
         </Alert>
       </Snackbar>
     </Box>
   );
 }
 
-// Sub-components & Styles
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const InfoItem = ({ icon, title, desc }: any) => (
   <Box
     sx={{
       py: 4,
       display: "flex",
-      gap: 2,
+      gap: 1,
       flexDirection: "column",
       alignItems: "center",
       textAlign: "center",
-      flex: "1",
-
-      "@media (max-width:1100px)": {
-        minWidth: 280, // ✅ important
-        flex: "0 0 auto",
-        scrollSnapAlign: "start",
-        bgcolor: "#fff",
-        borderRadius: 3,
-        px: 2,
-      },
+      flex: 1,
+      minWidth: 280,
     }}
   >
-    <Image src={icon} alt={title} width={120} height={40} />
+    <Image src={icon} alt={title} width={40} height={40} />
     <Typography fontWeight={600}>{title}</Typography>
-    <Typography fontSize={14} color="#555">
+    <Typography fontSize={13} color="#555">
       {desc}
     </Typography>
   </Box>

@@ -52,6 +52,7 @@ export interface ProductDetailType {
   images: Image[];
   category: CategoryType;
   short_description: string;
+  description: string;
   is_in_stock: boolean;
   is_pre_order: boolean;
   image?: string; // ✅ Optional fallback

@@ -18,7 +18,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import DoneIcon from "@mui/icons-material/Done";
 interface ProductItem {
   id: number | string;
-  short_description?: string;
+  description?: string;
   image: string;
   price: number;
   is_in_stock: boolean;
@@ -85,7 +85,7 @@ const BestSellers = () => {
     handleToggleFavorite({
       id: timestampId, // Date.now() o'rniga
       productId: item.id,
-      title: item.short_description || "Product",
+      title: item.description || "Product",
       image: item.image,
       price: item.price,
     });
@@ -104,7 +104,7 @@ const BestSellers = () => {
       handleAddToBasket({
         id: numericId, // Endi bu aniq number
         productId: numericId, // Endi bu aniq number
-        title: item.short_description || "Product",
+        title: item.description || "Product",
         price: item.price,
         image: item.image,
         quantity: 1,
@@ -229,7 +229,7 @@ const BestSellers = () => {
 
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography sx={descriptionStyle}>
-                      {item.short_description}
+                      {item.description}
                     </Typography>
                     <Typography
                       sx={{ color: "#000", fontWeight: 700, fontSize: "20px" }}

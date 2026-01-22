@@ -9,8 +9,7 @@ const Banners = () => {
     { img: "/Banner2.svg" },
     { img: "/Banner1.svg" },
     { img: "/Banner3.svg" },
-    { img: "/Banner3.svg" },
-    { img: "/Banner3.svg" },
+    { img: "/Banner4.svg" },
   ];
 
   const scrollRef = useRef<HTMLDivElement>(null);
