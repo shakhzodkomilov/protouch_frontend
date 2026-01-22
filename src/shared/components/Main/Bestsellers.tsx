@@ -229,7 +229,7 @@ const BestSellers = () => {
 
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography sx={descriptionStyle}>
-                      {item.description}
+                      {item.short_description}
                     </Typography>
                     <Typography
                       sx={{ color: "#000", fontWeight: 700, fontSize: "20px" }}
