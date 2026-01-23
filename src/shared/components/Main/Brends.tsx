@@ -2,7 +2,7 @@
 
 import { Box, IconButton, Typography } from "@mui/material";
 import Image from "next/image";
-import { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 const Brends = () => {
   const brends = [
@@ -30,12 +30,67 @@ const Brends = () => {
     { img: "/boschBrend.png" },
   ];
 
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<any>(null);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const scroll = (dir: "left" | "right") => {
+  // --- 1. AVTOMATIK SCROLL MANTIQI ---
+  useEffect(() => {
+    const slider = scrollRef.current;
+    let scrollInterval: any;
+
+    const startAutoScroll = () => {
+      scrollInterval = setInterval(() => {
+        // Agar sichqoncha ustida bo'lmasa va drag qilinmayotgan bo'lsa
+        if (slider && !slider.isDown) {
+          slider.scrollLeft += 1;
+
+          // Oxiriga yetsa boshiga qaytadi
+          if (slider.scrollLeft >= slider.scrollWidth - slider.clientWidth - 1) {
+            slider.scrollLeft = 0;
+          }
+        }
+      }, 30); // Tezlik (30ms)
+    };
+
+    if (!isHovered) {
+      startAutoScroll();
+    }
+
+    return () => clearInterval(scrollInterval);
+  }, [isHovered]);
+
+  // --- 2. SICHQONCHA BILAN SURISH (DRAG) MANTIQI ---
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const slider = scrollRef.current;
+    if (!slider) return;
+    slider.isDown = true;
+    slider.startX = e.pageX - slider.offsetLeft;
+    slider.scrollLeftStart = slider.scrollLeft;
+    slider.style.cursor = "grabbing";
+  };
+
+  const handleMouseLeaveOrUp = () => {
+    const slider = scrollRef.current;
+    if (!slider) return;
+    slider.isDown = false;
+    slider.style.cursor = "grab";
+    setIsHovered(false);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const slider = scrollRef.current;
+    if (!slider || !slider.isDown) return;
+    e.preventDefault();
+    const x = e.pageX - slider.offsetLeft;
+    const walk = (x - slider.startX) * 1.5; // Sezgirlik
+    slider.scrollLeft = slider.scrollLeftStart - walk;
+  };
+
+  // --- 3. TUGMALAR ORQALI SCROLL ---
+  const scrollBtn = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollBy({
-      left: dir === "left" ? -320 : 320,
+      left: dir === "left" ? -360 : 360,
       behavior: "smooth",
     });
   };
@@ -45,61 +100,68 @@ const Brends = () => {
       <Typography sx={{ fontSize: "34px", fontWeight: 600, color: "#000" }}>
         Бренды
       </Typography>
+      
       <Box sx={{ position: "relative", mt: "34px" }}>
+        {/* CHAP TUGMA */}
         <IconButton
-          onClick={() => scroll("left")}
+          onClick={() => scrollBtn("left")}
           sx={{
             position: "absolute",
             left: -20,
-            top: "60%",
+            top: "50%",
             transform: "translateY(-50%)",
             zIndex: 10,
             bgcolor: "#fff",
             boxShadow: 2,
             width: 40,
             height: 40,
-            "@media (max-width:900px)": {
-              display: "none",
-            },
+            display: { xs: "none", md: "flex" },
+            "&:hover": { bgcolor: "#f5f5f5" }
           }}
         >
           <Image src="/arrowleft.svg" width="32" height="32" alt="arrow left" />
         </IconButton>
+
+        {/* O'NG TUGMA */}
         <IconButton
-          onClick={() => scroll("right")}
+          onClick={() => scrollBtn("right")}
           sx={{
             position: "absolute",
             right: -20,
-            top: "60%",
+            top: "50%",
             transform: "translateY(-50%)",
             zIndex: 10,
             bgcolor: "#fff",
             boxShadow: 2,
             width: 40,
             height: 40,
-            "@media (max-width:900px)": {
-              display: "none",
-            },
+            display: { xs: "none", md: "flex" },
+            "&:hover": { bgcolor: "#f5f5f5" }
           }}
         >
-          <Image
-            src="/arrowright.svg"
-            width="32"
-            height="32"
-            alt="arrow right"
-          />
+          <Image src="/arrowright.svg" width="32" height="32" alt="arrow right" />
         </IconButton>
+
+        {/* SCROLL KONTEYNERI */}
         <Box
           ref={scrollRef}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeaveOrUp}
+          onMouseUp={handleMouseLeaveOrUp}
+          onMouseMove={handleMouseMove}
+          onMouseEnter={() => setIsHovered(true)}
           sx={{
             display: "flex",
             alignItems: "center",
             gap: 2,
             overflowX: "auto",
-            scrollBehavior: "smooth",
+            scrollBehavior: "auto", // Drag silliq bo'lishi uchun
             scrollbarWidth: "none",
             "&::-webkit-scrollbar": { display: "none" },
             pt: "20px",
+            cursor: "grab",
+            userSelect: "none",
+            WebkitOverflowScrolling: "touch",
           }}
         >
           {brends.map((item, i) => (
@@ -107,14 +169,16 @@ const Brends = () => {
               key={i}
               sx={{
                 minWidth: "280px",
-                width: "100%",
+                width: "280px",
                 height: "100px",
-                objectFit: "contain",
                 borderRadius: "18px",
                 border: "1px solid #DDDDDD",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                flexShrink: 0,
+                transition: "transform 0.15s ease",
+                "&:hover": { transform: "scale(1.02)" },
               }}
             >
               <Image
@@ -122,7 +186,7 @@ const Brends = () => {
                 alt="brand"
                 width={190}
                 height={60}
-                style={{ objectFit: "contain" }}
+                style={{ objectFit: "contain", pointerEvents: "none" }}
               />
             </Box>
           ))}
@@ -131,4 +195,5 @@ const Brends = () => {
     </Box>
   );
 };
+
 export default Brends;

@@ -21,8 +21,17 @@ interface NewsItem {
 
 const News = () => {
   const [openModal, setOpenModal] = useState<number | null>(null);
+  
+  // --- DRAG SCROLL LOGIC ---
   const scrollRef = useRef<HTMLDivElement>(null);
+  const dragInfo = useRef({
+    isDown: false,
+    startX: 0,
+    scrollLeft: 0,
+    hasMoved: false,
+  });
 
+ 
   const news: NewsItem[] = [
     {
       title: "Доставка",
@@ -190,11 +199,57 @@ const News = () => {
 Прикрепите кратко: опыт, город, контакты (и портфолио — для дизайнеров).`,
     },
   ];
+  // --- DRAG HANDLERS ---
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const slider = scrollRef.current;
+    if (!slider) return;
 
-  const scroll = (dir: "left" | "right") => {
+    dragInfo.current.isDown = true;
+    dragInfo.current.hasMoved = false;
+    dragInfo.current.startX = e.pageX - slider.offsetLeft;
+    dragInfo.current.scrollLeft = slider.scrollLeft;
+    
+    slider.style.cursor = "grabbing";
+    slider.style.scrollSnapType = "none";
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const slider = scrollRef.current;
+    if (!slider || !dragInfo.current.isDown) return;
+
+    e.preventDefault();
+    const x = e.pageX - slider.offsetLeft;
+    const distance = x - dragInfo.current.startX;
+    
+    if (Math.abs(distance) > 5) {
+      dragInfo.current.hasMoved = true;
+    }
+
+    const walk = distance * 1.5; 
+    slider.scrollLeft = dragInfo.current.scrollLeft - walk;
+  };
+
+  const stopDragging = () => {
+    const slider = scrollRef.current;
+    if (!slider) return;
+
+    dragInfo.current.isDown = false;
+    slider.style.cursor = "grab";
+    slider.style.scrollSnapType = "x mandatory";
+  };
+
+  const handleCaptureClick = (e: React.MouseEvent) => {
+    // Agar foydalanuvchi kartani surgan bo'lsa, Modal ochilmasligi kerak
+    if (dragInfo.current.hasMoved) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
+  const scrollBtn = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollBy({
-      left: dir === "left" ? -200 : 200,
+      left: dir === "left" ? -300 : 300,
       behavior: "smooth",
     });
   };
@@ -214,63 +269,40 @@ const News = () => {
       </Typography>
 
       <Box sx={{ position: "relative" }}>
+        {/* Nav Buttons */}
         <IconButton
-          onClick={() => scroll("left")}
-          sx={{
-            position: "absolute",
-            left: -20,
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 10,
-            bgcolor: "#fff",
-            boxShadow: 2,
-            width: 40,
-            height: 40,
-            "@media (max-width:900px)": {
-              display: "none",
-            },
-          }}
+          onClick={() => scrollBtn("left")}
+          sx={{ ...navBtnStyle, left: -20 }}
         >
           <Image src="/arrowleft.svg" width="32" height="32" alt="arrow left" />
         </IconButton>
 
         <IconButton
-          onClick={() => scroll("right")}
-          sx={{
-            position: "absolute",
-            right: -20,
-            top: "50%",
-            transform: "translateY(-50%)",
-            zIndex: 10,
-            bgcolor: "#fff",
-            boxShadow: 2,
-            width: 40,
-            height: 40,
-            "@media (max-width:900px)": {
-              display: "none",
-            },
-          }}
+          onClick={() => scrollBtn("right")}
+          sx={{ ...navBtnStyle, right: -20 }}
         >
-          <Image
-            src="/arrowright.svg"
-            width="32"
-            height="32"
-            alt="arrow right"
-          />
+          <Image src="/arrowright.svg" width="32" height="32" alt="arrow right" />
         </IconButton>
 
         <Box
           ref={scrollRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={stopDragging}
+          onMouseLeave={stopDragging}
+          onClickCapture={handleCaptureClick}
           sx={{
             display: "flex",
             alignItems: "center",
             gap: 2,
             overflowX: "auto",
-            scrollBehavior: "smooth",
             scrollbarWidth: "none",
             "&::-webkit-scrollbar": { display: "none" },
             pt: "20px",
-            cursor: "pointer",
+            cursor: "grab",
+            scrollSnapType: "x mandatory",
+            WebkitOverflowScrolling: "touch",
+            userSelect: "none",
           }}
         >
           {news.map((item, i) => (
@@ -278,7 +310,7 @@ const News = () => {
               key={i}
               onClick={() => item.modalContent && handleOpenModal(i)}
               sx={{
-                maxWidth: 300,
+                width: 300,
                 height: 250,
                 borderRadius: "16px",
                 p: 3,
@@ -286,20 +318,19 @@ const News = () => {
                 color: "#fff",
                 display: "flex",
                 flexDirection: "column",
-
                 flexShrink: 0,
                 position: "relative",
-                transition: "transform 0.2s, box-shadow 0.2s",
+                transition: "transform 0.2s",
+                scrollSnapAlign: "start",
                 "&:hover": {
                   transform: "translateY(-5px)",
-                  // boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
                 },
               }}
             >
               <Typography sx={{ fontSize: 18, fontWeight: 500 }}>
                 {item.title}
               </Typography>
-              <Typography sx={{ fontWeight: 300, mt: "22px" }}>
+              <Typography sx={{ fontWeight: 300, mt: "22px", whiteSpace: "normal" }}>
                 {item.text}
               </Typography>
               <Image
@@ -307,6 +338,7 @@ const News = () => {
                 width="150"
                 height="150"
                 alt="newsBg"
+                onDragStart={(e) => e.preventDefault()}
                 style={{
                   position: "absolute",
                   right: 0,
@@ -319,60 +351,21 @@ const News = () => {
         </Box>
       </Box>
 
-      {/* Modals */}
       {news.map((item, i) => (
-        <Modal
-          open={openModal === i}
-          onClose={handleCloseModal}
-          key={`modal-${i}`}
-        >
+        <Modal open={openModal === i} onClose={handleCloseModal} key={`modal-${i}`}>
           <Fade in={openModal === i}>
-            <Box
-              sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                maxWidth: 600,
-                width: "90vw",
-                maxHeight: "80vh",
-                bgcolor: "background.paper",
-                borderRadius: 4,
-                boxShadow: 24,
-                p: 4,
-                overflowY: "auto",
-              }}
-            >
-              <Typography
-                variant="h5"
-                sx={{
-                  mb: 3,
-                  fontWeight: 700,
-                  color: "#000",
-                }}
-              >
+            <Box sx={modalStyle}>
+              <Typography variant="h5" sx={{ mb: 3, fontWeight: 700, color: "#000" }}>
                 {item.title}
               </Typography>
               <Typography
-                sx={{
-                  lineHeight: 1.7,
-                  whiteSpace: "pre-line",
-                  color: "#333",
-                }}
+                sx={{ lineHeight: 1.7, whiteSpace: "pre-line", color: "#333" }}
                 dangerouslySetInnerHTML={{
                   __html: item.modalContent?.replace(/\n/g, "<br>") || "",
                 }}
               />
               <Box sx={{ mt: 4, textAlign: "right" }}>
-                <Button
-                  variant="contained"
-                  onClick={handleCloseModal}
-                  sx={{
-                    bgcolor: "#249FFC",
-                    color: "#fff",
-                    "&:hover": { bgcolor: "#1a8ae5" },
-                  }}
-                >
+                <Button variant="contained" onClick={handleCloseModal} sx={{ bgcolor: "#249FFC", color:"#fff"  }}>
                   Закрыть
                 </Button>
               </Box>
@@ -382,6 +375,35 @@ const News = () => {
       ))}
     </Box>
   );
+};
+
+// --- STYLES ---
+const navBtnStyle = {
+  position: "absolute",
+  top: "50%",
+  transform: "translateY(-50%)",
+  zIndex: 10,
+  bgcolor: "#fff",
+  boxShadow: 2,
+  width: 40,
+  height: 40,
+  "@media (max-width:900px)": { display: "none" },
+  "&:hover": { bgcolor: "#f5f5f5" }
+};
+
+const modalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  maxWidth: 600,
+  width: "90vw",
+  maxHeight: "80vh",
+  bgcolor: "background.paper",
+  borderRadius: 4,
+  boxShadow: 24,
+  p: 4,
+  overflowY: "auto",
 };
 
 export default News;

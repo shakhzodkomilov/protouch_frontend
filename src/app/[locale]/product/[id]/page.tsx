@@ -225,14 +225,22 @@ export default function ProductDetailPage() {
                   flex: 1,
                   height: 420,
                   position: "relative",
+                  display: "flex",
                   borderRadius: 3,
+                  justifyContent: "center",
+                  alignItems: "center",
                   border: "1px solid #eee",
                 }}
               >
                 <Image
-                  src={images[activeImage]?.url || product.image || ""}
-                  fill
-                  style={{ objectFit: "contain" }}
+                  src={images[activeImage]?.url}
+                  // fill
+                  width={290}
+                  height={290}
+                  style={{
+                    objectFit: "contain",
+                    position: "unset",
+                  }}
                   alt={product.title}
                 />
               </Box>

@@ -52,7 +52,6 @@ export default async function LocaleLayout({ children, params }: Props) {
           <Header />
           <main>{children}</main>
           <Footer />
-          {/* Mobil menyu shu yerda */}
           <MobileBottomNav />
         </NextIntlClientProvider>
       </body>

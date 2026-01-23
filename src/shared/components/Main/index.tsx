@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Box, Button, Container, Typography, IconButton } from "@mui/material";
 import Brends from "./Brends";
 import BestSellers from "./Bestsellers";
@@ -9,7 +9,7 @@ import NewArrivals from "./NewArrivals";
 import Image from "next/image";
 import Banners from "./Banners";
 import Recommend from "./Recommend";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 const cards = [
   {
@@ -30,7 +30,7 @@ const cards = [
     img: "/category_3.svg",
     url: "interactive-equipment/electronic-stands",
   },
-  { title: "Акции", bg: "#F2C94C", img: "/category_4.svg" },
+  { title: "Акции", bg: "#F2C94C", img: "/category_4.svg", url: "" },
   {
     title: "ВКС камеры",
     bg: "#9B8AFF",
@@ -41,188 +41,199 @@ const cards = [
 
 export default function HomeCategories() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { locale } = useParams();
+  const router = useRouter();
 
-  const scroll = (dir: "left" | "right") => {
+  // --- DRAG SCROLL LOGIC ---
+  const dragInfo = useRef({
+    isDown: false,
+    startX: 0,
+    scrollLeft: 0,
+    hasMoved: false,
+  });
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const slider = scrollRef.current;
+    if (!slider) return;
+
+    dragInfo.current.isDown = true;
+    dragInfo.current.hasMoved = false;
+    dragInfo.current.startX = e.pageX - slider.offsetLeft;
+    dragInfo.current.scrollLeft = slider.scrollLeft;
+
+    slider.style.cursor = "grabbing";
+    slider.style.scrollSnapType = "none";
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const slider = scrollRef.current;
+    if (!slider || !dragInfo.current.isDown) return;
+
+    e.preventDefault();
+    const x = e.pageX - slider.offsetLeft;
+    const distance = x - dragInfo.current.startX;
+
+    if (Math.abs(distance) > 5) {
+      dragInfo.current.hasMoved = true;
+    }
+
+    slider.scrollLeft = dragInfo.current.scrollLeft - distance * 1.5;
+  };
+
+  const stopDragging = () => {
+    const slider = scrollRef.current;
+    if (!slider) return;
+
+    dragInfo.current.isDown = false;
+    slider.style.cursor = "grab";
+    slider.style.scrollSnapType = "x mandatory";
+  };
+
+  const scrollBtn = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollBy({
-      left: dir === "left" ? -360 : 360,
+      left: dir === "left" ? -350 : 350,
       behavior: "smooth",
     });
   };
-  const { locale } = useParams();
-  const navigateCategory = (category: string) => {
-    // eslint-disable-next-line react-hooks/immutability
-    window.location.href = `/${locale}/catalog/${category}`;
+
+  const handleCategoryClick = (url: string) => {
+    // Agar foydalanuvchi surayotgan bo'lsa, link ochilib ketmasligi kerak
+    if (dragInfo.current.hasMoved || !url) return;
+    
+    const path = `/${locale}/catalog/${url}`;
+    router.push(path);
   };
+
   return (
-    <Container maxWidth={false} sx={{ py: 4, maxWidth: "1800px" }}>
+    <Container maxWidth={false} sx={{ py: 4, maxWidth: "1800px", userSelect: "none" }}>
       <Box sx={{ display: "flex", gap: 3 }}>
+        {/* SIDEBAR BOX */}
         <Box
           sx={{
             bgcolor: "#FFF7DA",
             width: 400,
             p: "24px 44px",
             borderRadius: "24px",
-            display: "flex",
+            display: { xs: "none", md: "flex" },
             flexDirection: "column",
             justifyContent: "space-between",
             color: "#000",
-            "@media (max-width:900px)": {
-              display: "none",
-            },
+            flexShrink: 0,
           }}
         >
-          <Box sx={{ width: "100%" }}>
-            <Typography fontWeight={600}>Личный кабинет</Typography>
-            <Typography width={"100%"}>
+          <Box>
+            <Typography fontWeight={600} fontSize="18px">Личный кабинет</Typography>
+            <Typography sx={{ mt: 1, color: "#4E4E4E" }}>
               Получайте бонусы, отслеживайте заказы и делитесь мнением
             </Typography>
           </Box>
-
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Button
-              variant="outlined"
-              sx={{
-                color: "#4E4E4E",
-                border: "1px solid #4E4E4E",
-                borderRadius: "8px",
-              }}
+            <Button 
+              variant="outlined" 
+              sx={{ color: "#4E4E4E", borderColor: "#4E4E4E", borderRadius: "8px", flex: 1 }}
             >
               Войти
             </Button>
-            <Button
-              variant="outlined"
-              sx={{
-                color: "#4E4E4E",
-                border: "1px solid #4E4E4E",
-                borderRadius: "8px",
-              }}
+            <Button 
+              variant="outlined" 
+              sx={{ color: "#4E4E4E", borderColor: "#4E4E4E", borderRadius: "8px", flex: 1 }}
             >
-              Мои заказы
+              Заказы
             </Button>
           </Box>
         </Box>
 
         {/* SLIDER AREA */}
-        <Box
-          sx={{
-            position: "relative",
-            flex: 1,
-            overflow: "hidden",
-            px: "24px",
-            "@media (max-width:900px)": {
-              px: "0",
-              mt: 12,
-            },
-          }}
-        >
-          {/* LEFT BTN */}
+        <Box sx={{ position: "relative", flex: 1, overflow: "hidden" }}>
+          
+          {/* NAVIGATION BUTTONS */}
           <IconButton
-            onClick={() => scroll("left")}
-            sx={{
-              "@media (max-width:900px)": {
-                display: "none",
-              },
-              position: "absolute",
-              left: 5,
-              top: "50%",
-              transform: "translateY(-50%)",
-              zIndex: 10,
-              bgcolor: "#fff",
-              boxShadow: 2,
-              width: 40,
-              height: 40,
-            }}
+            onClick={() => scrollBtn("left")}
+            sx={{ ...navBtnStyle, left: 10 }}
           >
-            <Image
-              src="/arrowleft.svg"
-              width="32"
-              height="32"
-              alt="arrow left"
-            />
+            <Image src="/arrowleft.svg" width={32} height={32} alt="left" />
           </IconButton>
 
-          {/* RIGHT BTN */}
           <IconButton
-            onClick={() => scroll("right")}
-            sx={{
-              "@media (max-width:900px)": {
-                display: "none",
-              },
-              position: "absolute",
-              right: 5,
-              top: "50%",
-              transform: "translateY(-50%)",
-              zIndex: 10,
-              bgcolor: "#fff",
-              boxShadow: 2,
-              width: 40,
-              height: 40,
-            }}
+            onClick={() => scrollBtn("right")}
+            sx={{ ...navBtnStyle, right: 10 }}
           >
-            <Image
-              src="/arrowright.svg"
-              width="32"
-              height="32"
-              alt="arrow right"
-            />
+            <Image src="/arrowright.svg" width={32} height={32} alt="right" />
           </IconButton>
 
-          {/* SCROLL CONTAINER */}
+          {/* SCROLLABLE CONTAINER */}
           <Box
             ref={scrollRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={stopDragging}
+            onMouseLeave={stopDragging}
             sx={{
               display: "flex",
               gap: "24px",
               overflowX: "auto",
-              scrollBehavior: "smooth",
-              pr: 4,
+              py: 1,
+              px: { xs: 2, md: 1 },
+              cursor: "grab",
+              WebkitOverflowScrolling: "touch",
               "&::-webkit-scrollbar": { display: "none" },
+              scrollbarWidth: "none",
+              scrollSnapType: "x mandatory",
             }}
           >
             {cards.map((item, i) => (
               <Box
                 key={i}
+                onClick={() => handleCategoryClick(item.url)}
                 sx={{
-                  minWidth: 320,
+                  minWidth: { xs: 280, md: 320 },
                   height: 280,
                   borderRadius: "24px",
                   background: item.bg,
                   p: 3,
                   position: "relative",
-                  cursor: item.url ? "pointer" : "default",
                   flexShrink: 0,
+                  scrollSnapAlign: "start",
+                  transition: "transform 0.2s ease",
+                  cursor: "pointer",
+                  overflow: "hidden",
+                  "&:active": { transform: "scale(0.97)" },
                 }}
-                onClick={() => navigateCategory(item.url)}
               >
-                <Image
-                  src={"/mainBgIcon.svg"}
-                  alt={item.title}
-                  width={150}
-                  height={150}
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    right: "-5%",
-                    width: "75%",
-                    height: "75%",
-                    objectFit: "contain",
-                  }}
-                />
-                <Typography fontWeight={600} color="#fff">
+                <Typography 
+                  fontWeight={600} 
+                  fontSize="18px"
+                  color="#fff" 
+                  sx={{ position: "relative", zIndex: 2, maxWidth: "70%" }}
+                >
                   {item.title}
                 </Typography>
 
+                <Image
+                  src="/mainBgIcon.svg"
+                  alt="bg"
+                  width={200}
+                  height={200}
+                  style={{
+                    position: "absolute", 
+                    bottom: "-10%", 
+                    right: "-10%",
+                    pointerEvents: "none",
+                  }}
+                />
                 <Box
                   component="img"
                   src={item.img}
                   sx={{
-                    position: "absolute",
-                    right: 10,
-                    bottom: 10,
-                    width: "55%",
-                    height: "55%",
+                    position: "absolute", 
+                    right: 20, 
+                    bottom: 20,
+                    width: "60%", 
+                    height: "60%", 
                     objectFit: "contain",
+                    zIndex: 1,
+                    pointerEvents: "none",
                   }}
                 />
               </Box>
@@ -230,6 +241,8 @@ export default function HomeCategories() {
           </Box>
         </Box>
       </Box>
+
+      {/* OTHER COMPONENTS */}
       <Brends />
       <BestSellers />
       <News />
@@ -239,3 +252,16 @@ export default function HomeCategories() {
     </Container>
   );
 }
+
+const navBtnStyle = {
+  display: { xs: "none", md: "flex" },
+  position: "absolute", 
+  top: "50%", 
+  transform: "translateY(-50%)",
+  zIndex: 10, 
+  bgcolor: "#fff", 
+  boxShadow: 3, 
+  width: 44, 
+  height: 44,
+  "&:hover": { bgcolor: "#f5f5f5" }
+};
