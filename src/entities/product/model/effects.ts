@@ -38,10 +38,9 @@ export const getProductDetailFx = createEffect<
 >(async ({ product_id, lang }) => {
   const { data } = await axios.get(
     `${BASE_URL}/api/v1/products/product/${product_id}/`,
-    { params: { lang: lang || "ru" } },
+    { params: { lang:  "ru" } },
   );
 
-  // ✅ Parse string prices to numbers
   return {
     ...data,
     price: Number(data.price),

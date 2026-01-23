@@ -8,12 +8,22 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https", // TypeScript now knows this is specifically 'https'
+        protocol: "https",
         hostname: "api.protouch.uz",
         port: "",
         pathname: "/media/**",
       },
     ],
+  },
+  async redirects() {
+    return [
+      {
+   
+        source: '/:lang/products/product/:id',
+        destination: '/:lang/product/:id',
+        permanent: true, 
+      },
+    ];
   },
 };
 
