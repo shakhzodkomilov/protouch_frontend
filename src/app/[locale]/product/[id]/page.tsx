@@ -234,7 +234,6 @@ export default function ProductDetailPage() {
               >
                 <Image
                   src={images[activeImage]?.url}
-                  // fill
                   width={290}
                   height={290}
                   style={{
@@ -246,7 +245,6 @@ export default function ProductDetailPage() {
               </Box>
             </Box>
 
-            {/* MIDDLE DESCRIPTION - ✅ UPDATED WITH CLAMP LOGIC */}
             <Box sx={{ flex: 1, maxWidth: { lg: 400 } }}>
               <Typography
                 sx={{ fontSize: 18, fontWeight: 600, mb: 2, color: "#000" }}

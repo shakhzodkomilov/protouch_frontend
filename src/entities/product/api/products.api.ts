@@ -1,8 +1,9 @@
-import { BASE_URL } from "../../config/base";
+import { API_URL } from "../../config/base";
 import { Product } from "../model/types";
 
 // Helper to handle the URL construction with lang=ru
-const getUrl = (path: string) => `${BASE_URL}${path}${path.includes('?') ? '&' : '?'}lang=ru`;
+const getUrl = (path: string) =>
+  `${API_URL}${path}${path.includes("?") ? "&" : "?"}lang=ru`;
 
 export async function getAllProducts(): Promise<Product[]> {
   // Result: https://api.protouch.uz/api/v1/products?lang=ru
@@ -18,7 +19,7 @@ export async function getAllProducts(): Promise<Product[]> {
 }
 
 export async function getProductsByCategory(
-  category: string
+  category: string,
 ): Promise<Product[]> {
   const res = await fetch(getUrl(`/products/category/${category}`), {
     cache: "no-store",

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { createEffect } from "effector";
 
-import { BASE_URL } from "../config/base";
+import { API_URL } from "../config/base";
 import {
   CategoryType,
   PaginationType,
@@ -20,8 +20,8 @@ export const getCategoriesFx = createEffect<
   if (lang) params.lang = lang;
 
   const response = await axios.get<Array<CategoryType>>(
-    `${BASE_URL}/api/v1/products/categories/`,
-    { params }
+    `${API_URL}/api/v1/products/categories/`,
+    { params },
   );
   return response.data;
 });
@@ -40,7 +40,7 @@ export const getProductsFx = createEffect<
   PaginationType
 >(async ({ page, slug, brand, lang, title }) => {
   const response = await axios.get<PaginationType>(
-    `${BASE_URL}/api/v1/products/`,
+    `${API_URL}/api/v1/products/`,
     {
       params: {
         page,
@@ -49,7 +49,7 @@ export const getProductsFx = createEffect<
         title,
         lang,
       },
-    }
+    },
   );
   return response.data;
 });
@@ -59,8 +59,8 @@ export const getProductDetailFx = createEffect<
   ProductDetailType
 >(async ({ product_id, lang }) => {
   const response = await axios.get<ProductDetailType>(
-    `${BASE_URL}/api/v1/products/product/${product_id}/`,
-    { params: { lang } }
+    `${API_URL}/api/v1/products/product/${product_id}/`,
+    { params: { lang } },
   );
   return response.data;
 });

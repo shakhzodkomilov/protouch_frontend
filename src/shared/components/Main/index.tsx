@@ -44,7 +44,6 @@ export default function HomeCategories() {
   const { locale } = useParams();
   const router = useRouter();
 
-  // --- DRAG SCROLL LOGIC ---
   const dragInfo = useRef({
     isDown: false,
     startX: 0,
@@ -98,15 +97,16 @@ export default function HomeCategories() {
   };
 
   const handleCategoryClick = (url: string) => {
-    // Agar foydalanuvchi surayotgan bo'lsa, link ochilib ketmasligi kerak
     if (dragInfo.current.hasMoved || !url) return;
-    
+
     const path = `/${locale}/catalog/${url}`;
     router.push(path);
   };
-
   return (
-    <Container maxWidth={false} sx={{ py: 4, maxWidth: "1800px", userSelect: "none" }}>
+    <Container
+      maxWidth={false}
+      sx={{ py: 4, maxWidth: "1800px", userSelect: "none" }}
+    >
       <Box sx={{ display: "flex", gap: 3 }}>
         {/* SIDEBAR BOX */}
         <Box
@@ -123,21 +123,34 @@ export default function HomeCategories() {
           }}
         >
           <Box>
-            <Typography fontWeight={600} fontSize="18px">Личный кабинет</Typography>
+            <Typography fontWeight={600} fontSize="18px">
+              Личный кабинет
+            </Typography>
             <Typography sx={{ mt: 1, color: "#4E4E4E" }}>
               Получайте бонусы, отслеживайте заказы и делитесь мнением
             </Typography>
           </Box>
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Button 
-              variant="outlined" 
-              sx={{ color: "#4E4E4E", borderColor: "#4E4E4E", borderRadius: "8px", flex: 1 }}
+            <Button
+              variant="outlined"
+              onClick={() => router.push(`/${locale}/login`)}
+              sx={{
+                color: "#4E4E4E",
+                borderColor: "#4E4E4E",
+                borderRadius: "8px",
+                flex: 1,
+              }}
             >
               Войти
             </Button>
-            <Button 
-              variant="outlined" 
-              sx={{ color: "#4E4E4E", borderColor: "#4E4E4E", borderRadius: "8px", flex: 1 }}
+            <Button
+              variant="outlined"
+              sx={{
+                color: "#4E4E4E",
+                borderColor: "#4E4E4E",
+                borderRadius: "8px",
+                flex: 1,
+              }}
             >
               Заказы
             </Button>
@@ -146,7 +159,6 @@ export default function HomeCategories() {
 
         {/* SLIDER AREA */}
         <Box sx={{ position: "relative", flex: 1, overflow: "hidden" }}>
-          
           {/* NAVIGATION BUTTONS */}
           <IconButton
             onClick={() => scrollBtn("left")}
@@ -201,10 +213,10 @@ export default function HomeCategories() {
                   "&:active": { transform: "scale(0.97)" },
                 }}
               >
-                <Typography 
-                  fontWeight={600} 
+                <Typography
+                  fontWeight={600}
                   fontSize="18px"
-                  color="#fff" 
+                  color="#fff"
                   sx={{ position: "relative", zIndex: 2, maxWidth: "70%" }}
                 >
                   {item.title}
@@ -216,8 +228,8 @@ export default function HomeCategories() {
                   width={200}
                   height={200}
                   style={{
-                    position: "absolute", 
-                    bottom: "-10%", 
+                    position: "absolute",
+                    bottom: "-10%",
                     right: "-10%",
                     pointerEvents: "none",
                   }}
@@ -226,11 +238,11 @@ export default function HomeCategories() {
                   component="img"
                   src={item.img}
                   sx={{
-                    position: "absolute", 
-                    right: 20, 
+                    position: "absolute",
+                    right: 20,
                     bottom: 20,
-                    width: "60%", 
-                    height: "60%", 
+                    width: "60%",
+                    height: "60%",
                     objectFit: "contain",
                     zIndex: 1,
                     pointerEvents: "none",
@@ -255,13 +267,13 @@ export default function HomeCategories() {
 
 const navBtnStyle = {
   display: { xs: "none", md: "flex" },
-  position: "absolute", 
-  top: "50%", 
+  position: "absolute",
+  top: "50%",
   transform: "translateY(-50%)",
-  zIndex: 10, 
-  bgcolor: "#fff", 
-  boxShadow: 3, 
-  width: 44, 
+  zIndex: 10,
+  bgcolor: "#fff",
+  boxShadow: 3,
+  width: 44,
   height: 44,
-  "&:hover": { bgcolor: "#f5f5f5" }
+  "&:hover": { bgcolor: "#f5f5f5" },
 };
