@@ -5,37 +5,62 @@ import Header from "../../shared/components/Header";
 import Footer from "../../shared/components/Footer/Footer";
 import { MobileBottomNav } from "../../shared/components/Bottom/MobileBottomNav";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+
 export const metadata: Metadata = {
-  openGraph: {
-    title: "Protouch Uzbekistan",
-    description:
-      "Интерактивные инфокиоски, сенсорные панели и роботы в Ташкенте",
-    url: "https://protouch.uz",
-    siteName: "Protouch",
-    images: [
-      {
-        url: "/icons/iconn.png",
-        width: 1200,
-        height: 630,
-      },
-    ],
-    locale: "ru_RU",
-    type: "website",
+  title: {
+    default:
+      "Protouch | Интерактивные инфокиоски и сенсорные панели в Ташкенте",
+    template: "%s | Protouch",
   },
-  twitter: {
-    card: "summary_large_image",
-    images: ["/icons/iconn.png"],
-  },
+  description:
+    "Интерактивные инфокиоски, сенсорные панели, рекламные дисплеи и промо-роботы в Ташкенте. Protouch — ваш надежный партнер в цифровых решениях для бизнеса и образования. Высокое качество, современный дизайн и установка под ключ.",
+  keywords: [
+    "интерактивный киоск Ташкент",
+    "сенсорная панель Узбекистан",
+    "инфокиоск купить",
+    "интерактивные дисплеи",
+    "интерактивные доски",
+    "роботы Ташкент",
+    "Protouch Uzbekistan",
+  ],
   alternates: {
+    canonical: "https://protouch.uz",
     languages: {
       uz: "https://protouch.uz/uz",
       ru: "https://protouch.uz/ru",
       en: "https://protouch.uz/en",
     },
   },
+  openGraph: {
+    title:
+      "Protouch Uzbekistan | Интерактивные инфокиоски, сенсорные панели и роботы в Ташкенте",
+    description:
+      "Protouch — ведущий поставщик интерактивных технологий в Узбекистане. Мы предлагаем сенсорные панели, инфокиоски и промо-роботов для бизнеса, образования и рекламы.",
+    url: "https://protouch.uz",
+    siteName: "Protouch Uzbekistan",
+    type: "website",
+    locale: "ru_RU",
+    images: [
+      {
+        url: "/icons/iconn.png",
+        width: 1200,
+        height: 630,
+        alt: "Интерактивные инфокиоски и сенсорные панели Protouch Uzbekistan",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Protouch | Интерактивные киоски и сенсорные панели в Ташкенте",
+    description:
+      "Купить интерактивные инфокиоски, сенсорные панели и промо-роботов в Ташкенте. Доставка и установка по Узбекистану.",
+    images: ["https://protouch.uz/og-image.jpg"],
+  },
+  icons: {
+    icon: "/icons/iconn.png",
+  },
 };
 
-// Define the type for params as a Promise
 type Props = {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
