@@ -11,7 +11,7 @@ const items = [
   {
     label: "Главная",
     icon: "/home.svg",
-    iconActive: "/homeActive.svg",
+    iconActive: "/homeMobile.svg",
     path: "",
   },
   {

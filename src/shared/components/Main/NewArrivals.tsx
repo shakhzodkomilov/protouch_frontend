@@ -40,7 +40,7 @@ interface ProductItem {
 
 const NewArrivals = () => {
   const { locale } = useParams();
-  
+
   // Effector units
   const [arrivals, loading, loadArrivalsEv] = useUnit([
     $newArrivals,
@@ -56,7 +56,9 @@ const NewArrivals = () => {
   // UI States
   const [openBasketToast, setOpenBasketToast] = useState(false);
   const [openFavoriteToast, setOpenFavoriteToast] = useState(false);
-  const [lastActionType, setLastActionType] = useState<"add" | "remove" | null>(null);
+  const [lastActionType, setLastActionType] = useState<"add" | "remove" | null>(
+    null,
+  );
 
   // --- DRAG SCROLL LOGIC ---
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -96,7 +98,7 @@ const NewArrivals = () => {
     dragInfo.current.hasMoved = false;
     dragInfo.current.startX = e.pageX - slider.offsetLeft;
     dragInfo.current.scrollLeft = slider.scrollLeft;
-    
+
     slider.style.cursor = "grabbing";
     slider.style.scrollSnapType = "none";
   };
@@ -108,12 +110,12 @@ const NewArrivals = () => {
     e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
     const distance = x - dragInfo.current.startX;
-    
+
     if (Math.abs(distance) > 5) {
       dragInfo.current.hasMoved = true;
     }
 
-    const walk = distance * 1.5; 
+    const walk = distance * 1.5;
     slider.scrollLeft = dragInfo.current.scrollLeft - walk;
   };
 
@@ -161,7 +163,8 @@ const NewArrivals = () => {
       if (dragInfo.current.hasMoved) return;
 
       if (item.is_in_stock) {
-        const numericId = typeof item.id === "string" ? parseInt(item.id, 10) : item.id;
+        const numericId =
+          typeof item.id === "string" ? parseInt(item.id, 10) : item.id;
         handleAddToBasket({
           id: numericId,
           productId: numericId,
@@ -195,10 +198,28 @@ const NewArrivals = () => {
 
       <Box sx={{ position: "relative", mt: "34px" }}>
         {/* Navigation Buttons */}
-        <IconButton onClick={() => scrollBtn("left")} sx={{ ...navBtnStyle, left: { xs: 8, md: -20 } }}>
+        <IconButton
+          onClick={() => scrollBtn("left")}
+          sx={{
+            ...navBtnStyle,
+            left: { xs: 8, md: -20 },
+            "@media (max-width:1000px)": {
+              display: "none",
+            },
+          }}
+        >
           <Image src="/arrowleft.svg" width={28} height={28} alt="left" />
         </IconButton>
-        <IconButton onClick={() => scrollBtn("right")} sx={{ ...navBtnStyle, right: { xs: 8, md: -20 } }}>
+        <IconButton
+          onClick={() => scrollBtn("right")}
+          sx={{
+            ...navBtnStyle,
+            right: { xs: 8, md: -20 },
+            "@media (max-width:1000px)": {
+              display: "none",
+            },
+          }}
+        >
           <Image src="/arrowright.svg" width={28} height={28} alt="right" />
         </IconButton>
 
@@ -223,7 +244,7 @@ const NewArrivals = () => {
               flexShrink: 0,
               scrollSnapAlign: "start",
               WebkitUserDrag: "none",
-            }
+            },
           }}
         >
           {loading && <Typography sx={{ p: 4 }}>Загрузка...</Typography>}
@@ -241,12 +262,19 @@ const NewArrivals = () => {
                 onDragStart={(e) => e.preventDefault()}
               >
                 <Box sx={cardStyle}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
                     <Typography sx={statusBadgeStyle(item.is_in_stock)}>
                       {item.is_in_stock ? "В наличии" : "Нет в наличии"}
                     </Typography>
                     <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                      <Image src="/scale.svg" height={24} width={24} alt="compare" />
+                      <Image
+                        src="/scale.svg"
+                        height={24}
+                        width={24}
+                        alt="compare"
+                      />
                       <IconButton
                         size="small"
                         onClick={(e) => onFavoriteClick(e, item)}
@@ -265,13 +293,30 @@ const NewArrivals = () => {
                     </Box>
                   </Box>
 
-                  <Box sx={{ position: "relative", width: "100%", height: "230px", my: 2, pointerEvents: "none" }}>
-                    <Image src={item.image} alt="product" fill style={{ objectFit: "contain" }} />
+                  <Box
+                    sx={{
+                      position: "relative",
+                      width: "100%",
+                      height: "230px",
+                      my: 2,
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <Image
+                      src={item.image}
+                      alt="product"
+                      fill
+                      style={{ objectFit: "contain" }}
+                    />
                   </Box>
 
                   <Box sx={{ flexGrow: 1 }}>
-                    <Typography sx={descriptionStyle}>{item.short_description}</Typography>
-                    <Typography sx={{ color: "#000", fontWeight: 700, fontSize: "20px" }}>
+                    <Typography sx={descriptionStyle}>
+                      {item.short_description}
+                    </Typography>
+                    <Typography
+                      sx={{ color: "#000", fontWeight: 700, fontSize: "20px" }}
+                    >
                       {new Intl.NumberFormat("ru-RU").format(item.price)} сум
                     </Typography>
                   </Box>
@@ -288,7 +333,11 @@ const NewArrivals = () => {
                       <DoneIcon sx={{ color: "#fff", fontSize: 30 }} />
                     ) : (
                       <Image
-                        src={item.is_in_stock ? "/basketIcon.svg" : "/call-outline_white.svg"}
+                        src={
+                          item.is_in_stock
+                            ? "/basketIcon.svg"
+                            : "/call-outline_white.svg"
+                        }
                         alt="icon"
                         width={26}
                         height={26}
@@ -303,13 +352,36 @@ const NewArrivals = () => {
       </Box>
 
       {/* Snackbar Toasts */}
-      <Snackbar open={openBasketToast} autoHideDuration={3000} onClose={() => setOpenBasketToast(false)} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
-        <Alert severity="success" variant="filled" sx={{ borderRadius: "10px" }}>Товар в корзине!</Alert>
+      <Snackbar
+        open={openBasketToast}
+        autoHideDuration={3000}
+        onClose={() => setOpenBasketToast(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          severity="success"
+          variant="filled"
+          sx={{ borderRadius: "10px" }}
+        >
+          Товар в корзине!
+        </Alert>
       </Snackbar>
 
-      <Snackbar open={openFavoriteToast} autoHideDuration={2000} onClose={() => setOpenFavoriteToast(false)} anchorOrigin={{ vertical: "top", horizontal: "left" }}>
-        <Alert severity={lastActionType === "add" ? "success" : "info"} variant="filled" sx={{ borderRadius: "10px" }}>
-          {lastActionType === "add" ? "Добавлено в избранное" : "Удалено из избранного"}!
+      <Snackbar
+        open={openFavoriteToast}
+        autoHideDuration={2000}
+        onClose={() => setOpenFavoriteToast(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Alert
+          severity={lastActionType === "add" ? "success" : "info"}
+          variant="filled"
+          sx={{ borderRadius: "10px" }}
+        >
+          {lastActionType === "add"
+            ? "Добавлено в избранное"
+            : "Удалено из избранного"}
+          !
         </Alert>
       </Snackbar>
     </Box>

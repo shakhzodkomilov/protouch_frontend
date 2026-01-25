@@ -97,9 +97,9 @@ const BestSellers = () => {
     dragInfo.current.hasMoved = false;
     dragInfo.current.startX = e.pageX - slider.offsetLeft;
     dragInfo.current.scrollLeft = slider.scrollLeft;
-    
+
     slider.style.cursor = "grabbing";
-    slider.style.scrollSnapType = "none"; 
+    slider.style.scrollSnapType = "none";
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -109,12 +109,12 @@ const BestSellers = () => {
     e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
     const distance = x - dragInfo.current.startX;
-    
+
     if (Math.abs(distance) > 5) {
       dragInfo.current.hasMoved = true;
     }
 
-    const walk = distance * 1.5; 
+    const walk = distance * 1.5;
     slider.scrollLeft = dragInfo.current.scrollLeft - walk;
   };
 
@@ -156,7 +156,8 @@ const BestSellers = () => {
     if (dragInfo.current.hasMoved) return;
 
     if (item.is_in_stock) {
-      const numericId = typeof item.id === "string" ? parseInt(item.id, 10) : item.id;
+      const numericId =
+        typeof item.id === "string" ? parseInt(item.id, 10) : item.id;
       handleAddToBasket({
         id: numericId,
         productId: numericId,
@@ -189,11 +190,29 @@ const BestSellers = () => {
 
       <Box sx={{ position: "relative", mt: "34px" }}>
         {/* Nav Arrows */}
-        <IconButton onClick={() => scrollBtn("left")} sx={{ ...navBtnStyle, left: { xs: 8, md: -20 } }}>
+        <IconButton
+          onClick={() => scrollBtn("left")}
+          sx={{
+            ...navBtnStyle,
+            left: { xs: 8, md: -20 },
+            "@media (max-width:1000px)": {
+              display: "none",
+            },
+          }}
+        >
           <Image src="/arrowleft.svg" width={28} height={28} alt="left" />
         </IconButton>
 
-        <IconButton onClick={() => scrollBtn("right")} sx={{ ...navBtnStyle, right: { xs: 8, md: -20 } }}>
+        <IconButton
+          onClick={() => scrollBtn("right")}
+          sx={{
+            ...navBtnStyle,
+            right: { xs: 8, md: -20 },
+            "@media (max-width:1000px)": {
+              display: "none",
+            },
+          }}
+        >
           <Image src="/arrowright.svg" width={28} height={28} alt="right" />
         </IconButton>
 
@@ -219,12 +238,12 @@ const BestSellers = () => {
               flexShrink: 0,
               scrollSnapAlign: "start",
               userSelect: "none",
-              WebkitUserDrag: "none", 
+              WebkitUserDrag: "none",
             },
           }}
         >
           {loading ? (
-             <Typography>Загрузка...</Typography>
+            <Typography>Загрузка...</Typography>
           ) : (
             arrivals?.results?.map((item) => {
               const inBasket = isItemInBasket(item.id);
@@ -238,23 +257,47 @@ const BestSellers = () => {
                   onDragStart={(e) => e.preventDefault()}
                 >
                   <Box sx={cardStyle}>
-                    <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
                       <Typography sx={statusBadgeStyle(item.is_in_stock)}>
                         {item.is_in_stock ? "В наличии" : "Нет в наличии"}
                       </Typography>
-                      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                        <Image src="/scale.svg" height={24} width={24} alt="compare" />
+                      <Box
+                        sx={{ display: "flex", gap: 1, alignItems: "center" }}
+                      >
+                        <Image
+                          src="/scale.svg"
+                          height={24}
+                          width={24}
+                          alt="compare"
+                        />
                         <IconButton
                           size="small"
                           onClick={(e) => onFavoriteClick(e, item)}
-                          sx={{ p: 0.25, color: isFavorite ? "#ff4444" : "#4E4E4E" }}
+                          sx={{
+                            p: 0.25,
+                            color: isFavorite ? "#ff4444" : "#4E4E4E",
+                          }}
                         >
-                          {isFavorite ? <FavoriteIcon /> : <FavoriteBorderOutlinedIcon />}
+                          {isFavorite ? (
+                            <FavoriteIcon />
+                          ) : (
+                            <FavoriteBorderOutlinedIcon />
+                          )}
                         </IconButton>
                       </Box>
                     </Box>
 
-                    <Box sx={{ position: "relative", width: "100%", height: "230px", my: 2, pointerEvents: "none" }}>
+                    <Box
+                      sx={{
+                        position: "relative",
+                        width: "100%",
+                        height: "230px",
+                        my: 2,
+                        pointerEvents: "none",
+                      }}
+                    >
                       <Image
                         src={item.image}
                         alt="product"
@@ -267,7 +310,13 @@ const BestSellers = () => {
                       <Typography sx={descriptionStyle}>
                         {item.short_description}
                       </Typography>
-                      <Typography sx={{ color: "#000", fontWeight: 700, fontSize: "20px" }}>
+                      <Typography
+                        sx={{
+                          color: "#000",
+                          fontWeight: 700,
+                          fontSize: "20px",
+                        }}
+                      >
                         {new Intl.NumberFormat("ru-RU").format(item.price)} сум
                       </Typography>
                     </Box>
@@ -277,14 +326,20 @@ const BestSellers = () => {
                       sx={{
                         ...actionBtnStyle,
                         bgcolor: inBasket ? "#3BB351" : "#249FFC",
-                        "&:hover": { bgcolor: inBasket ? "#2e8b40" : "#1a8ae5" },
+                        "&:hover": {
+                          bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
+                        },
                       }}
                     >
                       {inBasket ? (
                         <DoneIcon sx={{ color: "#fff", fontSize: 30 }} />
                       ) : (
                         <Image
-                          src={item.is_in_stock ? "/basketIcon.svg" : "/call-outline_white.svg"}
+                          src={
+                            item.is_in_stock
+                              ? "/basketIcon.svg"
+                              : "/call-outline_white.svg"
+                          }
                           alt="icon"
                           width={26}
                           height={26}
@@ -300,12 +355,30 @@ const BestSellers = () => {
       </Box>
 
       {/* Toasts */}
-      <Snackbar open={openToast} autoHideDuration={3000} onClose={() => setOpenToast(false)} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
-        <Alert severity="success" variant="filled" sx={{ borderRadius: '10px' }}>Товар в корзине!</Alert>
+      <Snackbar
+        open={openToast}
+        autoHideDuration={3000}
+        onClose={() => setOpenToast(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          severity="success"
+          variant="filled"
+          sx={{ borderRadius: "10px" }}
+        >
+          Товар в корзине!
+        </Alert>
       </Snackbar>
 
-      <Snackbar open={favoriteToast} autoHideDuration={2000} onClose={() => setFavoriteToast(false)} anchorOrigin={{ vertical: "top", horizontal: "left" }}>
-        <Alert severity="info" variant="filled" sx={{ borderRadius: '10px' }}>Избранное обновлено!</Alert>
+      <Snackbar
+        open={favoriteToast}
+        autoHideDuration={2000}
+        onClose={() => setFavoriteToast(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Alert severity="info" variant="filled" sx={{ borderRadius: "10px" }}>
+          Избранное обновлено!
+        </Alert>
       </Snackbar>
     </Box>
   );
@@ -353,7 +426,7 @@ const descriptionStyle = {
   display: "-webkit-box",
   WebkitBoxOrient: "vertical",
   WebkitLineClamp: 2,
-  color:"rgb(78, 78, 78)",
+  color: "rgb(78, 78, 78)",
   overflow: "hidden",
 };
 

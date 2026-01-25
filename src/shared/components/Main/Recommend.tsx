@@ -52,7 +52,9 @@ const Recommend = () => {
 
   const [openBasketToast, setOpenBasketToast] = useState(false);
   const [openFavoriteToast, setOpenFavoriteToast] = useState(false);
-  const [lastActionType, setLastActionType] = useState<"add" | "remove" | null>(null);
+  const [lastActionType, setLastActionType] = useState<"add" | "remove" | null>(
+    null,
+  );
 
   const getUniqueId = useMemo(() => Date.now(), []);
 
@@ -60,8 +62,18 @@ const Recommend = () => {
   const scrollRefTop = useRef<HTMLDivElement>(null);
   const scrollRefBottom = useRef<HTMLDivElement>(null);
 
-  const dragInfoTop = useRef({ isDown: false, startX: 0, scrollLeft: 0, hasMoved: false });
-  const dragInfoBottom = useRef({ isDown: false, startX: 0, scrollLeft: 0, hasMoved: false });
+  const dragInfoTop = useRef({
+    isDown: false,
+    startX: 0,
+    scrollLeft: 0,
+    hasMoved: false,
+  });
+  const dragInfoBottom = useRef({
+    isDown: false,
+    startX: 0,
+    scrollLeft: 0,
+    hasMoved: false,
+  });
 
   useEffect(() => {
     loadArrivalsEv({ lang: "ru" });
@@ -81,7 +93,11 @@ const Recommend = () => {
   );
 
   // --- REUSABLE DRAG HANDLERS ---
-  const handleMouseDown = (e: React.MouseEvent, ref: React.RefObject<HTMLDivElement>, info: any) => {
+  const handleMouseDown = (
+    e: React.MouseEvent,
+    ref: React.RefObject<HTMLDivElement>,
+    info: any,
+  ) => {
     const slider = ref.current;
     if (!slider) return;
     info.current.isDown = true;
@@ -92,7 +108,11 @@ const Recommend = () => {
     slider.style.scrollSnapType = "none";
   };
 
-  const handleMouseMove = (e: React.MouseEvent, ref: React.RefObject<HTMLDivElement>, info: any) => {
+  const handleMouseMove = (
+    e: React.MouseEvent,
+    ref: React.RefObject<HTMLDivElement>,
+    info: any,
+  ) => {
     const slider = ref.current;
     if (!slider || !info.current.isDown) return;
     e.preventDefault();
@@ -162,12 +182,21 @@ const Recommend = () => {
     [handleAddToBasket],
   );
 
-  const scrollBtn = (ref: React.RefObject<HTMLDivElement>, dir: "left" | "right") => {
+  const scrollBtn = (
+    ref: React.RefObject<HTMLDivElement>,
+    dir: "left" | "right",
+  ) => {
     if (!ref.current) return;
-    ref.current.scrollBy({ left: dir === "left" ? -300 : 300, behavior: "smooth" });
+    ref.current.scrollBy({
+      left: dir === "left" ? -300 : 300,
+      behavior: "smooth",
+    });
   };
 
-  const formatPrice = useMemo(() => (price: number) => new Intl.NumberFormat("ru-RU").format(price), []);
+  const formatPrice = useMemo(
+    () => (price: number) => new Intl.NumberFormat("ru-RU").format(price),
+    [],
+  );
 
   return (
     <Box sx={{ mt: "84px", userSelect: "none" }}>
@@ -177,10 +206,28 @@ const Recommend = () => {
 
       {/* TOP SECTION */}
       <Box sx={{ position: "relative", mt: "34px" }}>
-        <IconButton onClick={() => scrollBtn(scrollRefTop, "left")} sx={{ ...navBtnStyle, left: { xs: 8, md: -20 } }}>
+        <IconButton
+          onClick={() => scrollBtn(scrollRefTop, "left")}
+          sx={{
+            ...navBtnStyle,
+            left: { xs: 8, md: -20 },
+            "@media (max-width:1000px)": {
+              display: "none",
+            },
+          }}
+        >
           <Image src="/arrowleft.svg" width={28} height={28} alt="left" />
         </IconButton>
-        <IconButton onClick={() => scrollBtn(scrollRefTop, "right")} sx={{ ...navBtnStyle, right: { xs: 8, md: -20 } }}>
+        <IconButton
+          onClick={() => scrollBtn(scrollRefTop, "right")}
+          sx={{
+            ...navBtnStyle,
+            right: { xs: 8, md: -20 },
+            "@media (max-width:1000px)": {
+              display: "none",
+            },
+          }}
+        >
           <Image src="/arrowright.svg" width={28} height={28} alt="right" />
         </IconButton>
 
@@ -194,11 +241,11 @@ const Recommend = () => {
         >
           {loading && <Typography>Загрузка...</Typography>}
           {arrivals?.results?.map((item: ProductItem) => (
-            <ProductCard 
-              key={item.id} 
-              item={item} 
-              locale={locale} 
-              info={dragInfoTop} 
+            <ProductCard
+              key={item.id}
+              item={item}
+              locale={locale}
+              info={dragInfoTop}
               inBasket={isItemInBasket(item.id)}
               isFavorite={isItemFavorite(item.id)}
               onFavoriteClick={onFavoriteClick}
@@ -212,27 +259,49 @@ const Recommend = () => {
 
       {/* BOTTOM SECTION */}
       <Box sx={{ position: "relative", mt: "34px" }}>
-        <IconButton onClick={() => scrollBtn(scrollRefBottom, "left")} sx={{ ...navBtnStyle, left: { xs: 8, md: -20 } }}>
+        <IconButton
+          onClick={() => scrollBtn(scrollRefBottom, "left")}
+          sx={{
+            ...navBtnStyle,
+            left: { xs: 8, md: -20 },
+            "@media (max-width:1000px)": {
+              display: "none",
+            },
+          }}
+        >
           <Image src="/arrowleft.svg" width={28} height={28} alt="left" />
         </IconButton>
-        <IconButton onClick={() => scrollBtn(scrollRefBottom, "right")} sx={{ ...navBtnStyle, right: { xs: 8, md: -20 } }}>
+        <IconButton
+          onClick={() => scrollBtn(scrollRefBottom, "right")}
+          sx={{
+            ...navBtnStyle,
+            right: { xs: 8, md: -20 },
+            "@media (max-width:1000px)": {
+              display: "none",
+            },
+          }}
+        >
           <Image src="/arrowright.svg" width={28} height={28} alt="right" />
         </IconButton>
 
         <Box
           ref={scrollRefBottom}
-          onMouseDown={(e) => handleMouseDown(e, scrollRefBottom, dragInfoBottom)}
-          onMouseMove={(e) => handleMouseMove(e, scrollRefBottom, dragInfoBottom)}
+          onMouseDown={(e) =>
+            handleMouseDown(e, scrollRefBottom, dragInfoBottom)
+          }
+          onMouseMove={(e) =>
+            handleMouseMove(e, scrollRefBottom, dragInfoBottom)
+          }
           onMouseUp={() => stopDragging(scrollRefBottom, dragInfoBottom)}
           onMouseLeave={() => stopDragging(scrollRefBottom, dragInfoBottom)}
           sx={scrollContainerStyle}
         >
           {arrivals?.results?.map((item: ProductItem) => (
-            <ProductCard 
-              key={item.id} 
-              item={item} 
-              locale={locale} 
-              info={dragInfoBottom} 
+            <ProductCard
+              key={item.id}
+              item={item}
+              locale={locale}
+              info={dragInfoBottom}
               inBasket={isItemInBasket(item.id)}
               isFavorite={isItemFavorite(item.id)}
               onFavoriteClick={onFavoriteClick}
@@ -245,11 +314,31 @@ const Recommend = () => {
       </Box>
 
       {/* SNACKBARS */}
-      <Snackbar open={openBasketToast} autoHideDuration={3000} onClose={() => setOpenBasketToast(false)} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
-        <Alert severity="success" variant="filled" sx={{ borderRadius: "10px" }}>Товар в корзине!</Alert>
+      <Snackbar
+        open={openBasketToast}
+        autoHideDuration={3000}
+        onClose={() => setOpenBasketToast(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          severity="success"
+          variant="filled"
+          sx={{ borderRadius: "10px" }}
+        >
+          Товар в корзине!
+        </Alert>
       </Snackbar>
-      <Snackbar open={openFavoriteToast} autoHideDuration={2000} onClose={() => setOpenFavoriteToast(false)} anchorOrigin={{ vertical: "top", horizontal: "left" }}>
-        <Alert severity={lastActionType === "add" ? "success" : "info"} variant="filled" sx={{ borderRadius: "10px" }}>
+      <Snackbar
+        open={openFavoriteToast}
+        autoHideDuration={2000}
+        onClose={() => setOpenFavoriteToast(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+      >
+        <Alert
+          severity={lastActionType === "add" ? "success" : "info"}
+          variant="filled"
+          sx={{ borderRadius: "10px" }}
+        >
           {lastActionType === "add" ? "Добавлено" : "Удалено"}!
         </Alert>
       </Snackbar>
@@ -258,7 +347,17 @@ const Recommend = () => {
 };
 
 // --- SUB-COMPONENT FOR CLEANER CODE ---
-const ProductCard = ({ item, locale, info, inBasket, isFavorite, onFavoriteClick, onBasketClick, preventClick, formatPrice }: any) => (
+const ProductCard = ({
+  item,
+  locale,
+  info,
+  inBasket,
+  isFavorite,
+  onFavoriteClick,
+  onBasketClick,
+  preventClick,
+  formatPrice,
+}: any) => (
   <Link
     href={`/${locale}/product/${item.id}`}
     style={{ textDecoration: "none" }}
@@ -272,23 +371,55 @@ const ProductCard = ({ item, locale, info, inBasket, isFavorite, onFavoriteClick
         </Typography>
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
           <Image src="/scale.svg" height={24} width={24} alt="compare" />
-          <IconButton size="small" onClick={(e) => onFavoriteClick(e, item, info)} sx={{ color: isFavorite ? "#ff4444" : "#4E4E4E" }}>
+          <IconButton
+            size="small"
+            onClick={(e) => onFavoriteClick(e, item, info)}
+            sx={{ color: isFavorite ? "#ff4444" : "#4E4E4E" }}
+          >
             {isFavorite ? <FavoriteIcon /> : <FavoriteBorderOutlinedIcon />}
           </IconButton>
         </Box>
       </Box>
-      <Box sx={{ position: "relative", width: "100%", height: "230px", my: 2, pointerEvents: "none" }}>
-        <Image src={item.image} alt="product" fill style={{ objectFit: "contain" }} />
+      <Box
+        sx={{
+          position: "relative",
+          width: "100%",
+          height: "230px",
+          my: 2,
+          pointerEvents: "none",
+        }}
+      >
+        <Image
+          src={item.image}
+          alt="product"
+          fill
+          style={{ objectFit: "contain" }}
+        />
       </Box>
       <Box sx={{ flexGrow: 1 }}>
-        <Typography sx={descriptionStyle}>{item.short_description || "Product"}</Typography>
-        <Typography sx={{ color: "#000", fontWeight: 700, fontSize: "20px" }}>{formatPrice(item.price)} сум</Typography>
+        <Typography sx={descriptionStyle}>
+          {item.short_description || "Product"}
+        </Typography>
+        <Typography sx={{ color: "#000", fontWeight: 700, fontSize: "20px" }}>
+          {formatPrice(item.price)} сум
+        </Typography>
       </Box>
       <Button
         onClick={(e) => onBasketClick(e, item, info)}
         sx={{ ...actionBtnStyle, bgcolor: inBasket ? "#3BB351" : "#249FFC" }}
       >
-        {inBasket ? <DoneIcon sx={{ color: "#fff", fontSize: 30 }} /> : <Image src={item.is_in_stock ? "/basketIcon.svg" : "/call-outline_white.svg"} alt="icon" width={26} height={26} />}
+        {inBasket ? (
+          <DoneIcon sx={{ color: "#fff", fontSize: 30 }} />
+        ) : (
+          <Image
+            src={
+              item.is_in_stock ? "/basketIcon.svg" : "/call-outline_white.svg"
+            }
+            alt="icon"
+            width={26}
+            height={26}
+          />
+        )}
       </Button>
     </Box>
   </Link>
@@ -362,7 +493,7 @@ const actionBtnStyle = {
   position: "absolute",
   right: "15px",
   bottom: "15px",
-  "&:hover": { opacity: 0.9 }
+  "&:hover": { opacity: 0.9 },
 };
 
 export default Recommend;

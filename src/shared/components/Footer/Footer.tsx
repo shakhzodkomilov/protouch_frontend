@@ -307,13 +307,25 @@ const Footer = () => {
                 alt="TenderWeek"
                 style={{ width: "100%", height: "auto", maxWidth: "180px" }}
               />
-              <Image
-                src="/uzex.svg"
-                width={180}
-                height={30}
-                alt="uzex"
-                style={{ width: "100%", height: "auto", maxWidth: "180px" }}
-              />
+              <Box
+                sx={{
+                  width: "180px",
+                  "& img": {
+                    width: "100%",
+                    height: "auto",
+                    objectFit: "contain",
+                    "@media (max-width: 900px)": {},
+                  },
+                }}
+              >
+                <Image
+                  src="/uzex.svg"
+                  width={180}
+                  height={30}
+                  alt="uzex"
+                  priority
+                />
+              </Box>
               <Image
                 src="/UzExTender.svg"
                 width={180}
