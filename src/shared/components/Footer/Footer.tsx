@@ -20,7 +20,7 @@ const Footer = () => {
   const socialLinks = {
     linkedin: "https://linkedin.com/company/your-company",
     instagram: "https://instagram.com/protouch.uz",
-    telegram: "https://t.me/protouchuzb",
+    telegram: "https://t.me/ProTouchUz",
     facebook: "https://facebook.com/your-company",
   };
 

@@ -3,10 +3,11 @@ import {
   getCategoriesFx,
   getProductsFx,
   getProductDetailFx,
-  getSalesHitsFx,
-  getNewArrivalsFx,
+  getBestSellersFx,
   getProductsByCategoryFx,
   searchProductsFx,
+  getNewArrivalsFx,
+  getRecommendsFx,
 } from "./effects";
 import { CategoryType, PaginationType, ProductDetailType } from "./types";
 
@@ -41,6 +42,7 @@ export const searchProducts = createEvent<{
 
 export const loadSellers = createEvent<{ lang?: string }>();
 export const loadArrivals = createEvent<{ lang?: string }>();
+export const loadRecommends = createEvent<{ lang?: string }>();
 export const loadProductDetail = createEvent<{
   product_id: string;
   lang?: string;
@@ -82,12 +84,16 @@ export const $products = createStore<PaginationType | null>(null)
 
 // 4. Boshqa storelar
 export const $bestSellers = createStore<PaginationType | null>(null).on(
-  getSalesHitsFx.doneData,
+  getBestSellersFx.doneData,
   (_, data) => data,
 );
 
 export const $newArrivals = createStore<PaginationType | null>(null).on(
   getNewArrivalsFx.doneData,
+  (_, data) => data,
+);
+export const $Recommends = createStore<PaginationType | null>(null).on(
+  getRecommendsFx.doneData,
   (_, data) => data,
 );
 
@@ -100,8 +106,9 @@ export const $productDetail = createStore<ProductDetailType | null>(null).on(
 export const $loadingCategories = getCategoriesFx.pending;
 export const $loadingProducts = getProductsByCategoryFx.pending; // Katalog uchun asosiy loading
 export const $loadingGeneralProducts = getProductsFx.pending;
-export const $loadingSellers = getSalesHitsFx.pending;
+export const $loadingSellers = getBestSellersFx.pending;
 export const $loadingArrivals = getNewArrivalsFx.pending;
+export const $loadingRecommend = getRecommendsFx.pending;
 export const $loadingProductDetail = getProductDetailFx.pending;
 
 // --- Error Stores ---
@@ -131,8 +138,9 @@ export const $errorProductDetail = createStore<string | null>(null).on(
 // --- Triggers (Samples) ---
 sample({ clock: loadCategories, target: getCategoriesFx });
 sample({ clock: loadProducts, target: getProductsFx });
-sample({ clock: loadSellers, target: getSalesHitsFx });
+sample({ clock: loadSellers, target: getBestSellersFx });
 sample({ clock: loadArrivals, target: getNewArrivalsFx });
 sample({ clock: loadProductDetail, target: getProductDetailFx });
 sample({ clock: loadProductsByCategory, target: getProductsByCategoryFx });
+sample({ clock: loadRecommends, target: getRecommendsFx });
 sample({ clock: searchProducts, target: searchProductsFx });

@@ -435,7 +435,7 @@ export default function ProductDetailPage() {
               <Button
                 variant="contained"
                 component="a"
-                href="https://t.me/ProTouchUz"
+                href="https://t.me/ProtouchMarket"
                 target="_blank"
                 rel="noopener noreferrer"
                 startIcon={<TelegramIcon />}

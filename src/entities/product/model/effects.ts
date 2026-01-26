@@ -46,21 +46,52 @@ export const getProductDetailFx = createEffect<
     price: Number(data.price),
   };
 });
-export const getSalesHitsFx = createEffect<{ lang?: string }, PaginationType>(
+export const getBestSellersFx = createEffect<{ lang?: string }, PaginationType>(
   async ({ lang }) => {
-    const { data } = await axios.get(`${API_URL}/api/v1/products/`, {
-      params: { is_bestseller: true, lang: lang || "ru" },
-    });
+    const { data } = await axios.get(
+      `${API_URL}/api/v1/products/?slug=sales-hits`,
+      {
+        params: { is_bestseller: true, lang: lang || "ru" },
+      },
+    );
+    return data;
+  },
+);
+export const getSelesHItsFx = createEffect<
+  { lang?: string; page?: number },
+  PaginationType
+>(async ({ lang, page = 1 }) => {
+  const { data } = await axios.get(`${API_URL}/apiv1/products/`, {
+    params: {
+      page,
+      slug: "sales-hits",
+      lang: lang || "ru",
+    },
+  });
+  return data;
+});
+//BestSellers
+export const getNewArrivalsFx = createEffect<{ lang?: string }, PaginationType>(
+  async ({ lang }) => {
+    const { data } = await axios.get(
+      `${API_URL}/api/v1/products/?slug=new-arrivals`,
+      {
+        params: { is_new: true, lang: lang || "ru" },
+      },
+    );
     return data;
   },
 );
 
-// --- New arrivals ---
-export const getNewArrivalsFx = createEffect<{ lang?: string }, PaginationType>(
+//Reccomend
+export const getRecommendsFx = createEffect<{ lang?: string }, PaginationType>(
   async ({ lang }) => {
-    const { data } = await axios.get(`${API_URL}/api/v1/products/`, {
-      params: { is_new: true, lang: lang || "ru" },
-    });
+    const { data } = await axios.get(
+      `${API_URL}/api/v1/products/?slug=we-recommend`,
+      {
+        params: { is_new: true, lang: lang || "ru" },
+      },
+    );
     return data;
   },
 );

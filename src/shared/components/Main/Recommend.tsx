@@ -18,9 +18,9 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import DoneIcon from "@mui/icons-material/Done";
 
 import {
-  $newArrivals,
-  $loadingArrivals,
-  loadArrivals,
+  $Recommends,
+  $loadingRecommend,
+  loadRecommends,
 } from "../../../entities/product/model";
 import { addToBasket, $basket } from "../../../entities/basket/model/store";
 import {
@@ -39,10 +39,10 @@ interface ProductItem {
 
 export const Recommend = () => {
   const { locale } = useParams();
-  const [arrivals, loading, loadArrivalsEv] = useUnit([
-    $newArrivals,
-    $loadingArrivals,
-    loadArrivals,
+  const [item, loading, loadRecommend] = useUnit([
+    $Recommends,
+    $loadingRecommend,
+    loadRecommends,
   ]);
   const { items: basketItems } = useUnit($basket);
   const favorites = useUnit($favorites);
@@ -76,9 +76,9 @@ export const Recommend = () => {
   });
 
   useEffect(() => {
-    loadArrivalsEv({ lang: "ru" });
+    loadRecommends({ lang: "ru" });
     loadFavoritesEv();
-  }, [loadArrivalsEv, loadFavoritesEv]);
+  }, [loadRecommend, loadFavoritesEv]);
 
   const isItemInBasket = useCallback(
     (productId: number | string) =>
@@ -240,68 +240,12 @@ export const Recommend = () => {
           sx={scrollContainerStyle}
         >
           {loading && <Typography>Загрузка...</Typography>}
-          {arrivals?.results?.map((item: ProductItem) => (
+          {item?.results?.map((item: ProductItem) => (
             <ProductCard
               key={item.id}
               item={item}
               locale={locale}
               info={dragInfoTop}
-              inBasket={isItemInBasket(item.id)}
-              isFavorite={isItemFavorite(item.id)}
-              onFavoriteClick={onFavoriteClick}
-              onBasketClick={onBasketClick}
-              preventClick={preventClickIfDragged}
-              formatPrice={formatPrice}
-            />
-          ))}
-        </Box>
-      </Box>
-
-      {/* BOTTOM SECTION */}
-      <Box sx={{ position: "relative", mt: "34px" }}>
-        <IconButton
-          onClick={() => scrollBtn(scrollRefBottom, "left")}
-          sx={{
-            ...navBtnStyle,
-            left: { xs: 8, md: -20 },
-            "@media (max-width:1000px)": {
-              display: "none",
-            },
-          }}
-        >
-          <Image src="/arrowleft.svg" width={28} height={28} alt="left" />
-        </IconButton>
-        <IconButton
-          onClick={() => scrollBtn(scrollRefBottom, "right")}
-          sx={{
-            ...navBtnStyle,
-            right: { xs: 8, md: -20 },
-            "@media (max-width:1000px)": {
-              display: "none",
-            },
-          }}
-        >
-          <Image src="/arrowright.svg" width={28} height={28} alt="right" />
-        </IconButton>
-
-        <Box
-          ref={scrollRefBottom}
-          onMouseDown={(e) =>
-            handleMouseDown(e, scrollRefBottom, dragInfoBottom)
-          }
-          onMouseMove={(e) =>
-            handleMouseMove(e, scrollRefBottom, dragInfoBottom)
-          }
-          onMouseUp={() => stopDragging(scrollRefBottom, dragInfoBottom)}
-          onMouseLeave={() => stopDragging(scrollRefBottom, dragInfoBottom)}
-          sx={scrollContainerStyle}
-        >
-          {arrivals?.results?.map((item: ProductItem) => (
-            <ProductCard
-              key={item.id}
-              item={item}
-              locale={locale}
-              info={dragInfoBottom}
               inBasket={isItemInBasket(item.id)}
               isFavorite={isItemFavorite(item.id)}
               onFavoriteClick={onFavoriteClick}
@@ -453,14 +397,13 @@ const ProductCard = ({
   </Link>
 );
 
-// --- STYLES ---
 const navBtnStyle = {
   position: "absolute",
   top: "50%",
   transform: "translateY(-50%)",
   zIndex: 20,
-  width: 50,
-  height: 50,
+  width: 40,
+  height: 40,
   bgcolor: "#fff",
   boxShadow: 3,
   borderRadius: "50%",

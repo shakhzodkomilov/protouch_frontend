@@ -189,7 +189,7 @@ const NewArrivals = () => {
       behavior: "smooth",
     });
   };
-
+  console.log(arrivals);
   return (
     <Box sx={{ mt: "84px", userSelect: "none" }}>
       <Typography
@@ -424,8 +424,8 @@ const navBtnStyle = {
   top: "50%",
   transform: "translateY(-50%)",
   zIndex: 20,
-  width: 50,
-  height: 50,
+  width: 40,
+  height: 40,
   bgcolor: "#fff",
   boxShadow: 3,
   borderRadius: "50%",

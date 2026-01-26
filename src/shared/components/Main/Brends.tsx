@@ -120,7 +120,7 @@ const Brends = () => {
           sx={{
             position: "absolute",
             left: -20,
-            top: "50%",
+            top: "55%",
             transform: "translateY(-50%)",
             zIndex: 10,
             bgcolor: "#fff",
@@ -140,7 +140,7 @@ const Brends = () => {
           sx={{
             position: "absolute",
             right: -20,
-            top: "50%",
+            top: "55%",
             transform: "translateY(-50%)",
             zIndex: 10,
             bgcolor: "#fff",

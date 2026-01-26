@@ -27,9 +27,9 @@ interface ProductItem {
 }
 
 import {
-  $newArrivals,
-  $loadingArrivals,
-  loadArrivals,
+  $bestSellers,
+  $loadingSellers,
+  loadSellers,
 } from "../../../entities/product/model";
 import { addToBasket, $basket } from "../../../entities/basket/model/store";
 import {
@@ -41,10 +41,10 @@ import { color } from "framer-motion";
 
 const BestSellers = () => {
   const { locale } = useParams();
-  const [arrivals, loading, loadArrivalsEv] = useUnit([
-    $newArrivals,
-    $loadingArrivals,
-    loadArrivals,
+  const [items, loading, loadSellersEv] = useUnit([
+    $bestSellers,
+    $loadingSellers,
+    loadSellers,
   ]);
   const { items: basketItems } = useUnit($basket);
   const favorites = useUnit($favorites);
@@ -56,7 +56,6 @@ const BestSellers = () => {
   const [favoriteToast, setFavoriteToast] = useState(false);
   const [lastToggledId, setLastToggledId] = useState<number | string>(0);
 
-  // --- DRAG SCROLL LOGIC (useRef orqali optimizatsiya) ---
   const scrollRef = useRef<HTMLDivElement>(null);
   const dragInfo = useRef({
     isDown: false,
@@ -66,9 +65,8 @@ const BestSellers = () => {
   });
 
   useEffect(() => {
-    loadArrivalsEv({ lang: "ru" });
-    loadFavoritesEv();
-  }, [loadArrivalsEv, loadFavoritesEv]);
+    loadSellersEv({ lang: (locale as string) || "ru" });
+  }, [loadSellersEv, locale]);
 
   const isItemInBasket = useCallback(
     (productId: number | string) => {
@@ -204,6 +202,8 @@ const BestSellers = () => {
           sx={{
             ...navBtnStyle,
             left: { xs: 8, md: -20 },
+            width: 40,
+            height: 40,
             "@media (max-width:1000px)": {
               display: "none",
             },
@@ -217,6 +217,8 @@ const BestSellers = () => {
           sx={{
             ...navBtnStyle,
             right: { xs: 8, md: -20 },
+            width: 40,
+            height: 40,
             "@media (max-width:1000px)": {
               display: "none",
             },
@@ -254,7 +256,7 @@ const BestSellers = () => {
           {loading ? (
             <Typography>Загрузка...</Typography>
           ) : (
-            arrivals?.results?.map((item) => {
+            items?.results?.map((item) => {
               const inBasket = isItemInBasket(item.id);
               const isFavorite = isItemFavorite(item.id);
               return (

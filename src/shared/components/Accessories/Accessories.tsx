@@ -5,13 +5,13 @@ import { useEffect, useRef } from "react";
 import { useUnit } from "effector-react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import {
   $loadingArrivals,
   $newArrivals,
   loadArrivals,
 } from "../../../entities/product/model";
-import Image from "next/image";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 const Accessories = () => {
   const { locale } = useParams();

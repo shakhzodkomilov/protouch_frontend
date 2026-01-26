@@ -7,9 +7,9 @@ import { useParams, useRouter } from "next/navigation";
 import Brends from "./Brends";
 import BestSellers from "./Bestsellers";
 import News from "./News";
-import NewArrivals from "./NewArrivals";
 import Banners from "./Banners";
 import { Recommend } from "./Recommend";
+import NewArrivals from "./NewArrivals";
 const cards = [
   {
     title: "Интерактивные панели",
@@ -155,7 +155,7 @@ export default function HomeCategories() {
   return (
     <Container
       maxWidth={false}
-      sx={{ py: 4, maxWidth: "1800px", userSelect: "none" }}
+      sx={{ py: 4, px: 0, maxWidth: "1700px", userSelect: "none" }}
     >
       <Box
         sx={{
@@ -219,14 +219,14 @@ export default function HomeCategories() {
         <Box sx={{ position: "relative", flex: 1, overflow: "hidden" }}>
           <IconButton
             onClick={() => scrollBtn("left")}
-            sx={{ ...navBtnStyle, left: 10 }}
+            sx={{ ...navBtnStyle, left: 0 }}
           >
             <Image src="/arrowleft.svg" width={32} height={32} alt="left" />
           </IconButton>
 
           <IconButton
             onClick={() => scrollBtn("right")}
-            sx={{ ...navBtnStyle, right: 10 }}
+            sx={{ ...navBtnStyle, right: 0 }}
           >
             <Image src="/arrowright.svg" width={32} height={32} alt="right" />
           </IconButton>
