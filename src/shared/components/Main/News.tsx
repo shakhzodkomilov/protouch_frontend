@@ -21,7 +21,7 @@ interface NewsItem {
 
 const News = () => {
   const [openModal, setOpenModal] = useState<number | null>(null);
-  
+
   // --- DRAG SCROLL LOGIC ---
   const scrollRef = useRef<HTMLDivElement>(null);
   const dragInfo = useRef({
@@ -31,7 +31,6 @@ const News = () => {
     hasMoved: false,
   });
 
- 
   const news: NewsItem[] = [
     {
       title: "Доставка",
@@ -208,7 +207,7 @@ const News = () => {
     dragInfo.current.hasMoved = false;
     dragInfo.current.startX = e.pageX - slider.offsetLeft;
     dragInfo.current.scrollLeft = slider.scrollLeft;
-    
+
     slider.style.cursor = "grabbing";
     slider.style.scrollSnapType = "none";
   };
@@ -220,12 +219,12 @@ const News = () => {
     e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
     const distance = x - dragInfo.current.startX;
-    
+
     if (Math.abs(distance) > 5) {
       dragInfo.current.hasMoved = true;
     }
 
-    const walk = distance * 1.5; 
+    const walk = distance * 1.5;
     slider.scrollLeft = dragInfo.current.scrollLeft - walk;
   };
 
@@ -264,7 +263,14 @@ const News = () => {
 
   return (
     <Box sx={{ mt: "50px" }}>
-      <Typography sx={{ fontSize: "34px", fontWeight: 600, color: "#000" }}>
+      <Typography
+        sx={{
+          fontSize: "34px",
+          fontWeight: 600,
+          color: "#000",
+          "@media (max-width: 900px)": { fontSize: "26px" },
+        }}
+      >
         Статьи и новости
       </Typography>
 
@@ -281,7 +287,12 @@ const News = () => {
           onClick={() => scrollBtn("right")}
           sx={{ ...navBtnStyle, right: -20 }}
         >
-          <Image src="/arrowright.svg" width="32" height="32" alt="arrow right" />
+          <Image
+            src="/arrowright.svg"
+            width="32"
+            height="32"
+            alt="arrow right"
+          />
         </IconButton>
 
         <Box
@@ -313,7 +324,7 @@ const News = () => {
                 width: 300,
                 height: 250,
                 borderRadius: "16px",
-                p: 3,
+                p: 2,
                 background: `linear-gradient(90deg, ${item.linearColor1} 0%, ${item.linearColor2} 100%)`,
                 color: "#fff",
                 display: "flex",
@@ -325,12 +336,18 @@ const News = () => {
                 "&:hover": {
                   transform: "translateY(-5px)",
                 },
+                "@media (max-width: 900px)": {
+                  width: 220,
+                  height: 200,
+                },
               }}
             >
-              <Typography sx={{ fontSize: 18, fontWeight: 500 }}>
+              <Typography sx={{ fontSize: 20, fontWeight: 600 }}>
                 {item.title}
               </Typography>
-              <Typography sx={{ fontWeight: 300, mt: "22px", whiteSpace: "normal" }}>
+              <Typography
+                sx={{ fontWeight: 400, mt: "22px", whiteSpace: "normal" }}
+              >
                 {item.text}
               </Typography>
               <Image
@@ -352,20 +369,40 @@ const News = () => {
       </Box>
 
       {news.map((item, i) => (
-        <Modal open={openModal === i} onClose={handleCloseModal} key={`modal-${i}`}>
+        <Modal
+          open={openModal === i}
+          onClose={handleCloseModal}
+          key={`modal-${i}`}
+        >
           <Fade in={openModal === i}>
             <Box sx={modalStyle}>
-              <Typography variant="h5" sx={{ mb: 3, fontWeight: 700, color: "#000" }}>
+              <Typography
+                variant="h5"
+                sx={{
+                  mb: 3,
+                  fontWeight: 700,
+                  color: "#000",
+                }}
+              >
                 {item.title}
               </Typography>
               <Typography
-                sx={{ lineHeight: 1.7, whiteSpace: "pre-line", color: "#333" }}
+                sx={{
+                  lineHeight: 1.7,
+                  whiteSpace: "pre-line",
+                  color: "#333",
+                  "@media (max-width: 900px)": { fontSize: "14px" },
+                }}
                 dangerouslySetInnerHTML={{
                   __html: item.modalContent?.replace(/\n/g, "<br>") || "",
                 }}
               />
               <Box sx={{ mt: 4, textAlign: "right" }}>
-                <Button variant="contained" onClick={handleCloseModal} sx={{ bgcolor: "#249FFC", color:"#fff"  }}>
+                <Button
+                  variant="contained"
+                  onClick={handleCloseModal}
+                  sx={{ bgcolor: "#249FFC", color: "#fff" }}
+                >
                   Закрыть
                 </Button>
               </Box>
@@ -388,7 +425,7 @@ const navBtnStyle = {
   width: 40,
   height: 40,
   "@media (max-width:900px)": { display: "none" },
-  "&:hover": { bgcolor: "#f5f5f5" }
+  "&:hover": { bgcolor: "#f5f5f5" },
 };
 
 const modalStyle = {

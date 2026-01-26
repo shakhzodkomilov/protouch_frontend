@@ -21,7 +21,6 @@ export default function Header() {
         sx={{
           maxWidth: "1800px",
           mx: "auto",
-          // px: 2,
         }}
       >
         <Navbar />

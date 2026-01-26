@@ -156,24 +156,6 @@ const Footer = () => {
 
           {/* Brand Logos Section */}
           <Box sx={{ color: "#000", flexShrink: 0 }}>
-            {/* Main Logo */}
-            <Box
-              sx={{
-                "@media (max-width:1100px)": {
-                  display: "none",
-                },
-              }}
-            >
-              <Image
-                src="/LOGOPROTOUCH.svg"
-                width={180}
-                height={30}
-                alt="LOGOPROTOUCH"
-                style={{ width: "100%", height: "auto" }}
-                priority
-              />
-            </Box>
-
             {/* Social Media Icons */}
             <Box
               display="flex"
@@ -314,7 +296,6 @@ const Footer = () => {
                     width: "100%",
                     height: "auto",
                     objectFit: "contain",
-                    "@media (max-width: 900px)": {},
                   },
                 }}
               >

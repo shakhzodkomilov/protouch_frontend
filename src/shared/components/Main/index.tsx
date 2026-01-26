@@ -9,9 +9,7 @@ import BestSellers from "./Bestsellers";
 import News from "./News";
 import NewArrivals from "./NewArrivals";
 import Banners from "./Banners";
-import { Recommend } from "@mui/icons-material";
-
-// Barcha 14 ta card uchun ranglar va ma'lumotlar
+import { Recommend } from "./Recommend";
 const cards = [
   {
     title: "Интерактивные панели",
@@ -160,7 +158,12 @@ export default function HomeCategories() {
       sx={{ py: 4, maxWidth: "1800px", userSelect: "none" }}
     >
       <Box
-        sx={{ display: "flex", gap: 3, "@media (max-width:900px)": { mt: 13 } }}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: 3,
+          "@media (max-width:900px)": { mt: 13 },
+        }}
       >
         {/* SIDEBAR */}
         <Box
@@ -174,6 +177,7 @@ export default function HomeCategories() {
             justifyContent: "space-between",
             color: "#000",
             flexShrink: 0,
+            height: "280px",
           }}
         >
           <Box>
@@ -251,10 +255,14 @@ export default function HomeCategories() {
                 key={i}
                 onClick={() => handleCategoryClick(item.url)}
                 sx={{
-                  minWidth: { xs: 280, md: 320 },
+                  minWidth: {
+                    xs: "240px",
+                    sm: "280px",
+                  },
+                  width: { xs: "280px" },
                   height: 280,
                   borderRadius: "24px",
-                  background: item.bg, // Gradient shu yerda
+                  background: item.bg,
                   p: 3,
                   position: "relative",
                   flexShrink: 0,
@@ -263,6 +271,7 @@ export default function HomeCategories() {
                   cursor: "pointer",
                   overflow: "hidden",
                   "&:active": { transform: "scale(0.97)" },
+                  "@media (max-width:900px)": { height: "250px" },
                 }}
               >
                 <Typography
@@ -274,7 +283,6 @@ export default function HomeCategories() {
                   {item.title}
                 </Typography>
 
-                {/* Rasmda ko'ringan orqa fondagi diagonal qatlamlar */}
                 <Box
                   sx={{
                     position: "absolute",
@@ -301,6 +309,7 @@ export default function HomeCategories() {
                     objectFit: "contain",
                     zIndex: 2,
                     pointerEvents: "none",
+                    "@media (max-width:900px)": { height: "55%" },
                   }}
                 />
               </Box>

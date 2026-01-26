@@ -45,7 +45,10 @@ const Brends = () => {
           slider.scrollLeft += 1;
 
           // Oxiriga yetsa boshiga qaytadi
-          if (slider.scrollLeft >= slider.scrollWidth - slider.clientWidth - 1) {
+          if (
+            slider.scrollLeft >=
+            slider.scrollWidth - slider.clientWidth - 1
+          ) {
             slider.scrollLeft = 0;
           }
         }
@@ -96,12 +99,21 @@ const Brends = () => {
   };
 
   return (
-    <Box sx={{ mt: "84px" }}>
-      <Typography sx={{ fontSize: "34px", fontWeight: 600, color: "#000" }}>
+    <Box sx={{ mt: "44px" }}>
+      <Typography
+        sx={{
+          fontSize: "34px",
+          fontWeight: 600,
+          color: "#000",
+          "@media (max-width:900px)": {
+            fontSize: "26px",
+          },
+        }}
+      >
         Бренды
       </Typography>
-      
-      <Box sx={{ position: "relative", mt: "34px" }}>
+
+      <Box sx={{ position: "relative", mt: "14px" }}>
         {/* CHAP TUGMA */}
         <IconButton
           onClick={() => scrollBtn("left")}
@@ -116,7 +128,7 @@ const Brends = () => {
             width: 40,
             height: 40,
             display: { xs: "none", md: "flex" },
-            "&:hover": { bgcolor: "#f5f5f5" }
+            "&:hover": { bgcolor: "#f5f5f5" },
           }}
         >
           <Image src="/arrowleft.svg" width="32" height="32" alt="arrow left" />
@@ -136,10 +148,15 @@ const Brends = () => {
             width: 40,
             height: 40,
             display: { xs: "none", md: "flex" },
-            "&:hover": { bgcolor: "#f5f5f5" }
+            "&:hover": { bgcolor: "#f5f5f5" },
           }}
         >
-          <Image src="/arrowright.svg" width="32" height="32" alt="arrow right" />
+          <Image
+            src="/arrowright.svg"
+            width="32"
+            height="32"
+            alt="arrow right"
+          />
         </IconButton>
 
         {/* SCROLL KONTEYNERI */}

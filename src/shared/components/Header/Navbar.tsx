@@ -24,7 +24,7 @@ const Navbar = () => {
         sx={{
           maxWidth: "1800px",
           mx: "auto",
-          px: 3,
+          pr: 4,
           height: 70,
           display: "flex",
           alignItems: "center",
@@ -164,7 +164,6 @@ const Navbar = () => {
                 color: "#4E4E4E",
                 textTransform: "none",
                 borderRadius: 1,
-                px: 2,
                 fontSize: 16,
                 "&:hover": {
                   bgcolor: "rgba(36,159,252,0.08)",

@@ -19,6 +19,7 @@ import {
   ListItemText,
   CircularProgress,
   Avatar,
+  Container,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
@@ -193,7 +194,7 @@ const NavbarCatalog = () => {
                 borderRadius: 2,
                 "@media (max-width:900px)": {
                   mt: "60px",
-                  width: "100%",
+                  width: "95%",
                   position: "fixed",
                 },
               }}

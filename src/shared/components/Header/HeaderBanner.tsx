@@ -19,7 +19,7 @@ const HeaderBanner = () => {
     >
       <Container maxWidth="lg">
         <Box
-          width="90%"
+          width="100%"
           sx={{
             display: "flex",
             justifyContent: "space-between",
@@ -29,7 +29,7 @@ const HeaderBanner = () => {
           <Button
             sx={{
               borderRadius: "14px",
-              padding: "12px 18px",
+              padding: "8px 18px",
               fontWeight: 600,
               bgcolor: "#FDEC1A",
               fontSize: "16px",
@@ -57,7 +57,7 @@ const HeaderBanner = () => {
           <Button
             sx={{
               borderRadius: "14px",
-              padding: "12px 18px",
+              padding: "8px 18px",
               fontWeight: 600,
               bgcolor: "#FDEC1A",
               fontSize: "16px",

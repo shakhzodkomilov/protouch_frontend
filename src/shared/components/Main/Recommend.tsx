@@ -37,7 +37,7 @@ interface ProductItem {
   is_in_stock: boolean;
 }
 
-const Recommend = () => {
+export const Recommend = () => {
   const { locale } = useParams();
   const [arrivals, loading, loadArrivalsEv] = useUnit([
     $newArrivals,
@@ -387,6 +387,11 @@ const ProductCard = ({
           height: "230px",
           my: 2,
           pointerEvents: "none",
+          "@media (max-width:900px)": {
+            height: "140px",
+            width: "120px",
+            margin: "0 auto",
+          },
         }}
       >
         <Image
@@ -400,16 +405,38 @@ const ProductCard = ({
         <Typography sx={descriptionStyle}>
           {item.short_description || "Product"}
         </Typography>
-        <Typography sx={{ color: "#000", fontWeight: 700, fontSize: "20px" }}>
+        <Typography
+          sx={{
+            color: "#000",
+            fontWeight: 700,
+            fontSize: "20px",
+            "@media (max-width:1000px)": {
+              fontSize: "16px",
+            },
+          }}
+        >
           {formatPrice(item.price)} сум
         </Typography>
       </Box>
       <Button
-        onClick={(e) => onBasketClick(e, item, info)}
-        sx={{ ...actionBtnStyle, bgcolor: inBasket ? "#3BB351" : "#249FFC" }}
+        onClick={(e) => onBasketClick(e, item)}
+        sx={{
+          ...actionBtnStyle,
+          bgcolor: inBasket ? "#3BB351" : "#249FFC",
+          width: { xs: "44px", md: "54px" },
+          height: { xs: "44px", md: "54px" },
+          minWidth: { xs: "44px", md: "54px" },
+          "&:hover": {
+            bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
+          },
+          "& img": {
+            width: { xs: "22px", md: "26px" },
+            height: { xs: "22px", md: "26px" },
+          },
+        }}
       >
         {inBasket ? (
-          <DoneIcon sx={{ color: "#fff", fontSize: 30 }} />
+          <DoneIcon sx={{ color: "#fff", fontSize: { xs: 24, md: 30 } }} />
         ) : (
           <Image
             src={
@@ -418,6 +445,7 @@ const ProductCard = ({
             alt="icon"
             width={26}
             height={26}
+            style={{ objectFit: "contain" }}
           />
         )}
       </Button>
@@ -464,6 +492,10 @@ const cardStyle = {
   display: "flex",
   position: "relative",
   flexDirection: "column",
+  "@media (max-width:900px)": {
+    minHeight: "320px",
+    width: "240px",
+  },
 };
 
 const statusBadgeStyle = (isInStock: boolean) => ({
@@ -483,6 +515,9 @@ const descriptionStyle = {
   WebkitBoxOrient: "vertical",
   WebkitLineClamp: 2,
   overflow: "hidden",
+  "@media (max-width:1000px)": {
+    fontSize: "14px",
+  },
 };
 
 const actionBtnStyle = {
@@ -494,6 +529,12 @@ const actionBtnStyle = {
   right: "15px",
   bottom: "15px",
   "&:hover": { opacity: 0.9 },
+  "@media (max-width:1000px)": {
+    minWidth: "44px",
+    height: "44px",
+    borderRadius: "50%",
+    position: "absolute",
+    right: "15px",
+    bottom: "15px",
+  },
 };
-
-export default Recommend;

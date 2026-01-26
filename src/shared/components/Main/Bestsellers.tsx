@@ -184,11 +184,20 @@ const BestSellers = () => {
 
   return (
     <Box sx={{ mt: "84px", userSelect: "none" }}>
-      <Typography sx={{ fontSize: "34px", fontWeight: 600, color: "#000" }}>
+      <Typography
+        sx={{
+          fontSize: "34px",
+          fontWeight: 600,
+          color: "#000",
+          "@media (max-width:900px)": {
+            fontSize: "26px",
+          },
+        }}
+      >
         Хиты продаж
       </Typography>
 
-      <Box sx={{ position: "relative", mt: "34px" }}>
+      <Box sx={{ position: "relative", mt: "14px" }}>
         {/* Nav Arrows */}
         <IconButton
           onClick={() => scrollBtn("left")}
@@ -296,6 +305,11 @@ const BestSellers = () => {
                         height: "230px",
                         my: 2,
                         pointerEvents: "none",
+                        "@media (max-width:900px)": {
+                          height: "140px",
+                          width: "120px",
+                          margin: "0 auto",
+                        },
                       }}
                     >
                       <Image
@@ -315,6 +329,9 @@ const BestSellers = () => {
                           color: "#000",
                           fontWeight: 700,
                           fontSize: "20px",
+                          "@media (max-width:1000px)": {
+                            fontSize: "16px",
+                          },
                         }}
                       >
                         {new Intl.NumberFormat("ru-RU").format(item.price)} сум
@@ -326,13 +343,22 @@ const BestSellers = () => {
                       sx={{
                         ...actionBtnStyle,
                         bgcolor: inBasket ? "#3BB351" : "#249FFC",
+                        width: { xs: "44px", md: "54px" },
+                        height: { xs: "44px", md: "54px" },
+                        minWidth: { xs: "44px", md: "54px" },
                         "&:hover": {
                           bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
+                        },
+                        "& img": {
+                          width: { xs: "22px", md: "26px" },
+                          height: { xs: "22px", md: "26px" },
                         },
                       }}
                     >
                       {inBasket ? (
-                        <DoneIcon sx={{ color: "#fff", fontSize: 30 }} />
+                        <DoneIcon
+                          sx={{ color: "#fff", fontSize: { xs: 24, md: 30 } }}
+                        />
                       ) : (
                         <Image
                           src={
@@ -343,6 +369,7 @@ const BestSellers = () => {
                           alt="icon"
                           width={26}
                           height={26}
+                          style={{ objectFit: "contain" }}
                         />
                       )}
                     </Button>
@@ -409,6 +436,10 @@ const cardStyle = {
   display: "flex",
   position: "relative",
   flexDirection: "column",
+  "@media (max-width:900px)": {
+    minHeight: "320px",
+    width: "240px",
+  },
 };
 
 const statusBadgeStyle = (isInStock: boolean) => ({
@@ -428,6 +459,9 @@ const descriptionStyle = {
   WebkitLineClamp: 2,
   color: "rgb(78, 78, 78)",
   overflow: "hidden",
+  "@media (max-width:1000px)": {
+    fontSize: "14px",
+  },
 };
 
 const actionBtnStyle = {
@@ -437,6 +471,14 @@ const actionBtnStyle = {
   position: "absolute",
   right: "15px",
   bottom: "15px",
+  "@media (max-width:1000px)": {
+    minWidth: "44px",
+    height: "44px",
+    borderRadius: "50%",
+    position: "absolute",
+    right: "15px",
+    bottom: "15px",
+  },
 };
 
 export default BestSellers;
