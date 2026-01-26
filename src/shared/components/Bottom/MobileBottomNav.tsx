@@ -4,9 +4,6 @@ import { Box, Typography } from "@mui/material";
 import { usePathname, useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 
-/** * Navigatsiya elementlari ro'yxati.
- * path: i18n dan keyingi qism (masalan: /ru/settings bo'lsa, path "/settings")
- */
 const items = [
   {
     label: "Главная",

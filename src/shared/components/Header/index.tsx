@@ -7,20 +7,22 @@ import HeaderBanner from "./HeaderBanner";
 export default function Header() {
   return (
     <AppBar
-      position="static"
+      position="relative"
       elevation={0}
       sx={{
         bgcolor: "transparent",
         backgroundImage: "none",
         boxShadow: "none",
+        padding: "0 0",
       }}
     >
       <HeaderBanner />
       <Container
         maxWidth={false}
         sx={{
-          maxWidth: "1800px",
-          mx: "auto",
+          maxWidth: "1720px",
+          margin: "0 auto",
+          padding: "0 0",
         }}
       >
         <Navbar />

@@ -29,12 +29,12 @@ const cards = [
     img: "/category_3.svg",
     url: "interactive-equipment/electronic-stands",
   },
-  {
-    title: "Акции",
-    bg: "linear-gradient(180deg, #F2C94C 0%, #D4AF37 100%)",
-    img: "/category_4.svg",
-    url: "/sales",
-  },
+  // {
+  //   title: "Акции",
+  //   bg: "linear-gradient(180deg, #F2C94C 0%, #D4AF37 100%)",
+  //   img: "/category_4.svg",
+  //   url: "/sales",
+  // },
   {
     title: "ВКС камеры",
     bg: "linear-gradient(180deg, #9B8AFF 0%, #7B6AD9 100%)",
@@ -63,37 +63,37 @@ const cards = [
     title: "Коммерческие дисплеи",
     bg: "linear-gradient(180deg, #4BBC3C 0%, #3A9D2E 100%)",
     img: "/Commercial_displays.png",
-    url: "conference-equipment/vks-equipment",
+    url: "commercial-displays/digital-information",
   },
   {
     title: "Выдвижной монитор",
     bg: "linear-gradient(180deg, #B0B0B0 0%, #8E8E8E 100%)",
     img: "/Retractable_monitors.png",
-    url: "conference-equipment/vks-equipment",
+    url: "audiovisual-equipment/extendable-monitors",
   },
   {
     title: "Моноблоки",
     bg: "linear-gradient(180deg, #9474C0 0%, #7A5CA1 100%)",
     img: "/Monoblock.png",
-    url: "conference-equipment/vks-equipment",
+    url: "computer-equipment/monoblocks",
   },
   {
     title: "Конференц микрофоны",
     bg: "linear-gradient(180deg, #97A14F 0%, #7C863A 100%)",
     img: "/Conference_microphones.png",
-    url: "conference-equipment/vks-equipment",
+    url: "conference-equipment/conference-microphones",
   },
   {
     title: "Wi-fi оборудование",
     bg: "linear-gradient(180deg, #2A2C9B 0%, #17187B 100%)",
     img: "/Wi-Fi equipment.png",
-    url: "conference-equipment/vks-equipment",
+    url: "server-and-network-equipment/wi-fi-routers",
   },
   {
     title: "Коммутаторы",
     bg: "linear-gradient(180deg, #C67EF6 0%, #A35ED1 100%)",
     img: "/Switches.png",
-    url: "conference-equipment/vks-equipment",
+    url: "server-and-network-equipment/switches",
   },
 ];
 
@@ -147,7 +147,6 @@ export default function HomeCategories() {
   };
 
   const handleCategoryClick = (url: string) => {
-    if ((url = "sales")) return router.push(`/${locale}/${url}`);
     if (dragInfo.current.hasMoved || !url) return;
     router.push(`/${locale}/catalog/${url}`);
   };

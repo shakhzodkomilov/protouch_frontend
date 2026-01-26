@@ -22,13 +22,15 @@ const Navbar = () => {
     >
       <Box
         sx={{
-          maxWidth: "1800px",
+          width: "100%",
           mx: "auto",
-          pr: 4,
           height: 70,
           display: "flex",
           alignItems: "center",
           gap: 3,
+          "@media (max-width:900px)": {
+            mr: 3,
+          },
         }}
       >
         <Box

@@ -146,7 +146,7 @@ const NavbarCatalog = () => {
       <AppBar
         position="static"
         elevation={0}
-        sx={{ bgcolor: "#fff", color: "#000", width: "100%" }}
+        sx={{ bgcolor: "#fff", color: "#000", width: "100%", padding: "0 0" }}
       >
         <Box
           sx={{
@@ -167,14 +167,14 @@ const NavbarCatalog = () => {
               },
               bgcolor: isOpen ? "#1e88e5" : "#2196f3",
               color: "#fff",
-              px: 3,
               height: "55px",
               borderRadius: 2,
               display: "flex",
+
               gap: 1,
               textTransform: "none",
               fontWeight: 600,
-              minWidth: "200px",
+              maxWidth: "180px",
               "&:hover": { bgcolor: "#1e88e5" },
             }}
           >
@@ -194,7 +194,7 @@ const NavbarCatalog = () => {
                 borderRadius: 2,
                 "@media (max-width:900px)": {
                   mt: "60px",
-                  width: "95%",
+                  width: "100%",
                   position: "fixed",
                 },
               }}

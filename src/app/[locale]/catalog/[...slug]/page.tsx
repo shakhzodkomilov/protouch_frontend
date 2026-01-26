@@ -2,7 +2,7 @@
 
 import { use, useEffect, useState } from "react";
 import { useUnit } from "effector-react";
-import { useInView } from "react-intersection-observer"; // Sahifa oxirini tutish uchun
+import { useInView } from "react-intersection-observer";
 import {
   Box,
   Container,
