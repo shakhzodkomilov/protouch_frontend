@@ -47,7 +47,6 @@ const Catalog = ({
     loadCatalog({ lang: locale });
   }, [loadCatalog, locale]);
 
-  // --- MOBILE VIEW (Matches Screenshots) ---
   if (isMobile) {
     return (
       <Box sx={{ bgcolor: "#fff", minHeight: "100vh" }}>
@@ -128,7 +127,6 @@ const Catalog = ({
     );
   }
 
-  // --- DESKTOP VIEW (Your Original Grid) ---
   return (
     <Box sx={{ py: 8, bgcolor: "#f8f9fa" }}>
       <Box sx={{ textAlign: "center", mb: 6 }}>

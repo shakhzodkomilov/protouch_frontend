@@ -413,7 +413,6 @@ const BestSellers = () => {
   );
 };
 
-// ... STYLES (o'zgarmadi)
 const navBtnStyle = {
   position: "absolute",
   top: "50%",

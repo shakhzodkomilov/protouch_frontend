@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { use, useEffect } from "react";
@@ -118,7 +117,9 @@ export default function MobileCatalogPage(props: {
                     />
                   </Box>
                 )}
-                <Typography sx={{ fontWeight: 600, fontSize: "16px" }}>
+                <Typography
+                  sx={{ fontWeight: 600, fontSize: "16px", color: "#000" }}
+                >
                   {category.title}
                 </Typography>
               </Box>
@@ -127,7 +128,6 @@ export default function MobileCatalogPage(props: {
             <AccordionDetails sx={{ p: 0, bgcolor: "#fff" }}>
               <Divider />
               <List disablePadding>
-                {/* "Hamma mahsulotlar" tugmasi (Asosiy kategoriyaning o'ziga o'tish) */}
                 <Link
                   href={`/${locale}/catalog/${category.slug}`}
                   style={{ textDecoration: "none", color: "#249FFC" }}

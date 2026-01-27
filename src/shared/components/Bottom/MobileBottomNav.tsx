@@ -21,7 +21,7 @@ const items = [
     label: "Каталог",
     icon: "/SearchCatalog.svg",
     iconActive: "/catalogActive.svg",
-    path: "/catalogMobile",
+    path: "/catalogmobile",
   },
   {
     label: "Настройки",
