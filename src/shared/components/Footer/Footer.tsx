@@ -148,7 +148,7 @@ const Footer = () => {
                   style={{ height: "auto", width: "26px" }}
                 />
                 <Typography sx={{ userSelect: "none" }}>
-                  Tashkent City, Tong Yulduzi
+                  Мирабадский район, граждан Тонг Юлдузи
                 </Typography>
               </Box>
             </Stack>

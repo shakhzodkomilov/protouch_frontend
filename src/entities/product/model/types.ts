@@ -16,6 +16,7 @@ export interface CategoryChild {
 }
 
 export interface CategoryType {
+  name: string;
   id: string;
   title: string;
   slug: string;

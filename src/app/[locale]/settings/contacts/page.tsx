@@ -101,7 +101,7 @@ export default function ContactsPage() {
             <LocationOnOutlined />
           </ListItemIcon>
           <ListItemText
-            primary="Tashkent, Tong Yulduzi"
+            primary="Мирабадский район, махаллинский сход граждан Тонг Юлдузи"
             primaryTypographyProps={{
               fontSize: 16,
               fontWeight: 500,

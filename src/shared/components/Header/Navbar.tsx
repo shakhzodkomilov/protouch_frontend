@@ -136,7 +136,7 @@ const Navbar = () => {
             sx={contactStyle}
           >
             <Image src="/location.svg" alt="location" width={18} height={18} />
-            Tashkent City, Tong Yulduzi
+            Мирабадский район, Тонг Юлдузи
           </MuiLink>
         </Box>
 

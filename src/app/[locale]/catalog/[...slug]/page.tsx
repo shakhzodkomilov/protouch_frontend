@@ -16,6 +16,7 @@ import {
   $products,
   loadProductsByCategory,
   clearProducts,
+  $categories,
 } from "../../../../entities/product/model";
 import Link from "next/link";
 import Image from "next/image";
@@ -25,29 +26,50 @@ import {
   PaginationType,
 } from "../../../../entities/types/productService.types";
 
+/**
+ * Rekursiv qidiruv funksiyasi
+ * Kategoriyalar daraxti (children) ichidan berilgan slugga mosini topadi
+ */
+const findCategoryRecursive = (categories: any[], targetSlug: string): any => {
+  for (const cat of categories) {
+    if (cat.slug === targetSlug) {
+      return cat;
+    }
+    if (cat.children && cat.children.length > 0) {
+      const found = findCategoryRecursive(cat.children, targetSlug);
+      if (found) return found;
+    }
+  }
+  return null;
+};
+
 export default function CatalogPage(props: {
   params: Promise<{ locale: string; slug: string | string[] }>;
 }) {
   const resolvedParams = use(props.params);
   const { locale, slug } = resolvedParams;
 
+  // 1. Sluglarni tayyorlash
   const slugArray = Array.isArray(slug) ? slug : [slug];
-  const joinedSlug = slugArray.join("/");
+  const joinedSlug = slugArray.join("/"); // "interactive-equipment/interactive-panels"
   const lastSlug = slugArray[slugArray.length - 1] || "";
 
-  // Effector units
+  // 2. Effector Store
+  const allCategories = useUnit($categories);
   const products = useUnit($products) as unknown as PaginationType | null;
   const loading = useUnit($loadingProducts);
 
-  // Mahalliy sahifa holati
+  // 3. To'g'ri kategoriyani daraxt ichidan topish
+  const currentCategory = findCategoryRecursive(
+    allCategories || [],
+    joinedSlug,
+  );
+
+  // Mahalliy holat (Pagination uchun)
   const [currentPage, setCurrentPage] = useState(1);
+  const { ref, inView } = useInView({ threshold: 0.1 });
 
-  // Intersection Observer setup (Datchik)
-  const { ref, inView } = useInView({
-    threshold: 0.1, // Datchik 10% ko'rinsa ham ishlaydi
-  });
-
-  // 1. Kategoriya o'zgarganda hamma narsani tozalab, 1-sahifani yuklash
+  // 4. Birinchi yuklanish (Kategoriya o'zgarganda)
   useEffect(() => {
     if (joinedSlug && locale) {
       clearProducts();
@@ -55,12 +77,12 @@ export default function CatalogPage(props: {
       loadProductsByCategory({
         slugs: joinedSlug,
         page: 1,
-        lang: locale as string,
+        lang: locale,
       });
     }
   }, [joinedSlug, locale]);
 
-  // 2. Foydalanuvchi pastga yetganda keyingi sahifani chaqirish
+  // 5. Infinite Scroll yuklanishi
   useEffect(() => {
     if (inView && products?.next && !loading) {
       const nextPage = currentPage + 1;
@@ -68,7 +90,7 @@ export default function CatalogPage(props: {
       loadProductsByCategory({
         slugs: joinedSlug,
         page: nextPage,
-        lang: locale as string,
+        lang: locale,
       });
     }
   }, [inView, products?.next, loading, joinedSlug, locale, currentPage]);
@@ -81,19 +103,24 @@ export default function CatalogPage(props: {
     );
   }
 
+  // Sarlavha: Store'dan topilsa ruscha nomi, bo'lmasa slug'dan chiroyli matn
+  const displayTitle = currentCategory?.title || lastSlug.replaceAll("-", " ");
+
   return (
     <Box sx={{ bgcolor: "#FAFAFA", minHeight: "100vh", width: "100%", py: 4 }}>
       <Container maxWidth={false} sx={{ py: 4, maxWidth: "1800px" }}>
         <Typography
-          variant="h4"
+          variant="h1"
           sx={{
             mb: 4,
+            ml: 6,
             fontWeight: 700,
             color: "#000",
             textTransform: "capitalize",
+            fontSize: "34px",
           }}
         >
-          {lastSlug.replaceAll("-", " ")}
+          {displayTitle}
         </Typography>
 
         <Box
@@ -123,7 +150,6 @@ export default function CatalogPage(props: {
                   borderRadius: 3,
                   p: 2,
                   boxShadow: "0px 4px 20px rgba(0,0,0,0.08)",
-                  color: "#000",
                   bgcolor: "#fff",
                   display: "flex",
                   minHeight: "420px",
@@ -146,7 +172,13 @@ export default function CatalogPage(props: {
                       bgcolor: item.is_in_stock ? "#D6F2DB" : "#FFE4E4",
                     }}
                   >
-                    {item.is_in_stock ? "В наличии" : "По запросу"}
+                    {item.is_in_stock
+                      ? locale === "ru"
+                        ? "В наличии"
+                        : "Mavjud"
+                      : locale === "ru"
+                        ? "По запросу"
+                        : "So'rov bo'yicha"}
                   </Typography>
                   <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                     <Image
@@ -172,7 +204,7 @@ export default function CatalogPage(props: {
                 >
                   <Image
                     src={item.image || "/placeholder.png"}
-                    alt={item.title || "product image"}
+                    alt={item.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 300px"
                     style={{ objectFit: "contain" }}
@@ -197,8 +229,10 @@ export default function CatalogPage(props: {
                   <Typography
                     sx={{ fontWeight: 700, fontSize: 18, mt: 2, color: "#000" }}
                   >
-                    {new Intl.NumberFormat("ru-RU").format(Number(item.price))}{" "}
-                    сум
+                    {new Intl.NumberFormat(
+                      locale === "ru" ? "ru-RU" : "uz-UZ",
+                    ).format(Number(item.price))}{" "}
+                    {locale === "ru" ? "сум" : "so'm"}
                   </Typography>
                 </Box>
 
@@ -231,7 +265,7 @@ export default function CatalogPage(props: {
           ))}
         </Box>
 
-        {/* --- Datchik: Sahifa oxiriga yetganda shu ko'rinadi --- */}
+        {/* Scroll Sensor */}
         <Box
           ref={ref}
           sx={{
@@ -246,19 +280,12 @@ export default function CatalogPage(props: {
           )}
           {!products?.next && products?.results?.length ? (
             <Typography sx={{ color: "#999", fontSize: 14 }}>
-              Вы просмотрели все товары
+              {locale === "ru"
+                ? "Вы просмотрели все товары"
+                : "Barcha mahsulotlarni ko'rdingiz"}
             </Typography>
           ) : null}
         </Box>
-
-        {/* Bo'sh holat */}
-        {products?.results && products.results.length === 0 && !loading && (
-          <Box sx={{ mt: 10, textAlign: "center" }}>
-            <Typography variant="h6" sx={{ color: "#999" }}>
-              Ничего не найдено
-            </Typography>
-          </Box>
-        )}
       </Container>
     </Box>
   );

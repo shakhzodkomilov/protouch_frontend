@@ -70,7 +70,7 @@ export default function AboutUs() {
     width: 50,
     height: 50,
     borderRadius: "50%",
-    display: { xs: "none", md: "flex" }, // mobilda tugmalar yashirin
+    display: { xs: "none", md: "flex" },
     ...pos,
     "&:hover": { bgcolor: "#f5f5f5" },
   });
@@ -78,17 +78,26 @@ export default function AboutUs() {
   return (
     <Box sx={{ py: 8, bgcolor: "#fff", color: "#333" }}>
       <Container maxWidth="lg">
-        {/* Sarlavha */}
+        {/* Sarlavha - H1 (oldingi h4 style) */}
         <Typography
+          component="h1"
           variant="h4"
           sx={{ fontWeight: 800, mb: 2, color: "#1a1a1a" }}
         >
           PROTOUCH — компания с опытом реализации проектов для государственного
           и корпоративного сектора.
         </Typography>
+
+        {/* Matn - P */}
         <Typography
-          variant="body1"
-          sx={{ mb: 3, color: "#666", maxWidth: "800px", fontSize: "1.1rem" }}
+          component="p"
+          sx={{
+            mb: 3,
+            color: "#666",
+            maxWidth: "800px",
+            fontSize: "1.1rem",
+            lineHeight: 1.6,
+          }}
         >
           PROTOUCH — компания с опытом реализации проектов для государственного
           и корпоративного сектора. Много лет мы работали с госорганизациями и
@@ -100,21 +109,31 @@ export default function AboutUs() {
           количеству качественных и недорогих товаров, предоставляя лучший
           сервис.
         </Typography>
+
+        {/* Yo'nalishlar - H1 (oldingi h5 style) */}
         <Typography
-          variant="h5"
+          component="h1"
           sx={{
             mb: 2,
             mt: 2,
             color: "#000",
             fontWeight: "700",
-            fontSize: "20",
+            fontSize: "20px", // oldingi holatdagi "20"
           }}
         >
-          Наши направления{" "}
+          Наши направления
         </Typography>
+
+        {/* Matn - P */}
         <Typography
-          variant="body1"
-          sx={{ mb: 3, color: "#666", maxWidth: "800px", fontSize: "1.1rem" }}
+          component="p"
+          sx={{
+            mb: 3,
+            color: "#666",
+            maxWidth: "800px",
+            fontSize: "1.1rem",
+            lineHeight: 1.6,
+          }}
         >
           За годы работы мы расширили направления и собрали сильную команду
           инженеров и специалистов. Сегодня мы закрываем задачи комплексно — от
@@ -129,21 +148,31 @@ export default function AboutUs() {
           интерактивные панели/трибуны и оснащение помещений • решения “с нуля
           до реализации” под конкретные задачи Б
         </Typography>
+
+        {/* Ishonch - H1 (oldingi h5 style) */}
         <Typography
-          variant="h5"
+          component="h1"
           sx={{
             mb: 2,
             mt: 2,
             color: "#000",
             fontWeight: "700",
-            fontSize: "20",
+            fontSize: "20px", // oldingi holatdagi "20"
           }}
         >
           Нам доверяют
         </Typography>
+
+        {/* Matn - P */}
         <Typography
-          variant="body1"
-          sx={{ mb: 3, color: "#666", maxWidth: "800px", fontSize: "1.1rem" }}
+          component="p"
+          sx={{
+            mb: 4,
+            color: "#666",
+            maxWidth: "800px",
+            fontSize: "1.1rem",
+            lineHeight: 1.6,
+          }}
         >
           Крупные организации и бренды, среди которых: Wyndham Charvak, Hilton,
           CAEx Uzbekistan, UzExpo Center, NBU Bank, Kapital Bank, Orient Finans
@@ -207,13 +236,23 @@ export default function AboutUs() {
                     height: "100%",
                   }}
                 >
+                  {/* Timeline yili - H1 (oldingi h5 style) */}
                   <Typography
-                    variant="h5"
-                    sx={{ fontWeight: 800, mb: 1, color: "#1a1a1a" }}
+                    component="h1"
+                    sx={{
+                      fontWeight: 800,
+                      fontSize: "24px",
+                      mb: 1,
+                      color: "#1a1a1a",
+                    }}
                   >
                     {item.year}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  {/* Timeline matni - P */}
+                  <Typography
+                    component="p"
+                    sx={{ color: "#666", lineHeight: 1.5 }}
+                  >
                     {item.text}
                   </Typography>
                 </CardContent>
@@ -226,14 +265,14 @@ export default function AboutUs() {
   );
 }
 
-// Yordamchi komponent (afzalliklar uchun)
+// Yordamchi komponent
 function AdvantageItem({ text }: { text: string }) {
   return (
     <Stack direction="row" spacing={1.5} alignItems="flex-start">
       <CheckCircleOutline
         sx={{ color: "#1a1a1a", fontSize: "1.2rem", mt: 0.3 }}
       />
-      <Typography variant="body1" sx={{ color: "#333" }}>
+      <Typography component="p" sx={{ color: "#333", lineHeight: 1.5 }}>
         {text}
       </Typography>
     </Stack>
