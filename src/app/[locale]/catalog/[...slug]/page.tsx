@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, useMemo } from "react";
 import { useUnit } from "effector-react";
 import { useInView } from "react-intersection-observer";
 import {
@@ -26,15 +26,10 @@ import {
   PaginationType,
 } from "../../../../entities/types/productService.types";
 
-/**
- * Rekursiv qidiruv funksiyasi
- * Kategoriyalar daraxti (children) ichidan berilgan slugga mosini topadi
- */
 const findCategoryRecursive = (categories: any[], targetSlug: string): any => {
+  if (!categories) return null;
   for (const cat of categories) {
-    if (cat.slug === targetSlug) {
-      return cat;
-    }
+    if (cat.slug === targetSlug) return cat;
     if (cat.children && cat.children.length > 0) {
       const found = findCategoryRecursive(cat.children, targetSlug);
       if (found) return found;
@@ -49,27 +44,26 @@ export default function CatalogPage(props: {
   const resolvedParams = use(props.params);
   const { locale, slug } = resolvedParams;
 
-  // 1. Sluglarni tayyorlash
   const slugArray = Array.isArray(slug) ? slug : [slug];
-  const joinedSlug = slugArray.join("/"); // "interactive-equipment/interactive-panels"
+  const joinedSlug = slugArray.join("/");
   const lastSlug = slugArray[slugArray.length - 1] || "";
 
-  // 2. Effector Store
   const allCategories = useUnit($categories);
   const products = useUnit($products) as unknown as PaginationType | null;
   const loading = useUnit($loadingProducts);
 
-  // 3. To'g'ri kategoriyani daraxt ichidan topish
-  const currentCategory = findCategoryRecursive(
-    allCategories || [],
-    joinedSlug,
-  );
+  // 1. Memo orqali sarlavhani hisoblaymiz (bu Store o'zgarishi bilan avtomatik hisoblanadi)
+  const categoryData = useMemo(() => {
+    return findCategoryRecursive(allCategories || [], joinedSlug);
+  }, [allCategories, joinedSlug]);
 
-  // Mahalliy holat (Pagination uchun)
+  // Agar kategoriya topilsa uni title'ini, topilmasa slug'ni ishlatamiz
+  const displayTitle = categoryData?.title || lastSlug.replaceAll("-", " ");
+
   const [currentPage, setCurrentPage] = useState(1);
   const { ref, inView } = useInView({ threshold: 0.1 });
 
-  // 4. Birinchi yuklanish (Kategoriya o'zgarganda)
+  // Ma'lumotlarni yuklash
   useEffect(() => {
     if (joinedSlug && locale) {
       clearProducts();
@@ -82,7 +76,7 @@ export default function CatalogPage(props: {
     }
   }, [joinedSlug, locale]);
 
-  // 5. Infinite Scroll yuklanishi
+  // Infinite Scroll
   useEffect(() => {
     if (inView && products?.next && !loading) {
       const nextPage = currentPage + 1;
@@ -103,21 +97,21 @@ export default function CatalogPage(props: {
     );
   }
 
-  // Sarlavha: Store'dan topilsa ruscha nomi, bo'lmasa slug'dan chiroyli matn
-  const displayTitle = currentCategory?.title || lastSlug.replaceAll("-", " ");
-
   return (
     <Box sx={{ bgcolor: "#FAFAFA", minHeight: "100vh", width: "100%", py: 4 }}>
       <Container maxWidth={false} sx={{ py: 4, maxWidth: "1800px" }}>
+        {/* Sarlavha qismi */}
         <Typography
           variant="h1"
           sx={{
             mb: 4,
-            ml: 6,
+            ml: { xs: 0, md: 6 },
             fontWeight: 700,
             color: "#000",
             textTransform: "capitalize",
             fontSize: "34px",
+            // Store yuklanmaguncha "visibility: hidden" qilsak, sakrash bo'lmaydi
+            visibility: allCategories?.length ? "visible" : "hidden",
           }}
         >
           {displayTitle}
@@ -159,7 +153,6 @@ export default function CatalogPage(props: {
                   "&:hover": { transform: "translateY(-5px)" },
                 }}
               >
-                {/* Stock Status */}
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Typography
                     sx={{
@@ -193,7 +186,6 @@ export default function CatalogPage(props: {
                   </Box>
                 </Box>
 
-                {/* Product Image */}
                 <Box
                   sx={{
                     position: "relative",
@@ -211,7 +203,6 @@ export default function CatalogPage(props: {
                   />
                 </Box>
 
-                {/* Title & Price */}
                 <Box sx={{ mt: 2, flexGrow: 1 }}>
                   <Typography
                     sx={{
@@ -265,7 +256,6 @@ export default function CatalogPage(props: {
           ))}
         </Box>
 
-        {/* Scroll Sensor */}
         <Box
           ref={ref}
           sx={{
@@ -278,13 +268,6 @@ export default function CatalogPage(props: {
           {loading && currentPage > 1 && (
             <CircularProgress size={30} sx={{ color: "#249FFC" }} />
           )}
-          {!products?.next && products?.results?.length ? (
-            <Typography sx={{ color: "#999", fontSize: 14 }}>
-              {locale === "ru"
-                ? "Вы просмотрели все товары"
-                : "Barcha mahsulotlarni ko'rdingiz"}
-            </Typography>
-          ) : null}
         </Box>
       </Container>
     </Box>
