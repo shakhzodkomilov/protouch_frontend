@@ -111,7 +111,7 @@ export default function CatalogPage(props: {
             textTransform: "capitalize",
             fontSize: "34px",
             // Store yuklanmaguncha "visibility: hidden" qilsak, sakrash bo'lmaydi
-            visibility: allCategories?.length ? "visible" : "hidden",
+            display: allCategories?.length ? "flex" : "none",
           }}
         >
           {displayTitle}
