@@ -110,7 +110,6 @@ export default function CatalogPage(props: {
             color: "#000",
             textTransform: "capitalize",
             fontSize: "34px",
-            // Store yuklanmaguncha "visibility: hidden" qilsak, sakrash bo'lmaydi
             display: allCategories?.length ? "flex" : "none",
           }}
         >

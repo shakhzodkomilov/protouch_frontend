@@ -51,7 +51,7 @@ const cards = [
     title: "Видеостена",
     bg: "linear-gradient(180deg, #52C993 0%, #3DA173 100%)",
     img: "/Videowall.png",
-    url: "audiovisual-equipment/video-wall",
+    url: "commercial-displays/video-wall",
   },
   {
     title: "LED экраны",
