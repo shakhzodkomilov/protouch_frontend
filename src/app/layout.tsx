@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import ThemeProviderClient from "./ThemeProviderClient";
 
@@ -50,6 +51,7 @@ export const metadata: Metadata = {
     },
   },
 };
+
 export default function RootLayout({
   children,
 }: {
@@ -57,6 +59,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru" suppressHydrationWarning>
+      <head>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=AW-17911571855"
+          strategy="afterInteractive"
+        />
+        <Script id="google-ads-tag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'AW-17911571855');
+          `}
+        </Script>
+      </head>
       <body>
         <ThemeProviderClient>{children}</ThemeProviderClient>
       </body>
