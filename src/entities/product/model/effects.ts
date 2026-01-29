@@ -7,12 +7,15 @@ export const getCategoriesFx = createEffect<
   { is_carousel?: string; lang?: string },
   CategoryType[]
 >(async (params) => {
-  const { data } = await axios.get(`${API_URL}/api/v1/products/categories/`, {
-    params: {
-      is_carousel: params.is_carousel,
-      lang: params.lang || "ru",
+  const { data } = await axios.get(
+    `${API_URL}/api/v1/products/categories/?is_carousel=true`,
+    {
+      params: {
+        is_carousel: params.is_carousel,
+        lang: params.lang || "ru",
+      },
     },
-  });
+  );
   return data;
 });
 

@@ -28,7 +28,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let hasNextPage = true;
 
   try {
-    // 1. Barcha sahifalardagi mahsulotlarni yig'ish
     while (hasNextPage) {
       const res = await axios.get(`${API_URL}/api/v1/products/`, {
         params: { page: currentPage, lang: "ru" },
@@ -37,14 +36,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const { results, next } = res.data;
       allProducts.push(...results);
 
-      // Agar "next" field null bo'lsa, demak oxirgi sahifaga keldik
       if (next) {
         currentPage++;
       } else {
         hasNextPage = false;
       }
 
-      // Cheksiz sikl bo'lib qolmasligi uchun himoya (masalan, max 50 sahifa)
       if (currentPage > 50) break;
     }
 
