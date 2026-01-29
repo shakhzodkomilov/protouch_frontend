@@ -170,7 +170,7 @@ const NavbarCatalog = () => {
               height: "55px",
               borderRadius: 2,
               display: "flex",
-
+              ml: 1,
               gap: 1,
               textTransform: "none",
               fontWeight: 600,

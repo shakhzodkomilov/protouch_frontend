@@ -17,7 +17,7 @@ const HeaderBanner = () => {
         },
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Box
           width="100%"
           sx={{

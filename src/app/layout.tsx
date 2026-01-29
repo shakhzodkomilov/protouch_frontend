@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     siteName: "Protouch",
     images: [
       {
-        url: "/icons/iconn.png",
+        url: "/faviconn.png",
         width: 1200,
         height: 630,
         alt: "Интерактивный инфокиоск Protouch в Ташкенте",
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     title: "Protouch | Интерактивные технологии в Ташкенте",
     description:
       "Интерактивные инфокиоски, сенсорные панели и роботы — современные решения от Protouch.",
-    images: ["/icons/iconn.png"],
+    images: ["/faviconn.png"],
   },
   alternates: {
     canonical: "https://protouch.uz",

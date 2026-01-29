@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef } from "react";
-import { useParams, usePathname } from "next/navigation";
+import { useEffect, useState, useMemo } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useUnit } from "effector-react";
 import {
@@ -37,6 +37,8 @@ import {
   loadFavorites,
   toggleFavorite,
 } from "../../../../entities/favourite/model/store";
+import CallIcon from "@mui/icons-material/Call";
+import { useRouter } from "next/navigation";
 
 export default function ProductDetailPage() {
   type ProductImage = {
@@ -45,21 +47,16 @@ export default function ProductDetailPage() {
   };
 
   const { id, locale } = useParams();
-  const pathname = usePathname();
-  const [product, loading, loadProductDetailEv] = useUnit([
-    $productDetail,
-    $loadingProductDetail,
-    loadProductDetail,
-  ]);
 
-  const infoBlocksRef = useRef<HTMLDivElement>(null);
+  // Effector units
+  const product = useUnit($productDetail);
+  const loading = useUnit($loadingProductDetail);
+  const loadProductDetailEv = useUnit(loadProductDetail);
 
   // State management
   const [openToast, setOpenToast] = useState(false);
   const [favoriteToast, setFavoriteToast] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
-
-  // ✅ ADDED: Description state
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Global state
@@ -68,7 +65,7 @@ export default function ProductDetailPage() {
   const handleAddToBasket = useUnit(addToBasket);
   const handleToggleFavorite = useUnit(toggleFavorite);
   const loadFavoritesEv = useUnit(loadFavorites);
-
+  const router = useRouter();
   const productId = useMemo(() => {
     return product?.id ? Number(product.id) : null;
   }, [product]);
@@ -110,8 +107,6 @@ export default function ProductDetailPage() {
         isInStock: product.is_in_stock,
       });
       setOpenToast(true);
-    } else {
-      window.location.href = `tel:+998000000000`;
     }
   };
 
@@ -134,7 +129,7 @@ export default function ProductDetailPage() {
   }
 
   const images: ProductImage[] = product.images ?? [];
-
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   return (
     <Box sx={{ width: "100%", height: "auto", bgcolor: "#FAFAFA" }}>
       <Container maxWidth={false} sx={{ py: 4, maxWidth: "1800px" }}>
@@ -236,15 +231,13 @@ export default function ProductDetailPage() {
                   src={images[activeImage]?.url}
                   width={290}
                   height={290}
-                  style={{
-                    objectFit: "contain",
-                    position: "unset",
-                  }}
+                  style={{ objectFit: "contain", position: "unset" }}
                   alt={product.title}
                 />
               </Box>
             </Box>
 
+            {/* DESCRIPTION */}
             <Box sx={{ flex: 1, maxWidth: { lg: 400 } }}>
               <Typography
                 sx={{ fontSize: 18, fontWeight: 600, mb: 2, color: "#000" }}
@@ -322,7 +315,7 @@ export default function ProductDetailPage() {
 
               <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
                 <Button variant="outlined" fullWidth sx={actionBtnStyle}>
-                  <Image src="/scale.svg" width={24} height={24} alt="scale" />
+                  <Image src="/scale.svg" width={24} height={24} alt="scale" />{" "}
                   Сравнить
                 </Button>
                 <Button
@@ -371,23 +364,45 @@ export default function ProductDetailPage() {
 
               <Button
                 fullWidth
+                onClick={() => router.push(`/${locale}/legalentity/`)}
                 sx={{
                   bgcolor: "#25C261",
                   color: "#fff",
                   py: 1.5,
                   borderRadius: 3,
                   textTransform: "none",
+
                   "&:hover": { bgcolor: "#1FA754" },
                 }}
               >
                 <DescriptionOutlinedIcon sx={{ mr: 1 }} /> Купить как юр. лицо
+              </Button>
+
+              <Button
+                fullWidth
+                component="a"
+                href="tel:+998977782347"
+                sx={{
+                  bgcolor: "#249FFC",
+                  color: "#fff",
+                  py: 1.5,
+                  borderRadius: 3,
+                  mt: 2,
+                  fontSize: 16,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  textTransform: "none",
+                  "&:hover": { bgcolor: "#1d93d7" },
+                }}
+              >
+                <CallIcon /> Позвонить
               </Button>
             </Box>
           </Box>
 
           {/* INFO BLOCKS */}
           <Box
-            ref={infoBlocksRef}
             sx={{
               width: "100%",
               bgcolor: "#f4f4f4",
@@ -445,9 +460,7 @@ export default function ProductDetailPage() {
                   px: 4,
                   color: "#fff",
                   textTransform: "none",
-                  "&:hover": {
-                    bgcolor: "#1E8BD8",
-                  },
+                  "&:hover": { bgcolor: "#1E8BD8" },
                 }}
               >
                 Telegram

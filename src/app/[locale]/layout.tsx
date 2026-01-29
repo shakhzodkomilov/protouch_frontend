@@ -28,7 +28,6 @@ export const metadata: Metadata = {
     languages: {
       uz: "https://protouch.uz/uz",
       ru: "https://protouch.uz/ru",
-      en: "https://protouch.uz/en",
     },
   },
   openGraph: {
@@ -42,7 +41,7 @@ export const metadata: Metadata = {
     locale: "ru_RU",
     images: [
       {
-        url: "/icons/iconn.png",
+        url: "/faviconn.png",
         width: 1200,
         height: 630,
         alt: "Интерактивные инфокиоски и сенсорные панели Protouch Uzbekistan",
@@ -57,7 +56,7 @@ export const metadata: Metadata = {
     images: ["https://protouch.uz/og-image.jpg"],
   },
   icons: {
-    icon: "/icons/iconn.png",
+    icon: "/faviconn.png",
   },
 };
 

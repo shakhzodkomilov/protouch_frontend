@@ -1,5 +1,4 @@
 import { createEffect, createStore, createEvent, combine } from "effector";
-import axios from "axios";
 import { $api } from "../config/base";
 
 const LOGIN_URL = "https://api.protouch.uz/api/v1/auth/login/";

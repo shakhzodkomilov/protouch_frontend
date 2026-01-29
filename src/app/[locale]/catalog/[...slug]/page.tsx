@@ -26,6 +26,7 @@ import {
   PaginationType,
 } from "../../../../entities/types/productService.types";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const findCategoryRecursive = (categories: any[], targetSlug: string): any => {
   if (!categories) return null;
   for (const cat of categories) {
@@ -67,6 +68,7 @@ export default function CatalogPage(props: {
   useEffect(() => {
     if (joinedSlug && locale) {
       clearProducts();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentPage(1);
       loadProductsByCategory({
         slugs: joinedSlug,
@@ -80,6 +82,7 @@ export default function CatalogPage(props: {
   useEffect(() => {
     if (inView && products?.next && !loading) {
       const nextPage = currentPage + 1;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentPage(nextPage);
       loadProductsByCategory({
         slugs: joinedSlug,
