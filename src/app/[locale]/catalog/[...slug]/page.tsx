@@ -122,12 +122,13 @@ export default function CatalogPage(props: {
         <Box
           sx={{
             display: "grid",
-            gap: 4,
+            gap: 2,
             gridTemplateColumns: {
               xs: "1fr",
               sm: "repeat(2, 1fr)",
               md: "repeat(3, 1fr)",
               lg: "repeat(4, 1fr)",
+              xl: "repeat(5, 1fr)",
             },
             width: "100%",
           }}
