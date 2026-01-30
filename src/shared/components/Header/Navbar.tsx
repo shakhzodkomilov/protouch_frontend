@@ -154,8 +154,8 @@ const Navbar = () => {
             { title: "Акции", href: "/sales" },
             { title: "Доставка", href: "/delivery" },
             { title: "О нас", href: "/about-us" },
-            { title: "Гос. закупки", href: "/tenders" },
-            { title: "Юр. лицам", href: "/business" },
+            { title: "Гос. закупки", href: "/legaldoc" },
+            { title: "Юр. лицам", href: "/" },
           ].map((item) => (
             <Button
               key={item.title}

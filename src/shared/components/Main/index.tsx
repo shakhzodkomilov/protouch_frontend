@@ -161,7 +161,7 @@ export default function HomeCategories() {
           display: "flex",
           alignItems: "center",
           gap: 3,
-          "@media (max-width:900px)": { mt: 13 },
+          "@media (max-width:900px)": { mt: 12 },
         }}
       >
         {/* SIDEBAR */}
@@ -176,7 +176,7 @@ export default function HomeCategories() {
             justifyContent: "space-between",
             color: "#000",
             flexShrink: 0,
-            height: "280px",
+            height: "260px",
           }}
         >
           <Box>
@@ -254,12 +254,8 @@ export default function HomeCategories() {
                 key={i}
                 onClick={() => handleCategoryClick(item.url)}
                 sx={{
-                  minWidth: {
-                    xs: "240px",
-                    sm: "280px",
-                  },
                   width: { xs: "280px" },
-                  height: 280,
+                  height: 260,
                   borderRadius: "24px",
                   background: item.bg,
                   p: 3,
@@ -270,7 +266,10 @@ export default function HomeCategories() {
                   cursor: "pointer",
                   overflow: "hidden",
                   "&:active": { transform: "scale(0.97)" },
-                  "@media (max-width:900px)": { height: "250px" },
+                  "@media (max-width:900px)": {
+                    height: "220px",
+                    width: "220px",
+                  },
                 }}
               >
                 <Typography
@@ -303,8 +302,8 @@ export default function HomeCategories() {
                     position: "absolute",
                     right: 20,
                     bottom: 20,
-                    width: "65%",
-                    height: "65%",
+                    width: "55%",
+                    height: "55%",
                     objectFit: "contain",
                     zIndex: 2,
                     pointerEvents: "none",
