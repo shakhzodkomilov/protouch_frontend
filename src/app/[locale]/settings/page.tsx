@@ -27,27 +27,48 @@ import {
   PhoneEnabledOutlined,
 } from "@mui/icons-material";
 import Link from "next/link";
-
-import { useParams } from "next/navigation";
-
-const MENU_ITEMS = [
-  { text: "Избранное", icon: <FavoriteBorder />, path: "/favorites" },
-  { text: "Сравнение", icon: <ScaleOutlined />, path: "/compare" },
-  { text: "Акции", icon: <StarBorder />, path: "/sales" },
-  { text: "Доставка", icon: <LocalShippingOutlined />, path: "/delivery" },
-  { text: "О нас", icon: <InfoOutlined />, path: "/about-us" },
-  {
-    text: "Государственные закупки",
-    icon: <AccountBalanceOutlined />,
-    path: "/gov-purchases",
-  },
-  { text: "Юр. лицам", icon: <ShieldOutlined />, path: "/b2b" },
-  { text: "Язык", icon: <Translate />, path: "#" },
-  { text: "Связь", icon: <ChatBubbleOutline />, path: "/chat" },
-];
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function MobileSettings() {
   const { locale } = useParams();
+  const pathname = usePathname();
+  const router = useRouter();
+  const t = useTranslations("MobileSettings");
+
+  // --- LOGIKA: Tilni almashtirish ---
+  const handleLanguageToggle = () => {
+    const nextLocale = locale === "ru" ? "uz" : "ru";
+    // Joriy yo'ldagi til kodini almashtirish (/ru/about -> /uz/about)
+    const newPath = pathname.replace(`/${locale}`, `/${nextLocale}`);
+    router.push(newPath);
+  };
+
+  const MENU_ITEMS = [
+    { text: t("menu.favorites"), icon: <FavoriteBorder />, path: "/favorites" },
+    { text: t("menu.comparison"), icon: <ScaleOutlined />, path: "/compare" },
+    { text: t("menu.actions"), icon: <StarBorder />, path: "/sales" },
+    {
+      text: t("menu.delivery"),
+      icon: <LocalShippingOutlined />,
+      path: "/delivery",
+    },
+    { text: t("menu.about"), icon: <InfoOutlined />, path: "/about" },
+    {
+      text: t("menu.procurement"),
+      icon: <AccountBalanceOutlined />,
+      path: "/legaldoc",
+    },
+    { text: t("menu.b2b"), icon: <ShieldOutlined />, path: "/b2b" },
+    // Til almashtirish uchun maxsus item
+    {
+      text: t("menu.language"),
+      icon: <Translate />,
+      action: handleLanguageToggle,
+      label: locale === "ru" ? "O'zbekcha" : "Русский",
+    },
+    { text: t("menu.chat"), icon: <ChatBubbleOutline />, path: "/chat" },
+  ];
 
   return (
     <Box sx={{ bgcolor: "#F5F7FB", minHeight: "100vh", p: 2, pt: 8 }}>
@@ -59,7 +80,7 @@ export default function MobileSettings() {
         <Typography
           sx={{ fontSize: 14, fontWeight: 500, mb: 2, color: "#000" }}
         >
-          Получайте бонусы, сохраняйте и отслеживайте заказы
+          {t("auth.title")}
         </Typography>
         <Button
           fullWidth
@@ -74,7 +95,7 @@ export default function MobileSettings() {
             "&:hover": { bgcolor: "#1e8ce0" },
           }}
         >
-          Зарегистрироваться
+          {t("auth.register")}
         </Button>
         <Button
           fullWidth
@@ -87,7 +108,7 @@ export default function MobileSettings() {
             fontWeight: 600,
           }}
         >
-          Войти
+          {t("auth.login")}
         </Button>
       </Paper>
 
@@ -102,7 +123,7 @@ export default function MobileSettings() {
             <PhoneEnabledOutlined />
           </ListItemIcon>
           <ListItemText
-            primary="Контакты"
+            primary={t("menu.contacts")}
             primaryTypographyProps={{ fontWeight: 500, color: "#000" }}
           />
           <ChevronRight sx={{ color: "#BDC1C8" }} />
@@ -112,33 +133,45 @@ export default function MobileSettings() {
       {/* Main Menu List */}
       <Paper elevation={0} sx={{ borderRadius: 4, overflow: "hidden" }}>
         <List disablePadding>
-          {MENU_ITEMS.map((item, index) => (
-            <React.Fragment key={item.text}>
-              <ListItem disablePadding>
-                <ListItemButton
-                  component={Link}
-                  href={`/${locale}${item.path}`}
-                  sx={{ py: 1.5 }}
-                >
-                  <ListItemIcon sx={{ minWidth: 40, color: "#249FFC" }}>
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.text}
-                    primaryTypographyProps={{
-                      fontSize: 15,
-                      fontWeight: 500,
-                      color: "#000",
-                    }}
-                  />
-                  <ChevronRight sx={{ color: "#BDC1C8" }} />
-                </ListItemButton>
-              </ListItem>
-              {index !== MENU_ITEMS.length - 1 && (
-                <Divider variant="inset" sx={{ ml: 6, opacity: 0.5 }} />
-              )}
-            </React.Fragment>
-          ))}
+          {MENU_ITEMS.map((item, index) => {
+            // Agar elementda path bo'lsa Link, bo'lmasa div (onClick uchun) ishlatamiz
+            const isButton = !!item.action;
+
+            return (
+              <React.Fragment key={index}>
+                <ListItem disablePadding>
+                  <ListItemButton
+                    onClick={item.action}
+                    component={isButton ? "div" : Link}
+                    href={isButton ? undefined : `/${locale}${item.path}`}
+                    sx={{ py: 1.5 }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40, color: "#249FFC" }}>
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={item.text}
+                      secondary={item.label} // Til nomi (masalan: Русский)
+                      primaryTypographyProps={{
+                        fontSize: 15,
+                        fontWeight: 500,
+                        color: "#000",
+                      }}
+                      secondaryTypographyProps={{
+                        fontSize: 13,
+                        color: "#249FFC",
+                        fontWeight: 600,
+                      }}
+                    />
+                    <ChevronRight sx={{ color: "#BDC1C8" }} />
+                  </ListItemButton>
+                </ListItem>
+                {index !== MENU_ITEMS.length - 1 && (
+                  <Divider variant="inset" sx={{ ml: 6, opacity: 0.5 }} />
+                )}
+              </React.Fragment>
+            );
+          })}
         </List>
       </Paper>
     </Box>

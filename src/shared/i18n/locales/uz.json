@@ -363,5 +363,37 @@
     "toast": {
       "updated": "Sevimlilarda yangilandi"
     }
+  },
+  "MobileCatalog": {
+    "breadcrumbs": {
+      "home": "Bosh sahifa",
+      "catalog": "Katalog"
+    },
+    "title": "Mahsulotlar katalogi",
+    "allInSection": "{category} bo'limidagi barcha mahsulotlar",
+    "noSubcategories": "Ost-kategoriyalar mavjud emas"
+  },
+  "MobileSettings": {
+    "auth": {
+      "title": "Bonuslarga ega bo'ling, buyurtmalarni kuzating va saqlab qoling",
+      "register": "Ro'yxatdan o'tish",
+      "login": "Kirish"
+    },
+    "menu": {
+      "contacts": "Kontaktlar",
+      "favorites": "Sevimlilar",
+      "comparison": "Taqqoslash",
+      "actions": "Aksiyalar",
+      "delivery": "Yetkazib berish",
+      "about": "Biz haqimizda",
+      "procurement": "Davlat xaridlari",
+      "b2b": "Yuridik shaxslarga",
+      "language": "Til",
+      "chat": "Aloqa"
+    }
+  },
+  "Contacts": {
+    "title": "Kontaktlar",
+    "address": "Mirobod tumani, Tong Yulduzi MFY"
   }
 }

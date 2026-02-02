@@ -351,5 +351,37 @@
     "toast": {
       "updated": "Обновлено в избранном"
     }
+  },
+  "MobileCatalog": {
+    "breadcrumbs": {
+      "home": "Главная",
+      "catalog": "Каталог"
+    },
+    "title": "Каталог товаров",
+    "allInSection": "Все в разделе {category}",
+    "noSubcategories": "Подкатегории отсутствуют"
+  },
+  "MobileSettings": {
+    "auth": {
+      "title": "Получайте бонусы, сохраняйте и отслеживайте заказы",
+      "register": "Зарегистрироваться",
+      "login": "Войти"
+    },
+    "menu": {
+      "contacts": "Контакты",
+      "favorites": "Избранное",
+      "comparison": "Сравнение",
+      "actions": "Акции",
+      "delivery": "Доставка",
+      "about": "О нас",
+      "procurement": "Государственные закупки",
+      "b2b": "Юр. лицам",
+      "language": "Язык",
+      "chat": "Связь"
+    }
+  },
+  "Contacts": {
+    "title": "Контакты",
+    "address": "Мирабадский район, МСГ Тонг Юлдузи"
   }
 }

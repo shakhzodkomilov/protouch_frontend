@@ -23,11 +23,13 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Image from "next/image";
 
 import { $categories, loadCategories } from "../../../entities/product/model";
+import { useTranslations } from "next-intl";
 
 export default function MobileCatalogPage(props: {
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = use(props.params);
+  const t = useTranslations("MobileCatalog");
 
   const categories = useUnit($categories);
   const fetchCategories = useUnit(loadCategories);
@@ -45,7 +47,7 @@ export default function MobileCatalogPage(props: {
   }
 
   return (
-    <Box sx={{ bgcolor: "#F8F9FA", minHeight: "100vh", mt: 10, pb: 4 }}>
+    <Box sx={{ bgcolor: "#F8F9FA", minHeight: "100vh", mt: 14, pb: 4 }}>
       {/* Breadcrumbs */}
       <Box
         sx={{ px: 2, py: 1.5, bgcolor: "#fff", borderBottom: "1px solid #eee" }}
@@ -55,27 +57,22 @@ export default function MobileCatalogPage(props: {
             href={`/${locale}`}
             style={{ textDecoration: "none", color: "inherit" }}
           >
-            Главная
+            {t("breadcrumbs.home")}
           </Link>
           <Typography
             color="text.primary"
             sx={{ fontSize: "14px", fontWeight: 500 }}
           >
-            Каталог
+            {t("breadcrumbs.catalog")}
           </Typography>
         </Breadcrumbs>
       </Box>
 
       <Typography
         variant="h5"
-        sx={{
-          px: 2,
-          py: 2,
-          fontWeight: 700,
-          color: "#000",
-        }}
+        sx={{ px: 2, py: 2, fontWeight: 700, color: "#000" }}
       >
-        Каталог товаров
+        {t("title")}
       </Typography>
 
       <Box sx={{ px: 1 }}>
@@ -111,7 +108,7 @@ export default function MobileCatalogPage(props: {
                   >
                     <Image
                       src={category.image.url || category.image}
-                      alt=""
+                      alt={category.title}
                       width={24}
                       height={24}
                       style={{ objectFit: "contain" }}
@@ -136,7 +133,9 @@ export default function MobileCatalogPage(props: {
                   <ListItem disablePadding>
                     <ListItemButton sx={{ py: 1.5 }}>
                       <ListItemText
-                        primary={`Все в разделе ${category.title}`}
+                        primary={t("allInSection", {
+                          category: category.title,
+                        })} // Dinamik matn
                         primaryTypographyProps={{
                           fontSize: "14px",
                           fontWeight: 600,
@@ -149,7 +148,6 @@ export default function MobileCatalogPage(props: {
 
                 <Divider variant="middle" />
 
-                {/* Subcategories (Children) */}
                 {category.children && category.children.length > 0 ? (
                   category.children.map((child: any) => (
                     <React.Fragment key={child.id}>
@@ -177,7 +175,7 @@ export default function MobileCatalogPage(props: {
                   ))
                 ) : (
                   <Typography sx={{ p: 2, fontSize: "14px", color: "#999" }}>
-                    Подкатегории отсутствуют
+                    {t("noSubcategories")}
                   </Typography>
                 )}
               </List>

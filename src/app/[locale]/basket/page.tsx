@@ -62,7 +62,16 @@ export default function BasketPage() {
   if (!mounted) return null;
 
   return (
-    <Box sx={{ py: 4, bgcolor: "#fff", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        py: 4,
+        bgcolor: "#fff",
+        minHeight: "100vh",
+        "@media (max-width:800px)": {
+          mt: 15,
+        },
+      }}
+    >
       <Container maxWidth="lg">
         {/* Breadcrumbs */}
         <Breadcrumbs sx={{ mb: 2, fontSize: "14px" }}>
