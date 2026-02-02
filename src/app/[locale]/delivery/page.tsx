@@ -2,30 +2,7 @@
 
 import { Box, Typography } from "@mui/material";
 import { CheckCircle } from "@mui/icons-material";
-
-const deliveryItems = [
-  "По Ташкенту — бесплатно.",
-  "В регионы — платная доставка (стоимость зависит от направления, веса/габаритов и службы доставки).",
-  "Отправка выполняется после подтверждения заказа и оплаты (если не согласовано иначе).",
-  "Перед отправкой проверяем комплектацию и надёжно упаковываем товар.",
-  "При отправке через службу доставки предоставляем трек-номер.",
-];
-
-const pickupItems = [
-  "Самовывоз доступен из офиса/склада.",
-  "Просим заранее согласовать наличие и время выдачи — подготовим заказ к вашему приезду.",
-  "При получении можно проверить товар и комплектацию на месте.",
-];
-
-const paymentItems = [
-  "Картой",
-  "Наличными",
-  "Безналичный расчёт (для организаций).",
-];
-
-const documentItems = [
-  "Предоставляем счёт, накладную, акт (при необходимости) и другие закрывающие документы.",
-];
+import { useTranslations } from "next-intl";
 
 function Section({ title, items }: { title: string; items: string[] }) {
   return (
@@ -50,28 +27,33 @@ function Section({ title, items }: { title: string; items: string[] }) {
 }
 
 export default function Delivery() {
+  const t = useTranslations("Delivery");
+
+  const deliveryItems = t.raw("sections.delivery.items") as string[];
+  const pickupItems = t.raw("sections.pickup.items") as string[];
+  const paymentItems = t.raw("sections.payment.items") as string[];
+  const documentItems = t.raw("sections.documents.items") as string[];
+
   return (
     <Box sx={{ py: 8, px: 3, maxWidth: 800, mx: "auto" }}>
       <Typography
         variant="h4"
         sx={{ mb: 6, textAlign: "center", fontWeight: 700, color: "#000" }}
       >
-        PROTOUCH UZ
+        {t("pageTitle")}
       </Typography>
 
       <Typography
         variant="body1"
         sx={{ mb: 6, textAlign: "center", lineHeight: 1.7, color: "#000" }}
       >
-        Ташкент — доставка бесплатно, в регионы отправляем платно. Есть
-        самовывоз из офиса/склада по предварительному согласованию. Оплата:
-        карта, наличные или безналичный расчёт.
+        {t("intro")}
       </Typography>
 
-      <Section title="Доставка" items={deliveryItems} />
-      <Section title="Самовывоз" items={pickupItems} />
-      <Section title="Оплата" items={paymentItems} />
-      <Section title="Документы" items={documentItems} />
+      <Section title={t("sections.delivery.title")} items={deliveryItems} />
+      <Section title={t("sections.pickup.title")} items={pickupItems} />
+      <Section title={t("sections.payment.title")} items={paymentItems} />
+      <Section title={t("sections.documents.title")} items={documentItems} />
     </Box>
   );
 }

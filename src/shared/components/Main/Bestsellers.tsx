@@ -37,10 +37,11 @@ import {
   loadFavorites,
   $favorites,
 } from "../../../entities/favourite/model/store";
-import { color } from "framer-motion";
+import { useTranslations } from "next-intl";
 
 const BestSellers = () => {
   const { locale } = useParams();
+  const t = useTranslations("main");
   const [items, loading, loadSellersEv] = useUnit([
     $bestSellers,
     $loadingSellers,
@@ -192,9 +193,8 @@ const BestSellers = () => {
           },
         }}
       >
-        Хиты продаж
+        {t("bestSellers")}
       </Typography>
-
       <Box sx={{ position: "relative", mt: "14px" }}>
         {/* Nav Arrows */}
         <IconButton
@@ -336,7 +336,8 @@ const BestSellers = () => {
                           },
                         }}
                       >
-                        {new Intl.NumberFormat("ru-RU").format(item.price)} сум
+                        {new Intl.NumberFormat("ru-RU").format(item.price)}{" "}
+                        {t("summary")}
                       </Typography>
                     </Box>
 

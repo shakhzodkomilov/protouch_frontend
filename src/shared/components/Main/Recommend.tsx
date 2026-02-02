@@ -76,7 +76,7 @@ export const Recommend = () => {
   });
 
   useEffect(() => {
-    loadRecommends({ lang: "ru" });
+    loadRecommends({ lang: (locale as string) || "ru" });
     loadFavoritesEv();
   }, [loadRecommend, loadFavoritesEv]);
 

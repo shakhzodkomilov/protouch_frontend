@@ -39,6 +39,7 @@ import {
 } from "../../../../entities/favourite/model/store";
 import CallIcon from "@mui/icons-material/Call";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function ProductDetailPage() {
   type ProductImage = {
@@ -47,7 +48,7 @@ export default function ProductDetailPage() {
   };
 
   const { id, locale } = useParams();
-
+  const t = useTranslations("ObjectDetail");
   // Effector units
   const product = useUnit($productDetail);
   const loading = useUnit($loadingProductDetail);
@@ -87,7 +88,7 @@ export default function ProductDetailPage() {
     handleToggleFavorite({
       id: Date.now(),
       productId: Number(productData.id),
-      title: productData.title || "Product",
+      title: productData.title || t("fallback.product"),
       image: productData.image || productData.images?.[0]?.url,
       price: productData.price,
     });
@@ -140,7 +141,7 @@ export default function ProductDetailPage() {
           >
             <Link href={`/${locale}`} style={{ textDecoration: "none" }}>
               <Chip
-                label="Главная"
+                label={t("breadcrumbs.home")}
                 clickable
                 sx={{ bgcolor: "transparent", color: "#000" }}
               />
@@ -242,7 +243,7 @@ export default function ProductDetailPage() {
               <Typography
                 sx={{ fontSize: 18, fontWeight: 600, mb: 2, color: "#000" }}
               >
-                Описание
+                {t("description")}{" "}
               </Typography>
               <Typography
                 sx={{
@@ -282,7 +283,7 @@ export default function ProductDetailPage() {
                     },
                   }}
                 >
-                  {isExpanded ? "Свернуть" : "Подробнее"}
+                  {isExpanded ? t("collapse") : t("readMore")}
                 </Button>
               )}
             </Box>
@@ -304,19 +305,21 @@ export default function ProductDetailPage() {
                   fontWeight: 600,
                 }}
               >
-                {product.is_in_stock ? "• В наличии" : "• Нет в наличии"}
+                {product.is_in_stock
+                  ? `• ${t("inStock")}`
+                  : `• ${t("notAvailable")}`}
               </Typography>
 
               <Typography
                 sx={{ fontSize: 32, fontWeight: 700, mb: 2, color: "#000" }}
               >
-                {formatPrice(product.price)} сум
+                {formatPrice(product.price)} {t("currency")}
               </Typography>
 
               <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
                 <Button variant="outlined" fullWidth sx={actionBtnStyle}>
                   <Image src="/scale.svg" width={24} height={24} alt="scale" />{" "}
-                  Сравнить
+                  {t("actions.compare")}{" "}
                 </Button>
                 <Button
                   variant="outlined"
@@ -329,7 +332,9 @@ export default function ProductDetailPage() {
                   ) : (
                     <FavoriteBorderOutlinedIcon sx={{ color: "#FF5F5F" }} />
                   )}
-                  {isFavorite ? "В избранном" : "Избранное"}
+                  {isFavorite
+                    ? t("actions.inFavorites")
+                    : t("actions.addToFavorites")}
                 </Button>
               </Box>
 
@@ -359,7 +364,7 @@ export default function ProductDetailPage() {
                     alt="cart"
                   />
                 )}
-                {inBasket ? "Добавлено" : "Добавить в корзину"}
+                {inBasket ? t("actions.added") : t("actions.addToCart")}
               </Button>
 
               <Button
@@ -375,7 +380,8 @@ export default function ProductDetailPage() {
                   "&:hover": { bgcolor: "#1FA754" },
                 }}
               >
-                <DescriptionOutlinedIcon sx={{ mr: 1 }} /> Купить как юр. лицо
+                <DescriptionOutlinedIcon sx={{ mr: 1 }} />{" "}
+                {t("actions.buyAsLegal")}
               </Button>
 
               <Button
@@ -396,7 +402,7 @@ export default function ProductDetailPage() {
                   "&:hover": { bgcolor: "#1d93d7" },
                 }}
               >
-                <CallIcon /> Позвонить
+                <CallIcon /> {t("actions.call")}
               </Button>
             </Box>
           </Box>
@@ -417,8 +423,8 @@ export default function ProductDetailPage() {
           >
             <InfoItem
               icon="/Pickup.svg"
-              title="Самовывоз"
-              desc="г. Ташкент, Сергелийский р-н."
+              title={t("pickup.pickup.title")}
+              desc={t("pickup.pickup.address")}
             />
             <Divider
               orientation="vertical"
@@ -427,8 +433,8 @@ export default function ProductDetailPage() {
             />
             <InfoItem
               icon="/Delivery.svg"
-              title="Доставка"
-              desc="бесплатно в течении 3-х дней"
+              title={t("pickup.delivery.title")}
+              desc={t("pickup.delivery.description")}
             />
             <Divider
               orientation="vertical"
@@ -446,7 +452,7 @@ export default function ProductDetailPage() {
                 minWidth: 280,
               }}
             >
-              <Typography>Есть вопросы?</Typography>
+              <Typography>{t("pickup.questions.title")}</Typography>{" "}
               <Button
                 variant="contained"
                 component="a"
@@ -484,7 +490,7 @@ export default function ProductDetailPage() {
           variant="filled"
           sx={{ width: "100%", borderRadius: "10px" }}
         >
-          Товар в корзине!
+          {t("toasts.addedToCart")}
         </Alert>
       </Snackbar>
 
@@ -499,7 +505,9 @@ export default function ProductDetailPage() {
           variant="filled"
           sx={{ width: "100%", borderRadius: "10px" }}
         >
-          {isFavorite ? "Добавлено в избранное" : "Удалено из избранного"}
+          {isFavorite
+            ? t("toasts.addedToFavorites")
+            : t("toasts.removedFromFavorites")}
         </Alert>
       </Snackbar>
     </Box>

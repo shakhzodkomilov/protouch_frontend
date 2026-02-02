@@ -30,7 +30,10 @@ export const getProductsFx = createEffect<
   PaginationType
 >(async (params) => {
   const { data } = await axios.get(`${API_URL}/api/v1/products/`, {
-    params: { lang: "ru", ...params },
+    params: {
+      ...params,
+      lang: params.lang || "ru",
+    },
   });
   return data;
 });
@@ -41,7 +44,7 @@ export const getProductDetailFx = createEffect<
 >(async ({ product_id, lang }) => {
   const { data } = await axios.get(
     `${API_URL}/api/v1/products/product/${product_id}/`,
-    { params: { lang: "ru" } },
+    { params: { lang: lang || "ru" } },
   );
 
   return {
@@ -49,6 +52,7 @@ export const getProductDetailFx = createEffect<
     price: Number(data.price),
   };
 });
+
 export const getBestSellersFx = createEffect<{ lang?: string }, PaginationType>(
   async ({ lang }) => {
     const { data } = await axios.get(
@@ -60,19 +64,20 @@ export const getBestSellersFx = createEffect<{ lang?: string }, PaginationType>(
     return data;
   },
 );
-export const getSelesHItsFx = createEffect<
-  { lang?: string; page?: number },
-  PaginationType
->(async ({ lang, page = 1 }) => {
-  const { data } = await axios.get(`${API_URL}/apiv1/products/`, {
-    params: {
-      page,
-      slug: "sales-hits",
-      lang: lang || "ru",
-    },
-  });
-  return data;
-});
+
+// export const getSelesHItsFx = createEffect<
+//   { lang?: string; page?: number },
+//   PaginationType
+// >(async ({ lang, page = 1 }) => {
+//   const { data } = await axios.get(`${API_URL}/apiv1/products/`, {
+//     params: {
+//       page,
+//       slug: "sales-hits",
+//       lang: lang || "ru",
+//     },
+//   });
+//   return data;
+// });
 //BestSellers
 export const getNewArrivalsFx = createEffect<{ lang?: string }, PaginationType>(
   async ({ lang }) => {

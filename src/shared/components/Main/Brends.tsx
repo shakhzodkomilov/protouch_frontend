@@ -3,8 +3,11 @@
 import { Box, IconButton, Typography } from "@mui/material";
 import Image from "next/image";
 import React, { useRef, useState, useEffect } from "react";
+import { useTranslations } from "next-intl"; // Tarjima uchun hook
 
 const Brends = () => {
+  const t = useTranslations("main"); // "main" bo'limidan foydalanamiz
+
   const brends = [
     { img: "/dahua.svg" },
     { img: "/galaxyhub.svg" },
@@ -40,11 +43,8 @@ const Brends = () => {
 
     const startAutoScroll = () => {
       scrollInterval = setInterval(() => {
-        // Agar sichqoncha ustida bo'lmasa va drag qilinmayotgan bo'lsa
         if (slider && !slider.isDown) {
           slider.scrollLeft += 1;
-
-          // Oxiriga yetsa boshiga qaytadi
           if (
             slider.scrollLeft >=
             slider.scrollWidth - slider.clientWidth - 1
@@ -52,7 +52,7 @@ const Brends = () => {
             slider.scrollLeft = 0;
           }
         }
-      }, 30); // Tezlik (30ms)
+      }, 30);
     };
 
     if (!isHovered) {
@@ -85,11 +85,10 @@ const Brends = () => {
     if (!slider || !slider.isDown) return;
     e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
-    const walk = (x - slider.startX) * 1.5; // Sezgirlik
+    const walk = (x - slider.startX) * 1.5;
     slider.scrollLeft = slider.scrollLeftStart - walk;
   };
 
-  // --- 3. TUGMALAR ORQALI SCROLL ---
   const scrollBtn = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollBy({
@@ -110,7 +109,7 @@ const Brends = () => {
           },
         }}
       >
-        Бренды
+        {t("brands")} {/* "Бренды" o'rniga tarjima funksiyasi */}
       </Typography>
 
       <Box sx={{ position: "relative", mt: "14px" }}>
@@ -120,7 +119,7 @@ const Brends = () => {
           sx={{
             position: "absolute",
             left: -20,
-            top: "55%",
+            top: "50%", // Markazlashtirish to'g'rilandi
             transform: "translateY(-50%)",
             zIndex: 10,
             bgcolor: "#fff",
@@ -131,7 +130,7 @@ const Brends = () => {
             "&:hover": { bgcolor: "#f5f5f5" },
           }}
         >
-          <Image src="/arrowleft.svg" width="32" height="32" alt="arrow left" />
+          <Image src="/arrowleft.svg" width={32} height={32} alt="arrow left" />
         </IconButton>
 
         {/* O'NG TUGMA */}
@@ -140,7 +139,7 @@ const Brends = () => {
           sx={{
             position: "absolute",
             right: -20,
-            top: "55%",
+            top: "50%", // Markazlashtirish to'g'rilandi
             transform: "translateY(-50%)",
             zIndex: 10,
             bgcolor: "#fff",
@@ -153,8 +152,8 @@ const Brends = () => {
         >
           <Image
             src="/arrowright.svg"
-            width="32"
-            height="32"
+            width={32}
+            height={32}
             alt="arrow right"
           />
         </IconButton>
@@ -172,7 +171,7 @@ const Brends = () => {
             alignItems: "center",
             gap: 2,
             overflowX: "auto",
-            scrollBehavior: "auto", // Drag silliq bo'lishi uchun
+            scrollBehavior: "auto",
             scrollbarWidth: "none",
             "&::-webkit-scrollbar": { display: "none" },
             pt: "20px",

@@ -8,6 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import DoneIcon from "@mui/icons-material/Done";
+import { useTranslations } from "next-intl";
 import {
   $favorites,
   toggleFavorite,
@@ -17,7 +18,7 @@ import { $basket, addToBasket } from "../../../entities/basket/model/store";
 
 // ✅ Proper FavoriteItem type
 type FavoriteItem = {
-  id: number; // string olib tashlandi, faqat number qoldi
+  id: number;
   productId: string | number;
   title: string;
   image: string;
@@ -25,10 +26,10 @@ type FavoriteItem = {
 };
 
 const cardStyle = {
-  width: "100%", // CSS Grid o'zi o'lchamni boshqaradi
-  maxWidth: "320px",
+  width: "100%",
+  maxWidth: "280px",
   margin: "0 auto",
-  minHeight: "480px",
+  minHeight: "380px",
   borderRadius: 3,
   p: 2,
   boxShadow: "0px 4px 20px rgba(0,0,0,0.08)",
@@ -77,6 +78,7 @@ const actionBtnStyle = {
 export default function FavoritesPage() {
   const params = useParams();
   const locale = params?.locale;
+  const t = useTranslations("favorites");
 
   const favorites = useUnit($favorites) as FavoriteItem[];
   const basket = useUnit($basket);
@@ -94,7 +96,6 @@ export default function FavoritesPage() {
 
   const isItemInBasket = useCallback(
     (productId: string | number) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return basketItems.some((item: any) => item.productId === productId);
     },
     [basketItems],
@@ -103,14 +104,11 @@ export default function FavoritesPage() {
   const onFavoriteClick = (e: React.MouseEvent, item: FavoriteItem) => {
     e.preventDefault();
     e.stopPropagation();
-
-    // toggleFavorite funksiyasiga yuborishda 'as any' ishlatamiz
-    // bu modeldagi va sahifadagi tiplar o'rtasidagi ziddiyatni hal qiladi
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleToggleFavorite(item as any);
     setOpenToast(true);
     setTimeout(() => setOpenToast(false), 3000);
   };
+
   const onBasketClick = (e: React.MouseEvent, item: FavoriteItem) => {
     e.preventDefault();
     e.stopPropagation();
@@ -140,16 +138,16 @@ export default function FavoritesPage() {
       >
         <Container maxWidth="md">
           <Typography variant="h5" sx={{ mb: 2, color: "#666" }}>
-            Избранное пусто
+            {t("empty.title")}
           </Typography>
           <Typography sx={{ color: "#999", mb: 4 }}>
-            Добавьте товары в избранное, нажав на сердечко
+            {t("empty.description")}
           </Typography>
           <Link href={`/${locale}`} style={{ textDecoration: "none" }}>
             <Typography
               sx={{ color: "#2196f3", fontWeight: 600, cursor: "pointer" }}
             >
-              Перейти в каталог
+              {t("empty.goToCatalog")}
             </Typography>
           </Link>
         </Container>
@@ -165,10 +163,9 @@ export default function FavoritesPage() {
             variant="h4"
             sx={{ mb: 6, fontWeight: 700, color: "#000" }}
           >
-            Избранные товары ({favorites.length})
+            {t("title")} ({favorites.length})
           </Typography>
 
-          {/* GRID O'RNIGA BOX + CSS GRID: Xatolikni yo'qotadi */}
           <Box
             sx={{
               display: "grid",
@@ -177,7 +174,7 @@ export default function FavoritesPage() {
                 xs: "1fr",
                 sm: "repeat(2, 1fr)",
                 md: "repeat(3, 1fr)",
-                lg: "repeat(4, 1fr)",
+                lg: "repeat(6, 1fr)",
               },
               width: "100%",
             }}
@@ -196,7 +193,7 @@ export default function FavoritesPage() {
                       sx={{ display: "flex", justifyContent: "space-between" }}
                     >
                       <Typography sx={statusBadgeStyle(true)}>
-                        В избранном
+                        {t("inFavorite")}
                       </Typography>
                       <Box
                         sx={{ display: "flex", gap: 1, alignItems: "center" }}
@@ -228,7 +225,7 @@ export default function FavoritesPage() {
                       sx={{
                         position: "relative",
                         width: "100%",
-                        height: "230px",
+                        height: "200px",
                         my: 2,
                       }}
                     >
@@ -236,15 +233,15 @@ export default function FavoritesPage() {
                         src={item.image || "/placeholder-product.jpg"}
                         alt={item.title || "Product"}
                         fill
-                        sizes="(max-width: 768px) 100vw, 300px"
+                        sizes="(max-width: 768px) 100vw, 250px"
                         style={{ objectFit: "contain" }}
                       />
                     </Box>
 
                     <Box sx={{ flexGrow: 1 }}>
-                      <Typography sx={descriptionStyle}>
-                        {item.title || "Название недоступно"}
-                      </Typography>
+                      {/* <Typography sx={descriptionStyle}>
+                        {item.title || t("titleUnavailable")}
+                      </Typography> */}
                       <Typography
                         sx={{
                           color: "#000",
@@ -253,9 +250,8 @@ export default function FavoritesPage() {
                         }}
                       >
                         {item.price > 0
-                          ? new Intl.NumberFormat("ru-RU").format(item.price) +
-                            " сум"
-                          : "Цена недоступна"}
+                          ? `${new Intl.NumberFormat("ru-RU").format(item.price)} ${t("currency")}`
+                          : t("priceUnavailable")}
                       </Typography>
                     </Box>
 
@@ -288,7 +284,7 @@ export default function FavoritesPage() {
         </Container>
       </Box>
 
-      {/* ✅ FIXED Toast notification */}
+      {/* Toast notification */}
       {openToast && (
         <Box
           sx={{
@@ -310,7 +306,7 @@ export default function FavoritesPage() {
               fontWeight: 500,
             }}
           >
-            Обновлено в избранном
+            {t("toast.updated")}
           </Box>
         </Box>
       )}

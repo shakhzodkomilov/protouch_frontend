@@ -34,7 +34,7 @@ export const $basket = createStore<BasketState>(initialState).on(
     removeFromBasketFx.doneData,
     updateQuantityFx.doneData,
   ],
-  (_, items) => updateTotals(items)
+  (_, items) => updateTotals(items),
 );
 
 sample({ clock: loadBasket, target: getBasketFx });

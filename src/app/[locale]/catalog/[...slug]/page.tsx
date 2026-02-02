@@ -52,7 +52,6 @@ export default function CatalogPage(props: {
   const allCategories = useUnit($categories);
   const products = useUnit($products) as unknown as PaginationType | null;
   const loading = useUnit($loadingProducts);
-
   // 1. Memo orqali sarlavhani hisoblaymiz (bu Store o'zgarishi bilan avtomatik hisoblanadi)
   const categoryData = useMemo(() => {
     return findCategoryRecursive(allCategories || [], joinedSlug);

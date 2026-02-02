@@ -4,104 +4,104 @@ import { useRef } from "react";
 import { Box, Button, Container, Typography, IconButton } from "@mui/material";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+
 import Brends from "./Brends";
 import BestSellers from "./Bestsellers";
 import News from "./News";
 import Banners from "./Banners";
 import { Recommend } from "./Recommend";
 import NewArrivals from "./NewArrivals";
-const cards = [
-  {
-    title: "Интерактивные панели",
-    bg: "linear-gradient(180deg, #64D2FF 0%, #3DA9E3 100%)",
-    img: "/category_1.svg",
-    url: "interactive-equipment/interactive-panels",
-  },
-  {
-    title: "Инфокиоски",
-    bg: "linear-gradient(180deg, #FF8E71 0%, #E86B4D 100%)",
-    img: "/category_2.svg",
-    url: "interactive-equipment/information-kiosks",
-  },
-  {
-    title: "Мультимедийные трибуны",
-    bg: "linear-gradient(180deg, #6BD47E 0%, #4FB863 100%)",
-    img: "/category_3.svg",
-    url: "interactive-equipment/electronic-stands",
-  },
-  // {
-  //   title: "Акции",
-  //   bg: "linear-gradient(180deg, #F2C94C 0%, #D4AF37 100%)",
-  //   img: "/category_4.svg",
-  //   url: "/sales",
-  // },
-  {
-    title: "ВКС камеры",
-    bg: "linear-gradient(180deg, #9B8AFF 0%, #7B6AD9 100%)",
-    img: "/category_5.svg",
-    url: "conference-equipment/vks-equipment",
-  },
-  {
-    title: "Cпикерфоны",
-    bg: "linear-gradient(180deg, #FD9234 0%, #E37E22 100%)",
-    img: "/Speakerphones.png",
-    url: "conference-equipment/speakerphones",
-  },
-  {
-    title: "Видеостена",
-    bg: "linear-gradient(180deg, #52C993 0%, #3DA173 100%)",
-    img: "/Videowall.png",
-    url: "commercial-displays/video-wall",
-  },
-  {
-    title: "LED экраны",
-    bg: "linear-gradient(180deg, #5EA3EE 0%, #4688D1 100%)",
-    img: "/LED_screens.png",
-    url: "audiovisual-equipment/led-screens",
-  },
-  {
-    title: "Коммерческие дисплеи",
-    bg: "linear-gradient(180deg, #4BBC3C 0%, #3A9D2E 100%)",
-    img: "/Commercial_displays.png",
-    url: "commercial-displays/digital-information",
-  },
-  {
-    title: "Выдвижной монитор",
-    bg: "linear-gradient(180deg, #B0B0B0 0%, #8E8E8E 100%)",
-    img: "/Retractable_monitors.png",
-    url: "audiovisual-equipment/extendable-monitors",
-  },
-  {
-    title: "Моноблоки",
-    bg: "linear-gradient(180deg, #9474C0 0%, #7A5CA1 100%)",
-    img: "/Monoblock.png",
-    url: "computer-equipment/monoblocks",
-  },
-  {
-    title: "Конференц микрофоны",
-    bg: "linear-gradient(180deg, #97A14F 0%, #7C863A 100%)",
-    img: "/Conference_microphones.png",
-    url: "conference-equipment/conference-microphones",
-  },
-  {
-    title: "Wi-fi оборудование",
-    bg: "linear-gradient(180deg, #2A2C9B 0%, #17187B 100%)",
-    img: "/Wi-Fi equipment.png",
-    url: "server-and-network-equipment/wi-fi-routers",
-  },
-  {
-    title: "Коммутаторы",
-    bg: "linear-gradient(180deg, #C67EF6 0%, #A35ED1 100%)",
-    img: "/Switches.png",
-    url: "server-and-network-equipment/switches",
-  },
-];
 
 export default function HomeCategories() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { locale } = useParams();
   const router = useRouter();
+  const t = useTranslations("main");
 
+  // Statik massiv - Tarjimalar bilan
+  const cards = [
+    {
+      title: t("categories.interactive_panels"),
+      bg: "linear-gradient(180deg, #64D2FF 0%, #3DA9E3 100%)",
+      img: "/category_1.svg",
+      url: "interactive-equipment/interactive-panels",
+    },
+    {
+      title: t("categories.infokiosks"),
+      bg: "linear-gradient(180deg, #FF8E71 0%, #E86B4D 100%)",
+      img: "/category_2.svg",
+      url: "interactive-equipment/information-kiosks",
+    },
+    {
+      title: t("categories.multimedia_stands"),
+      bg: "linear-gradient(180deg, #6BD47E 0%, #4FB863 100%)",
+      img: "/category_3.svg",
+      url: "interactive-equipment/electronic-stands",
+    },
+    {
+      title: t("categories.vks_cameras"),
+      bg: "linear-gradient(180deg, #9B8AFF 0%, #7B6AD9 100%)",
+      img: "/category_5.svg",
+      url: "conference-equipment/vks-equipment",
+    },
+    {
+      title: t("categories.speakerphones"),
+      bg: "linear-gradient(180deg, #FD9234 0%, #E37E22 100%)",
+      img: "/Speakerphones.png",
+      url: "conference-equipment/speakerphones",
+    },
+    {
+      title: t("categories.videowall"),
+      bg: "linear-gradient(180deg, #52C993 0%, #3DA173 100%)",
+      img: "/Videowall.png",
+      url: "commercial-displays/video-wall",
+    },
+    {
+      title: t("categories.led_screens"),
+      bg: "linear-gradient(180deg, #5EA3EE 0%, #4688D1 100%)",
+      img: "/LED_screens.png",
+      url: "audiovisual-equipment/led-screens",
+    },
+    {
+      title: t("categories.commercial_displays"),
+      bg: "linear-gradient(180deg, #4BBC3C 0%, #3A9D2E 100%)",
+      img: "/Commercial_displays.png",
+      url: "commercial-displays/digital-information",
+    },
+    {
+      title: t("categories.retractable_monitors"),
+      bg: "linear-gradient(180deg, #B0B0B0 0%, #8E8E8E 100%)",
+      img: "/Retractable_monitors.png",
+      url: "audiovisual-equipment/extendable-monitors",
+    },
+    {
+      title: t("categories.monoblocks"),
+      bg: "linear-gradient(180deg, #9474C0 0%, #7A5CA1 100%)",
+      img: "/Monoblock.png",
+      url: "computer-equipment/monoblocks",
+    },
+    {
+      title: t("categories.conference_microphones"),
+      bg: "linear-gradient(180deg, #97A14F 0%, #7C863A 100%)",
+      img: "/Conference_microphones.png",
+      url: "conference-equipment/conference-microphones",
+    },
+    {
+      title: t("categories.wifi_equipment"),
+      bg: "linear-gradient(180deg, #2A2C9B 0%, #17187B 100%)",
+      img: "/Wi-Fi equipment.png",
+      url: "server-and-network-equipment/wi-fi-routers",
+    },
+    {
+      title: t("categories.switches"),
+      bg: "linear-gradient(180deg, #C67EF6 0%, #A35ED1 100%)",
+      img: "/Switches.png",
+      url: "server-and-network-equipment/switches",
+    },
+  ];
+
+  // Drag-and-drop mantiqi o'zgarmasdan qoladi...
   const dragInfo = useRef({
     isDown: false,
     startX: 0,
@@ -164,7 +164,7 @@ export default function HomeCategories() {
           "@media (max-width:900px)": { mt: 12 },
         }}
       >
-        {/* SIDEBAR */}
+        {/* SIDEBAR - Tarjima qo'shildi */}
         <Box
           sx={{
             bgcolor: "#FFF7DA",
@@ -181,10 +181,10 @@ export default function HomeCategories() {
         >
           <Box>
             <Typography fontWeight={600} fontSize="18px">
-              Личный кабинет
+              {t("personalAccount")}
             </Typography>
             <Typography sx={{ mt: 1, color: "#4E4E4E" }}>
-              Получайте бонусы, отслеживайте заказы и делитесь мнением
+              {t("accountText")}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", gap: 2 }}>
@@ -196,9 +196,10 @@ export default function HomeCategories() {
                 borderColor: "#4E4E4E",
                 borderRadius: "8px",
                 flex: 1,
+                textTransform: "none",
               }}
             >
-              Войти
+              {t("login")}
             </Button>
             <Button
               variant="outlined"
@@ -207,9 +208,10 @@ export default function HomeCategories() {
                 borderColor: "#4E4E4E",
                 borderRadius: "8px",
                 flex: 1,
+                textTransform: "none",
               }}
             >
-              Заказы
+              {t("orders")}
             </Button>
           </Box>
         </Box>
@@ -222,7 +224,6 @@ export default function HomeCategories() {
           >
             <Image src="/arrowleft.svg" width={32} height={32} alt="left" />
           </IconButton>
-
           <IconButton
             onClick={() => scrollBtn("right")}
             sx={{ ...navBtnStyle, right: 0 }}
@@ -243,7 +244,6 @@ export default function HomeCategories() {
               py: 1,
               px: { xs: 2, md: 1 },
               cursor: "grab",
-              WebkitOverflowScrolling: "touch",
               "&::-webkit-scrollbar": { display: "none" },
               scrollbarWidth: "none",
               scrollSnapType: "x mandatory",
@@ -280,7 +280,6 @@ export default function HomeCategories() {
                 >
                   {item.title}
                 </Typography>
-
                 <Box
                   sx={{
                     position: "absolute",
@@ -294,7 +293,6 @@ export default function HomeCategories() {
                     zIndex: 1,
                   }}
                 />
-
                 <Box
                   component="img"
                   src={item.img}
@@ -307,7 +305,6 @@ export default function HomeCategories() {
                     objectFit: "contain",
                     zIndex: 2,
                     pointerEvents: "none",
-                    "@media (max-width:900px)": { height: "55%" },
                   }}
                 />
               </Box>
@@ -315,6 +312,7 @@ export default function HomeCategories() {
           </Box>
         </Box>
       </Box>
+
       <Brends />
       <BestSellers />
       <News />

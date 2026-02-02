@@ -1,12 +1,15 @@
 :root {
-  --font-inter: 'Inter', sans-serif;
+  --font-inter: "Inter", sans-serif;
 }
 
 body {
   font-family: var(--font-inter);
 }
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
 }

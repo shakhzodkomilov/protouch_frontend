@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
+import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface NewsItem {
   title: string;
@@ -21,23 +23,16 @@ interface NewsItem {
 
 const News = () => {
   const [openModal, setOpenModal] = useState<number | null>(null);
-
-  // --- DRAG SCROLL LOGIC ---
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const dragInfo = useRef({
-    isDown: false,
-    startX: 0,
-    scrollLeft: 0,
-    hasMoved: false,
-  });
-
-  const news: NewsItem[] = [
-    {
-      title: "Доставка",
-      text: "Ташкент — доставка бесплатно, в регионы отправляем платно",
-      linearColor1: "#7ED9F6",
-      linearColor2: "#32C2E7",
-      modalContent: `Ташкент — доставка бесплатно, в регионы отправляем платно.
+  const { locale } = useParams();
+  const t = useTranslations("main");
+  const content: Record<string, NewsItem[]> = {
+    ru: [
+      {
+        title: "Доставка",
+        text: "Ташкент — доставка бесплатно, в регионы отправляем платно",
+        linearColor1: "#7ED9F6",
+        linearColor2: "#32C2E7",
+        modalContent: `Ташкент — доставка бесплатно, в регионы отправляем платно.
 Есть самовывоз из офиса/склада по предварительному согласованию.
 Оплата: карта, наличные или безналичный расчёт.
 
@@ -60,13 +55,13 @@ const News = () => {
 
 **Документы**
 • Предоставляем счёт, накладную, акт (при необходимости) и другие закрывающие документы.`,
-    },
-    {
-      title: "Наш telegram канал",
-      text: "Подписывайтесь на телеграм канал",
-      linearColor1: "#FB8D76",
-      linearColor2: "#FC7D6A",
-      modalContent: `Подписывайтесь на @ProtouchMarket — новинки, акции и полезные подборки по электронике.
+      },
+      {
+        title: "Наш telegram канал",
+        text: "Подписывайтесь на телеграм канал",
+        linearColor1: "#FB8D76",
+        linearColor2: "#FC7D6A",
+        modalContent: `Подписывайтесь на @ProtouchMarket — новинки, акции и полезные подборки по электронике.
 Делимся обзорами, советами по выбору и инструкциями по подключению.
 Будьте в курсе поступлений и выгодных предложений.
 
@@ -82,13 +77,13 @@ const News = () => {
 • Кейсы и примеры установок (сети, Wi-Fi, видеонаблюдение, digital signage)
 
 **Подписывайтесь:** @ProtouchMarket`,
-    },
-    {
-      title: "Отрасли",
-      text: "Мы поставляем оборудование и внедряем решения",
-      linearColor1: "#89D87D",
-      linearColor2: "#57C056",
-      modalContent: `Мы поставляем оборудование и внедряем решения для малого, среднего и крупного бизнеса, а также для государственных и коммерческих организаций. Закрываем проекты "под ключ" — от подбора и проектирования до монтажа, настройки и сопровождения.
+      },
+      {
+        title: "Отрасли",
+        text: "Мы поставляем оборудование и внедряем решения",
+        linearColor1: "#89D87D",
+        linearColor2: "#57C056",
+        modalContent: `Мы поставляем оборудование и внедряем решения для малого, среднего и крупного бизнеса, а также для государственных и коммерческих организаций. Закрываем проекты "под ключ" — от подбора и проектирования до монтажа, настройки и сопровождения.
 
 **Наши направления**
 • Электроника и IT-оборудование: компьютеры, ноутбуки, моноблоки, периферия, комплектующие.
@@ -108,13 +103,13 @@ const News = () => {
 2. Подбираем оборудование и готовим решение
 3. Поставка, монтаж и настройка
 4. Тестирование, обучение и поддержка`,
-    },
-    {
-      title: "Наши проекты",
-      text: "Мы реализуем проекты под ключ для бизнеса и организаций",
-      linearColor1: "#EBC773",
-      linearColor2: "#EDAE45",
-      modalContent: `Мы реализуем проекты "под ключ" для бизнеса и организаций по всему Узбекистану — от поставки оборудования до внедрения и поддержки.
+      },
+      {
+        title: "Наши проекты",
+        text: "Мы реализуем проекты под ключ для бизнеса и организаций",
+        linearColor1: "#EBC773",
+        linearColor2: "#EDAE45",
+        modalContent: `Мы реализуем проекты "под ключ" для бизнеса и организаций по всему Узбекистану — от поставки оборудования до внедрения и поддержки.
 Более 300 успешно реализованных проектов в сфере IT, сетей, ВКС, серверов, digital signage и инфокиосков.
 
 **Наши проекты / С кем мы работаем (список)**
@@ -134,13 +129,13 @@ const News = () => {
 • Xalq Bank
 
 **Более 300 успешно реализованных проектов по всему Узбекистану.**`,
-    },
-    {
-      title: "PROTOUCH club",
-      text: "Сообщество клиентов и партнёров Protouch Market",
-      linearColor1: "#249FFC",
-      linearColor2: "#1E77BA",
-      modalContent: `**PROTOUCH CLUB** — сообщество клиентов и партнёров Protouch Market.
+      },
+      {
+        title: "PROTOUCH club",
+        text: "Сообщество клиентов и партнёров Protouch Market",
+        linearColor1: "#249FFC",
+        linearColor2: "#1E77BA",
+        modalContent: `**PROTOUCH CLUB** — сообщество клиентов и партнёров Protouch Market.
 Скидки, спеццены, ранний доступ к новинкам и поддержка по подбору решений.
 Присоединяйтесь и получайте больше выгод.
 
@@ -164,13 +159,13 @@ const News = () => {
 1. Подпишитесь на наш Telegram: @ProtouchMarket
 2. Напишите в чат/менеджеру: "Хочу в PROTOUCH CLUB"
 3. Получите статус участника и условия привилегий`,
-    },
-    {
-      title: "Вакансии",
-      text: "Мы растём и постоянно расширяем команду",
-      linearColor1: "#AB9CFF",
-      linearColor2: "#826BFA",
-      modalContent: `Мы растём и постоянно расширяем команду.
+      },
+      {
+        title: "Вакансии",
+        text: "Мы растём и постоянно расширяем команду",
+        linearColor1: "#AB9CFF",
+        linearColor2: "#826BFA",
+        modalContent: `Мы растём и постоянно расширяем команду.
 Ищем инженеров и дизайнеров на проекты по электронике, IT и digital signage.
 Оставьте заявку — свяжемся с вами.
 
@@ -196,18 +191,194 @@ const News = () => {
 Напишите в Telegram: @ProTouchUz
 Тема сообщения: «Вакансия — инженер» или «Вакансия — дизайнер»
 Прикрепите кратко: опыт, город, контакты (и портфолио — для дизайнеров).`,
-    },
-  ];
-  // --- DRAG HANDLERS ---
+      },
+    ],
+    uz: [
+      {
+        title: "Yetkazib berish",
+        text: "Toshkent — yetkazib berish bepul, viloyatlarga pullik asosda yuboramiz",
+        linearColor1: "#7ED9F6",
+        linearColor2: "#32C2E7",
+        modalContent: `Toshkent — yetkazib berish bepul, viloyatlarga pullik asosda yuboramiz.
+Oldindan kelishuvga ko'ra ofis yoki ombordan olib ketish (samovivoz) imkoniyati mavjud.
+To'lov: karta, naqd pul yoki pul o'tkazmasi (perechisleniye) orqali.
+
+**Yetkazib berish**
+• Toshkent bo'ylab — bepul.
+• Viloyatlarga — pullik (narxi yo'nalishga, vazn/o'lchamlarga va yetkazib berish xizmatiga bog'liq).
+• Yuborish buyurtma tasdiqlangach va to'lov amalga oshirilgach bajariladi (agar boshqacha kelishilmagan bo'lsa).
+• Yuborishdan oldin butunligini tekshiramiz va mahsulotni mustahkam qadoqlaymiz.
+• Yetkazib berish xizmati orqali yuborilganda trek-raqam taqdim etiladi.
+
+**Olib ketish (Samovivoz)**
+• Ofis yoki ombordan olib ketish imkoniyati mavjud.
+• Iltimos, mahsulot borligini va berish vaqtini oldindan kelishib oling — kelishingizga buyurtmani tayyorlab qo'yamiz.
+• Qabul qilish vaqtida mahsulotni va butunligini joyida tekshirib olish mumkin.
+
+**To'lov**
+• Karta orqali
+• Naqd pulda
+• Pul o'tkazmasi (perechisleniye) — tashkilotlar uchun (hisob-faktura va yopuvchi hujjatlar bilan).
+
+**Hujjatlar**
+• Hisob-faktura, yuk xati, dalolatnoma (zarur bo'lganda) va boshqa yopuvchi hujjatlarni taqdim etamiz.`,
+      },
+      {
+        title: "Telegram kanalimiz",
+        text: "Telegram kanalimizga obuna bo'ling",
+        linearColor1: "#FB8D76",
+        linearColor2: "#FC7D6A",
+        modalContent: `@ProtouchMarket kanaliga obuna bo'ling — elektronika bo'yicha yangiliklar, aksiyalar va foydali to'plamlar.
+Sharhlar, tanlash bo'yicha maslahatlar va ulanish yo'riqnomalari bilan bo'lishamiz.
+Yangi kelgan mahsulotlar va foydali takliflardan xabardor bo'ling.
+
+**@ProtouchMarket** — Protouch Market rasmiy Telegram kanali. Biz elektronika yo'nalishlarini kengaytirmoqdamiz va eng muhim hamda foydali ma'lumotlarni e'lon qilamiz.
+
+**Kanalda quyidagilarni topasiz:**
+• Yangiliklar va yangi kelgan mahsulotlar (nima keldi, nima mavjud)
+• Aksiyalar va maxsus takliflar
+• Vazifa va byudjetga qarab mahsulotlar to'plami
+• Ommabop modellarning sharhi va taqqoslovi
+• Ulanish va sozlash bo'yicha yo'riqnomalar
+• Mutaxassislardan tez-tez beriladigan savollarga javoblar va tavsiyalar
+• Amalga oshirilgan loyihalar va o'rnatish misollari (tarmoqlar, Wi-Fi, videokuzatuv, digital signage)
+
+**Obuna bo'ling:** @ProtouchMarket`,
+      },
+      {
+        title: "Sohalar",
+        text: "Biz uskunalar yetkazib beramiz va yechimlarni joriy qilamiz",
+        linearColor1: "#89D87D",
+        linearColor2: "#57C056",
+        modalContent: `Biz kichik, o'rta va yirik biznes, shuningdek, davlat va tijorat tashkilotlari uchun uskunalar yetkazib beramiz hamda yechimlarni joriy qilamiz. Loyihalarni tanlash va loyihalashdan tortib, montaj, sozlash va texnik kuzatuvgacha "tayyor holda" (pod klyuch) yopamiz.
+
+**Bizning yo'nalishlar**
+• Elektronika va IT-uskunalar: kompyuterlar, noutbuklar, monobloklar, periferiya, butlovchi qismlar.
+• Serverlar va infratuzilma: serverlar, ShX/saqlash tizimlari, tarmoq shkaflari/stoykalari, UBP/quvvat manbalari va butlovchi qismlar.
+• Tarmoq uskunalari: kommutatorlar, marshrutizatorlar/shlyuzlar, Wi-Fi ulanish nuqtalari, optika, kabel mahsulotlari va aksessuarlar.
+• IP-telefoniya va aloqa: IP-telefonlar, SIP-yechimlar, korporativ telefoniya, garnituralar.
+• Konferents-aloqa uskunalari va VKS: videokonferentsiya tizimlari, kameralar, mikrofonlar, spikerfonlar, kalonkalar, muzokaralar xonalari uchun to'plamlar.
+• Telemeditsina: masofaviy maslahatlar uchun to'plamlar va uskunalar, tibbiyot muassasalari uchun xonalarni jihozlash.
+• Digital Signage va ekranlar: professional displeylar, axborot panellari, LED-ekranlar, reklama va navigatsiya yechimlari.
+• Infokioskalar va kiosk-tizimlar: ko'cha va bino ichidagi infokioskalar, bulutli boshqariladigan kioskalar, kontentni boshqarish, namoyish jadvallari.
+• Robotlar va avtomatlashtirish: xizmat ko'rsatish/namoyish/navigatsiya uchun robotlashtirilgan yechimlar (loyiha bo'yicha).
+• Dasturiy ta'minot: litsenziyalar, joriy etish, sozlash va qo'llab-quvvatlash.
+• Interaktiv panellar va tribunalar, xonalarni jihozlash: interaktiv tribunalar, interaktiv panellar, elektron navbat tizimlari, stoykalar/mahkamlagichlar va xonalar uchun yechimlar — g'oyadan amalga oshirishgacha.
+
+**Qanday ishlaymiz**
+1. Vazifa va talablarni tushunib olamiz
+2. Uskunalarni tanlaymiz va yechim tayyorlaymiz
+3. Yetkazib berish, montaj va sozlash
+4. Sinovdan o'tkazish, o'qitish va qo'llab-quvvatlash`,
+      },
+      {
+        title: "Loyihalarimiz",
+        text: "Biz biznes va tashkilotlar uchun tayyor loyihalarni amalga oshiramiz",
+        linearColor1: "#EBC773",
+        linearColor2: "#EDAE45",
+        modalContent: `Biz butun O'zbekiston bo'ylab biznes va tashkilotlar uchun loyihalarni "tayyor holda" (pod klyuch) amalga oshiramiz — uskuna yetkazib berishdan tortib, joriy etish va qo'llab-quvvatlashgacha.
+IT, tarmoqlar, VKS, serverlar, digital signage va infokioskalar sohasida 300 dan ortiq muvaffaqiyatli amalga oshirilgan loyihalar.
+
+**Bizning loyihalar / Kimlar bilan ishlaymiz (ro'yxat)**
+• Wyndham Chorvoq
+• Hilton
+• CAEx Uzbekistan
+• UzExpo Center
+• NBU Bank
+• Kapital Bank
+• Orient Finans Bank
+• International School
+• Ucell
+• Beeline Uzbekistan
+• IT Park
+• Turonbank
+• SQB
+• Xalq Bank
+
+**Butun O'zbekiston bo'ylab 300 dan ortiq muvaffaqiyatli amalga oshirilgan loyihalar.**`,
+      },
+      {
+        title: "PROTOUCH club",
+        text: "Protouch Market mijozlari va hamkorlari hamjamiyati",
+        linearColor1: "#249FFC",
+        linearColor2: "#1E77BA",
+        modalContent: `**PROTOUCH CLUB** — Protouch Market mijozlari va hamkorlari hamjamiyati.
+Chegirmalar, maxsus narxlar, yangiliklarga erta kirish va yechimlarni tanlashda yordam.
+Qo'shiling va ko'proq imtiyozlarga ega bo'ling.
+
+**PROTOUCH CLUB** — bu uy, ofis va biznes uchun elektronika hamda IT-yechimlar sotib oluvchi mijozlar, integratorlar va kompaniyalar klubi. Ishtirokchilar imtiyozlar, tezkor xizmat va foydali materiallarga ega bo'ladilar.
+
+**Klubda ishtirok etish nima beradi:**
+• Ommabop mahsulot toifalariga chegirmalar va maxsus narxlar
+• Yangi mahsulotlar va cheklangan partiyalarga erta kirish imkoniyati
+• Vazifa va byudjetga qarab shaxsiy to'plamlar (ofis, muzokaralar xonasi, tarmoq, digital signage va boshqalar)
+• Moslik, butlovchi qismlar va sozlash bo'yicha ustuvor qo'llab-quvvatlash
+• Faqat ishtirokchilar uchun aksiyalar va promo-kodlar
+• Bonuslar/sovg'alar (aksiya shartlariga ko'ra)
+• Loyihalar va keyslar haqida ma'lumot, foydali qo'llanmalar va ko'rsatmalar
+
+**Biznes uchun (B2B):**
+• Loyihalarni "pod klyuch" tanlash (TIdan amalga oshirishgacha)
+• Tijorat taklifi, spetsifikatsiya, hujjatlar
+• Loyiha narxlari va hamrohlik qilish (kelishuvga ko'ra)
+
+**Qanday a'zo bo'lish mumkin:**
+1. Bizning Telegramimizga obuna bo'ling: @ProtouchMarket
+2. Chatga/menejerga yozing: "PROTOUCH CLUBga a'zo bo'lishni xohlayman"
+3. Ishtirokchi maqomi va imtiyozlar shartlarini oling`,
+      },
+      {
+        title: "Bo'sh ish o'rinlari",
+        text: "Biz o'syapmiz va jamoamizni muntazam kengaytirmoqdamiz",
+        linearColor1: "#AB9CFF",
+        linearColor2: "#826BFA",
+        modalContent: `Biz o'syapmiz va jamoamizni muntazam kengaytirmoqdamiz.
+Elektronika, IT va digital signage loyihalari uchun muhandislar va dizaynerlarni qidirmoqdamiz.
+Ariza qoldiring — siz bilan bog'lanamiz.
+
+**Biz PROTOUCHda** elektronika va IT-yechimlar yo'nalishlarini faol rivojlantirmoqdamiz, shuning uchun muntazam ravishda xodimlarga ehtiyoj sezamiz. Agar sizga real loyihalar, zamonaviy uskunalar va o'sish qiziq bo'lsa — tanishishdan xursand bo'lamiz.
+
+**Kimlarni qidirmoqdamiz:**
+• Muhandislar (tarmoqlar/Wi-Fi, serverlar, VKS, montaj va sozlash, diagnostika)
+• Dizaynerlar (ekranlar uchun kontent/digital signage, bannerlar, bezatish, taqdimotlar)
+
+**Siz nima qilasiz (rolingizga qarab):**
+• Yechimlarni "noldan amalga oshirishgacha" tanlash va joriy etish
+• Mijozlarda uskunalarni sozlash va xizmat ko'rsatish
+• Loyihalar uchun vizual materiallar va kontent yaratish
+• Texnik topshiriq bilan ishlash, sifat va servisni yaxshilash
+
+**Biz nima taklif qilamiz:**
+• Barqaror ish va doimiy loyihalar
+• Jamoa ichida o'sish va rivojlanish
+• Do'stona muhit va qo'llab-quvvatlash
+• Kelishilgan to'lov (daraja va tajribaga qarab)
+
+**Qanday javob berish kerak:**
+Telegramga yozing: @ProTouchUz
+Xabar mavzusi: «Vakansiya — muhandis» yoki «Vakansiya — dizayner»
+Qisqacha biriktiring: tajriba, shahar, kontaktlar (va dizaynerlar uchun — portfoliyo).`,
+      },
+    ],
+  };
+
+  const news = content[locale as string] || content.ru;
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const dragInfo = useRef({
+    isDown: false,
+    startX: 0,
+    scrollLeft: 0,
+    hasMoved: false,
+  });
+
   const handleMouseDown = (e: React.MouseEvent) => {
     const slider = scrollRef.current;
     if (!slider) return;
-
     dragInfo.current.isDown = true;
     dragInfo.current.hasMoved = false;
     dragInfo.current.startX = e.pageX - slider.offsetLeft;
     dragInfo.current.scrollLeft = slider.scrollLeft;
-
     slider.style.cursor = "grabbing";
     slider.style.scrollSnapType = "none";
   };
@@ -215,33 +386,18 @@ const News = () => {
   const handleMouseMove = (e: React.MouseEvent) => {
     const slider = scrollRef.current;
     if (!slider || !dragInfo.current.isDown) return;
-
     e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
     const distance = x - dragInfo.current.startX;
-
-    if (Math.abs(distance) > 5) {
-      dragInfo.current.hasMoved = true;
-    }
-
-    const walk = distance * 1.5;
-    slider.scrollLeft = dragInfo.current.scrollLeft - walk;
+    if (Math.abs(distance) > 5) dragInfo.current.hasMoved = true;
+    slider.scrollLeft = dragInfo.current.scrollLeft - distance * 1.5;
   };
 
   const stopDragging = () => {
-    const slider = scrollRef.current;
-    if (!slider) return;
-
-    dragInfo.current.isDown = false;
-    slider.style.cursor = "grab";
-    slider.style.scrollSnapType = "x mandatory";
-  };
-
-  const handleCaptureClick = (e: React.MouseEvent) => {
-    // Agar foydalanuvchi kartani surgan bo'lsa, Modal ochilmasligi kerak
-    if (dragInfo.current.hasMoved) {
-      e.preventDefault();
-      e.stopPropagation();
+    if (scrollRef.current) {
+      dragInfo.current.isDown = false;
+      scrollRef.current.style.cursor = "grab";
+      scrollRef.current.style.scrollSnapType = "x mandatory";
     }
   };
 
@@ -251,14 +407,6 @@ const News = () => {
       left: dir === "left" ? -300 : 300,
       behavior: "smooth",
     });
-  };
-
-  const handleOpenModal = (index: number) => {
-    setOpenModal(index);
-  };
-
-  const handleCloseModal = () => {
-    setOpenModal(null);
   };
 
   return (
@@ -271,28 +419,21 @@ const News = () => {
           "@media (max-width: 900px)": { fontSize: "26px" },
         }}
       >
-        Статьи и новости
+        {t("newsTitle")}
       </Typography>
 
       <Box sx={{ position: "relative" }}>
-        {/* Nav Buttons */}
         <IconButton
           onClick={() => scrollBtn("left")}
           sx={{ ...navBtnStyle, left: -20 }}
         >
-          <Image src="/arrowleft.svg" width="32" height="32" alt="arrow left" />
+          <Image src="/arrowleft.svg" width={32} height={32} alt="left" />
         </IconButton>
-
         <IconButton
           onClick={() => scrollBtn("right")}
           sx={{ ...navBtnStyle, right: -20 }}
         >
-          <Image
-            src="/arrowright.svg"
-            width="32"
-            height="32"
-            alt="arrow right"
-          />
+          <Image src="/arrowright.svg" width={32} height={32} alt="right" />
         </IconButton>
 
         <Box
@@ -301,10 +442,11 @@ const News = () => {
           onMouseMove={handleMouseMove}
           onMouseUp={stopDragging}
           onMouseLeave={stopDragging}
-          onClickCapture={handleCaptureClick}
+          onClickCapture={(e) =>
+            dragInfo.current.hasMoved && e.stopPropagation()
+          }
           sx={{
             display: "flex",
-            alignItems: "center",
             gap: 2,
             overflowX: "auto",
             scrollbarWidth: "none",
@@ -319,7 +461,7 @@ const News = () => {
           {news.map((item, i) => (
             <Box
               key={i}
-              onClick={() => item.modalContent && handleOpenModal(i)}
+              onClick={() => item.modalContent && setOpenModal(i)}
               sx={{
                 width: 300,
                 height: 250,
@@ -333,29 +475,21 @@ const News = () => {
                 position: "relative",
                 transition: "transform 0.2s",
                 scrollSnapAlign: "start",
-                "&:hover": {
-                  transform: "translateY(-5px)",
-                },
-                "@media (max-width: 900px)": {
-                  width: 220,
-                  height: 200,
-                },
+                "&:hover": { transform: "translateY(-5px)" },
+                "@media (max-width: 900px)": { width: 220, height: 200 },
               }}
             >
               <Typography sx={{ fontSize: 20, fontWeight: 600 }}>
                 {item.title}
               </Typography>
-              <Typography
-                sx={{ fontWeight: 400, mt: "22px", whiteSpace: "normal" }}
-              >
+              <Typography sx={{ fontWeight: 400, mt: "22px" }}>
                 {item.text}
               </Typography>
               <Image
                 src="/newsBg.svg"
-                width="150"
-                height="150"
-                alt="newsBg"
-                onDragStart={(e) => e.preventDefault()}
+                width={150}
+                height={150}
+                alt="bg"
                 style={{
                   position: "absolute",
                   right: 0,
@@ -371,18 +505,14 @@ const News = () => {
       {news.map((item, i) => (
         <Modal
           open={openModal === i}
-          onClose={handleCloseModal}
+          onClose={() => setOpenModal(null)}
           key={`modal-${i}`}
         >
           <Fade in={openModal === i}>
             <Box sx={modalStyle}>
               <Typography
                 variant="h5"
-                sx={{
-                  mb: 3,
-                  fontWeight: 700,
-                  color: "#000",
-                }}
+                sx={{ mb: 3, fontWeight: 700, color: "#000" }}
               >
                 {item.title}
               </Typography>
@@ -391,7 +521,7 @@ const News = () => {
                   lineHeight: 1.7,
                   whiteSpace: "pre-line",
                   color: "#333",
-                  "@media (max-width: 900px)": { fontSize: "14px" },
+                  fontSize: { xs: "14px", md: "16px" },
                 }}
                 dangerouslySetInnerHTML={{
                   __html: item.modalContent?.replace(/\n/g, "<br>") || "",
@@ -400,10 +530,14 @@ const News = () => {
               <Box sx={{ mt: 4, textAlign: "right" }}>
                 <Button
                   variant="contained"
-                  onClick={handleCloseModal}
-                  sx={{ bgcolor: "#249FFC", color: "#fff" }}
+                  onClick={() => setOpenModal(null)}
+                  sx={{
+                    bgcolor: "#249FFC",
+                    color: "#fff",
+                    textTransform: "none",
+                  }}
                 >
-                  Закрыть
+                  {t("close")}
                 </Button>
               </Box>
             </Box>
@@ -414,7 +548,6 @@ const News = () => {
   );
 };
 
-// --- STYLES ---
 const navBtnStyle = {
   position: "absolute",
   top: "50%",

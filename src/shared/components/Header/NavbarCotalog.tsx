@@ -3,7 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useUnit } from "effector-react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   AppBar,
   Box,
@@ -19,7 +20,6 @@ import {
   ListItemText,
   CircularProgress,
   Avatar,
-  Container,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
@@ -27,7 +27,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import ScaleIcon from "@mui/icons-material/Scale";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import LanguageIcon from "@mui/icons-material/Language";
 
 import {
   $categories,
@@ -47,7 +47,9 @@ import { CatalogDropdown } from "./CatalogDropdown";
 
 const NavbarCatalog = () => {
   const { locale } = useParams();
+  const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations("header");
 
   // Effector Units
   const categories = useUnit($categories) as CategoryType[];
@@ -67,6 +69,14 @@ const NavbarCatalog = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  // --- LOGIC: Language Switching ---
+  const toggleLanguage = () => {
+    const nextLocale = locale === "ru" ? "uz" : "ru";
+    // Joriy yo'ldagi til kodini almashtirish
+    const newPath = pathname.replace(`/${locale}`, `/${nextLocale}`);
+    router.push(newPath);
+  };
 
   // Handle clicking outside to close search results
   useEffect(() => {
@@ -96,12 +106,10 @@ const NavbarCatalog = () => {
     return () => clearTimeout(timer);
   }, [searchQuery, locale, searchProductsEv]);
 
-  // FIXED: Logic moved here to prevent cascading renders in useEffect
   const handleCatalogClick = () => {
     if (!isOpen) {
       loadCategories({ lang: (locale as string) || "ru" });
       setIsOpen(true);
-      // Immediately set the first category if it exists
       if (categories.length > 0) {
         setActiveCategory(categories[0]);
       }
@@ -110,10 +118,8 @@ const NavbarCatalog = () => {
     }
   };
 
-  // Sync active category only when categories load while the menu is already open
   useEffect(() => {
     if (isOpen && categories.length > 0 && !activeCategory) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveCategory(categories[0]);
     }
   }, [categories, isOpen, activeCategory]);
@@ -122,31 +128,14 @@ const NavbarCatalog = () => {
     setActiveCategory(category);
   };
 
-  const handleClose = () => {
-    setIsOpen(false);
-  };
-
-  const handleBasketClick = () => {
-    router.push(`/${locale}/basket`);
-  };
-
-  const handleFavoritesClick = () => {
-    router.push(`/${locale}/favorites`);
-  };
-
   return (
     <Box
-      sx={{
-        position: "relative",
-        bgcolor: "#fff",
-        zIndex: 100,
-        width: "100%",
-      }}
+      sx={{ position: "relative", bgcolor: "#fff", zIndex: 100, width: "100%" }}
     >
       <AppBar
         position="static"
         elevation={0}
-        sx={{ bgcolor: "#fff", color: "#000", width: "100%", padding: "0 0" }}
+        sx={{ bgcolor: "#fff", color: "#000", width: "100%", py: 1 }}
       >
         <Box
           sx={{
@@ -155,31 +144,27 @@ const NavbarCatalog = () => {
             justifyContent: "space-between",
             gap: 2,
             width: "100%",
-            py: 1,
+            px: 1,
           }}
         >
           {/* Catalog Button */}
           <Button
             onClick={handleCatalogClick}
             sx={{
-              "@media (max-width:900px)": {
-                display: "none",
-              },
+              display: { xs: "none", md: "flex" },
               bgcolor: isOpen ? "#1e88e5" : "#2196f3",
               color: "#fff",
               height: "55px",
               borderRadius: 2,
-              display: "flex",
-              ml: 1,
               gap: 1,
               textTransform: "none",
               fontWeight: 600,
-              maxWidth: "180px",
+              minWidth: "180px",
               "&:hover": { bgcolor: "#1e88e5" },
             }}
           >
             {isOpen ? <CloseIcon /> : <MenuIcon />}
-            Каталог товаров
+            {t("catalog")}
           </Button>
 
           {/* Search Bar Container */}
@@ -196,12 +181,14 @@ const NavbarCatalog = () => {
                   mt: "60px",
                   width: "100%",
                   position: "fixed",
+                  left: 0,
+                  px: 2,
                 },
               }}
             >
               <SearchIcon sx={{ color: "#999", mr: 1 }} />
               <InputBase
-                placeholder="Поиск"
+                placeholder={t("search")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => searchQuery.length >= 2 && setShowResults(true)}
@@ -225,8 +212,8 @@ const NavbarCatalog = () => {
                   maxHeight: "450px",
                   overflowY: "auto",
                   borderRadius: 2,
-                  border: "1px solid #eee",
                   bgcolor: "#fff",
+                  color: "#000",
                   "@media (max-width:900px)": {
                     mt: "70px",
                     width: "100%",
@@ -256,19 +243,15 @@ const NavbarCatalog = () => {
                                   height: 45,
                                   bgcolor: "#f5f5f5",
                                   p: 0.5,
-                                  border: "1px solid #eee",
                                 }}
                               />
                               <ListItemText
                                 primary={product.title}
-                                secondary={`${new Intl.NumberFormat(
-                                  "ru-RU",
-                                ).format(Number(product.price))} сум`}
+                                secondary={`${new Intl.NumberFormat("ru-RU").format(Number(product.price))} сум`}
                                 primaryTypographyProps={{
                                   fontWeight: 600,
                                   fontSize: "14px",
                                   noWrap: true,
-                                  color: "#000",
                                 }}
                                 secondaryTypographyProps={{
                                   color: "#2196f3",
@@ -282,7 +265,7 @@ const NavbarCatalog = () => {
                   ) : !searchLoading ? (
                     <Box sx={{ p: 3, textAlign: "center" }}>
                       <Typography sx={{ color: "#999", fontSize: "14px" }}>
-                        Ничего не найдено по запросу `{searchQuery}`
+                        {t("no_results")} `{searchQuery}`
                       </Typography>
                     </Box>
                   ) : null}
@@ -292,38 +275,31 @@ const NavbarCatalog = () => {
           </Box>
 
           {/* Right Icons */}
-          <Box
-            sx={{
-              display: "flex",
-              gap: 2,
-              "@media (max-width:900px)": {
-                display: "none",
-              },
-            }}
-          >
-            <HeaderIcon icon={<ScaleIcon />} label="Сравнение" />
-
+          <Box sx={{ display: { xs: "none", md: "flex" }, gap: 1 }}>
+            <HeaderIcon
+              icon={<LanguageIcon />}
+              label={locale === "ru" ? "O'zbekcha" : "Русский"}
+              onClick={toggleLanguage}
+            />
+            <HeaderIcon icon={<ScaleIcon />} label={t("comparison")} />
             <HeaderIcon
               icon={
                 <Badge badgeContent={totalCount} color="error">
                   <ShoppingCartOutlinedIcon />
                 </Badge>
               }
-              label="Корзина"
-              onClick={handleBasketClick}
+              label={t("cart")}
+              onClick={() => router.push(`/${locale}/basket`)}
             />
-
             <HeaderIcon
               icon={
                 <Badge badgeContent={favoritesCount} color="error">
                   <FavoriteBorderIcon />
                 </Badge>
               }
-              label="Избранное"
-              onClick={handleFavoritesClick}
+              label={t("favorites")}
+              onClick={() => router.push(`/${locale}/favorites`)}
             />
-
-            <HeaderIcon icon={<SupportAgentIcon />} label="Связь" />
           </Box>
         </Box>
       </AppBar>
@@ -332,7 +308,7 @@ const NavbarCatalog = () => {
         isOpen={isOpen}
         activeCategory={activeCategory}
         onCategoryHover={handleCategoryHover}
-        onClose={handleClose}
+        onClose={() => setIsOpen(false)}
       />
     </Box>
   );
@@ -352,7 +328,7 @@ const HeaderIcon = ({ icon, label, onClick }: HeaderIconProps) => (
       flexDirection: "column",
       alignItems: "center",
       cursor: "pointer",
-      minWidth: "65px",
+      minWidth: "75px",
       transition: "0.2s",
       "&:hover": { color: "#2196f3" },
     }}
@@ -360,7 +336,9 @@ const HeaderIcon = ({ icon, label, onClick }: HeaderIconProps) => (
     <IconButton color="inherit" sx={{ p: 1 }}>
       {icon}
     </IconButton>
-    <Typography sx={{ fontSize: "11px", fontWeight: 500 }}>{label}</Typography>
+    <Typography sx={{ fontSize: "11px", fontWeight: 500, textAlign: "center" }}>
+      {label}
+    </Typography>
   </Box>
 );
 

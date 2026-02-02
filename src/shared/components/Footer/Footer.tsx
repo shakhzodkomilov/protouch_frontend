@@ -7,8 +7,10 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import FacebookIcon from "@mui/icons-material/Facebook";
+import { useTranslations } from "next-intl";
 
 const Footer = () => {
+  const t = useTranslations("Footer");
   // Phone numbers array for easy management
   const phoneNumbers = [
     "+998 97 778 23 47",
@@ -49,10 +51,10 @@ const Footer = () => {
           {/* Left Section - Subscription */}
           <Box sx={{ color: "#000" }}>
             <Typography variant="h6" mb={2} sx={{ fontSize: "24px" }}>
-              Хотите быть в курсе акций и скидок?
+              {t("subscription.title")}{" "}
             </Typography>
             <Typography variant="h6" mb={2} sx={{ fontSize: "24px" }}>
-              Подпишитесь на наш:
+              {t("subscription.subtitle")}{" "}
             </Typography>
             <Button
               variant="contained"
@@ -79,17 +81,17 @@ const Footer = () => {
           {/* Middle Section - Resources */}
           <Box sx={{ color: "#000" }}>
             <Typography variant="h6" mb={2}>
-              Ресурсы
+              {t("resources.title")}{" "}
             </Typography>
             <Stack spacing={1} mt={2} gap={3}>
               <Link href="#" underline="hover" color="inherit">
-                Обработка персональных данных
+                {t("resources.personalData")}{" "}
               </Link>
               <Link href="#" underline="hover" color="inherit">
-                Конфиденциальность
+                {t("resources.privacy")}{" "}
               </Link>
               <Link href="#" underline="hover" color="inherit">
-                Сервисные центры
+                {t("resources.serviceCenters")}{" "}
               </Link>
             </Stack>
           </Box>
@@ -97,7 +99,7 @@ const Footer = () => {
           {/* Right Section - Contacts */}
           <Box sx={{ color: "#000" }}>
             <Typography variant="h6" mb={2}>
-              Контакты
+              {t("contacts.title")}
             </Typography>
             <Stack spacing={1} gap={2}>
               {phoneNumbers.map((number, index) => (
@@ -148,15 +150,13 @@ const Footer = () => {
                   style={{ height: "auto", width: "26px" }}
                 />
                 <Typography sx={{ userSelect: "none" }}>
-                  Мирабадский район, граждан Тонг Юлдузи
+                  {t("contacts.address")}{" "}
                 </Typography>
               </Box>
             </Stack>
           </Box>
 
-          {/* Brand Logos Section */}
           <Box sx={{ color: "#000", flexShrink: 0 }}>
-            {/* Social Media Icons */}
             <Box
               display="flex"
               width="100%"
@@ -185,10 +185,10 @@ const Footer = () => {
                 <LinkedInIcon
                   sx={{
                     color: "#000",
-                    opacity: "0.2", // 20% base opacity
+                    opacity: "0.2",
                     width: "34px",
                     height: "34px",
-                    transition: "opacity 0.2s ease", // Smooth hover transition
+                    transition: "opacity 0.2s ease",
                   }}
                 />
               </Box>
@@ -272,8 +272,6 @@ const Footer = () => {
                 />
               </Box>
             </Box>
-
-            {/* Partner Logos */}
             <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
               <Image
                 src="/HayotBirja.svg"

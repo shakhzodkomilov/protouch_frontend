@@ -70,18 +70,15 @@ export const $categories = createStore<CategoryType[]>([]).on(
 export const $products = createStore<PaginationType | null>(null)
   .on(getProductsFx.doneData, (_, data) => data) // Oddiy yuklash
   .on(getProductsByCategoryFx.doneData, (state, newData) => {
-    // ✅ Agar bu 1-sahifa bo'lsa (previous === null), yangi ma'lumotni to'liq o'zlashtiramiz
     if (!state || newData.previous === null) {
       return newData;
     }
-    // ✅ Agar keyingi sahifalar kelsa (page 2, 3...), eski natijalarga yangisini qo'shamiz
     return {
       ...newData,
       results: [...state.results, ...newData.results],
     };
   })
-  .reset(clearProducts); // ✅ Tozalash eventi chaqirilganda store null bo'ladi
-
+  .reset(clearProducts);
 // 4. Boshqa storelar
 export const $bestSellers = createStore<PaginationType | null>(null).on(
   getBestSellersFx.doneData,
@@ -104,7 +101,7 @@ export const $productDetail = createStore<ProductDetailType | null>(null).on(
 
 // --- Loading Flags ---
 export const $loadingCategories = getCategoriesFx.pending;
-export const $loadingProducts = getProductsByCategoryFx.pending; // Katalog uchun asosiy loading
+export const $loadingProducts = getProductsByCategoryFx.pending;
 export const $loadingGeneralProducts = getProductsFx.pending;
 export const $loadingSellers = getBestSellersFx.pending;
 export const $loadingArrivals = getNewArrivalsFx.pending;

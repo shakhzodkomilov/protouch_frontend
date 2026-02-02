@@ -2,11 +2,22 @@
 
 import { Box, Button, Link as MuiLink } from "@mui/material";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 const Navbar = () => {
   const router = useRouter();
+  const { locale } = useParams();
+  const t = useTranslations("header");
+
+  const menuItems = [
+    { title: t("actions"), href: "/sales" },
+    { title: t("delivery"), href: "/delivery" },
+    { title: t("about"), href: "/about-us" },
+    { title: t("legaldoc"), href: "/legaldoc" },
+    { title: t("Goverprocurement"), href: "/b2b" },
+  ];
 
   return (
     <Box
@@ -63,7 +74,7 @@ const Navbar = () => {
             width={250}
             height={40}
             style={{ cursor: "pointer" }}
-            onClick={() => router.push("/")}
+            onClick={() => router.push(`/${locale}`)}
             priority
           />
           <MuiLink
@@ -82,7 +93,8 @@ const Navbar = () => {
             <Image src="/location.svg" alt="location" width={30} height={30} />
           </MuiLink>
         </Box>
-        {/* LOGO */}
+
+        {/* LOGO (DESKTOP) */}
         <Box
           sx={{
             flexShrink: 0,
@@ -98,12 +110,12 @@ const Navbar = () => {
             width={250}
             height={40}
             style={{ cursor: "pointer" }}
-            onClick={() => router.push("/")}
+            onClick={() => router.push(`/${locale}`)}
             priority
           />
         </Box>
 
-        {/* CENTER CONTACTS */}
+        {/* CENTER CONTACTS (DESKTOP) */}
         <Box
           sx={{
             flex: 1,
@@ -115,19 +127,16 @@ const Navbar = () => {
             },
           }}
         >
-          {/* Phone 1 */}
           <MuiLink href="tel:+998977782347" underline="none" sx={contactStyle}>
             <Image src="/call-outline.svg" alt="call" width={18} height={18} />
             +998 97 778 23 47
           </MuiLink>
 
-          {/* Phone 2 */}
           <MuiLink href="tel:+998951700571" underline="none" sx={contactStyle}>
             <Image src="/call-outline.svg" alt="call" width={18} height={18} />
             +998 95 170 05 71
           </MuiLink>
 
-          {/* Location */}
           <MuiLink
             href="https://yandex.uz/maps/-/CLdXa09U"
             target="_blank"
@@ -136,11 +145,11 @@ const Navbar = () => {
             sx={contactStyle}
           >
             <Image src="/location.svg" alt="location" width={18} height={18} />
-            Мирабадский район, Тонг Юлдузи
+            {t("address")}
           </MuiLink>
         </Box>
 
-        {/* RIGHT MENU */}
+        {/* RIGHT MENU (DESKTOP) */}
         <Box
           sx={{
             display: "flex",
@@ -150,17 +159,11 @@ const Navbar = () => {
             },
           }}
         >
-          {[
-            { title: "Акции", href: "/sales" },
-            { title: "Доставка", href: "/delivery" },
-            { title: "О нас", href: "/about-us" },
-            { title: "Гос. закупки", href: "/legaldoc" },
-            { title: "Юр. лицам", href: "/" },
-          ].map((item) => (
+          {menuItems.map((item) => (
             <Button
               key={item.title}
               component={Link}
-              href={item.href}
+              href={`/${locale}${item.href}`}
               sx={{
                 fontWeight: 500,
                 color: "#4E4E4E",
@@ -194,6 +197,7 @@ const contactStyle = {
     color: "#249FFC",
   },
 };
+
 const contactStyleResponsive = {
   fontWeight: 600,
   color: "#4E4E4E",

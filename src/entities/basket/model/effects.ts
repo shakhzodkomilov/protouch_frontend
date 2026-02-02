@@ -28,7 +28,7 @@ export const addToBasketFx = createEffect<BasketItem, BasketItem[]>(
       updated = items.map((i) =>
         i.productId === newItem.productId
           ? { ...i, quantity: i.quantity + 1 }
-          : i
+          : i,
       );
     } else {
       updated = [...items, { ...newItem, quantity: 1 }];
@@ -36,7 +36,7 @@ export const addToBasketFx = createEffect<BasketItem, BasketItem[]>(
 
     saveLocalBasket(updated);
     return updated;
-  }
+  },
 );
 
 export const removeFromBasketFx = createEffect<number, BasketItem[]>(
@@ -45,7 +45,7 @@ export const removeFromBasketFx = createEffect<number, BasketItem[]>(
     const updated = items.filter((i) => i.productId !== productId);
     saveLocalBasket(updated);
     return updated;
-  }
+  },
 );
 
 export const updateQuantityFx = createEffect<
@@ -54,7 +54,7 @@ export const updateQuantityFx = createEffect<
 >(async ({ productId, quantity }) => {
   const items = getLocalBasket();
   const updated = items.map((i) =>
-    i.productId === productId ? { ...i, quantity } : i
+    i.productId === productId ? { ...i, quantity } : i,
   );
   saveLocalBasket(updated);
   return updated;

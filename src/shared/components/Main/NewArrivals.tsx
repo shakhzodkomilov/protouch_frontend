@@ -72,7 +72,7 @@ const NewArrivals = () => {
   const getUniqueId = useMemo(() => Date.now(), []);
 
   useEffect(() => {
-    loadArrivalsEv({ lang: "ru" });
+    loadArrivalsEv({ lang: (locale as string) || "ru" });
     loadFavoritesEv();
   }, [loadArrivalsEv, loadFavoritesEv]);
 

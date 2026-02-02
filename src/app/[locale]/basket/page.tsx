@@ -20,6 +20,7 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import BalanceIcon from "@mui/icons-material/Balance";
+import { useTranslations } from "next-intl";
 
 import {
   $basket,
@@ -31,6 +32,7 @@ import {
 
 export default function BasketPage() {
   const { locale } = useParams();
+  const t = useTranslations("basket");
   const { items, totalCount, totalPrice } = useUnit($basket);
   const loading = useUnit($basketLoading);
 
@@ -40,7 +42,6 @@ export default function BasketPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     loadBasketEv();
   }, [loadBasketEv]);
@@ -69,15 +70,15 @@ export default function BasketPage() {
             href={`/${locale}`}
             style={{ color: "#000", textDecoration: "none" }}
           >
-            Главная
+            {t("breadcrumbs.home")}
           </Link>
           <Typography color="text.secondary" sx={{ fontSize: "14px" }}>
-            Корзина
+            {t("breadcrumbs.basket")}
           </Typography>
         </Breadcrumbs>
 
-        <Typography variant="h4" sx={{ mb: 4, fontWeight: 700 }}>
-          Корзина
+        <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, color: "#000" }}>
+          {t("title")}
         </Typography>
 
         {items.length === 0 && !loading ? (
@@ -91,9 +92,9 @@ export default function BasketPage() {
               color: "#000",
             }}
           >
-            <Typography variant="h6">Ваша корзина пуста</Typography>
+            <Typography variant="h6">{t("empty.title")}</Typography>
             <Button component={Link} href={`/${locale}`} sx={{ mt: 2 }}>
-              В каталог
+              {t("empty.button")}
             </Button>
           </Paper>
         ) : (
@@ -163,7 +164,7 @@ export default function BasketPage() {
                             mb: 1,
                           }}
                         >
-                          В наличии
+                          {t("inStock")}
                         </Typography>
                         <Box>
                           <IconButton size="small">
@@ -182,7 +183,7 @@ export default function BasketPage() {
                           gap: 2,
                         }}
                       >
-                        <Typography
+                        {/* <Typography
                           sx={{
                             fontSize: "14px",
                             color: "#666",
@@ -191,7 +192,7 @@ export default function BasketPage() {
                           }}
                         >
                           {item.title}
-                        </Typography>
+                        </Typography> */}
                         <Box
                           sx={{
                             textAlign: "right",
@@ -208,7 +209,7 @@ export default function BasketPage() {
                             )}{" "}
                           </Typography>
                           <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                            Сум
+                            {t("orderSummary.currency")}
                           </Typography>
                         </Box>
                       </Box>
@@ -221,7 +222,7 @@ export default function BasketPage() {
                           color: "#000",
                         }}
                       >
-                        Кол-во
+                        {t("quantity")}
                       </Typography>
 
                       <Box
@@ -257,8 +258,6 @@ export default function BasketPage() {
                         </IconButton>
                       </Box>
                     </Box>
-
-                    {/* Price */}
                   </Box>
                 </Paper>
               ))}
@@ -274,7 +273,7 @@ export default function BasketPage() {
                   variant="h6"
                   sx={{ fontWeight: 700, mb: 3, color: "#000" }}
                 >
-                  Условия заказа
+                  {t("orderSummary.title")}
                 </Typography>
 
                 {/* Delivery Info Boxes */}
@@ -301,9 +300,9 @@ export default function BasketPage() {
                       width={24}
                       height={24}
                       alt="Delivery"
-                    />{" "}
+                    />
                     <Typography sx={{ fontSize: "13px", color: "#444" }}>
-                      по г. Ташкент осуществляется бесплатно в течении 3-х дней
+                      {t("orderSummary.delivery")}
                     </Typography>
                   </Box>
                   <Box
@@ -320,10 +319,10 @@ export default function BasketPage() {
                       src={"/Pickup.svg"}
                       width={24}
                       height={24}
-                      alt="Delivery"
+                      alt="Pickup"
                     />
                     <Typography sx={{ fontSize: "13px", color: "#444" }}>
-                      Пункт выдачи: доступны
+                      {t("orderSummary.pickup")}
                     </Typography>
                   </Box>
                   <Box
@@ -340,10 +339,10 @@ export default function BasketPage() {
                       src={"/Delivery.svg"}
                       width={24}
                       height={24}
-                      alt="Delivery"
-                    />{" "}
+                      alt="Regional Delivery"
+                    />
                     <Typography sx={{ fontSize: "13px", color: "#444" }}>
-                      в регионы платная и осуществляется в течении 3-х дней
+                      {t("orderSummary.regionalDelivery")}
                     </Typography>
                   </Box>
                 </Box>
@@ -361,14 +360,15 @@ export default function BasketPage() {
                 >
                   <Box>
                     <Typography sx={{ color: "#999", fontSize: "14px" }}>
-                      Итого:
+                      {t("orderSummary.total")}
                     </Typography>
                     <Typography sx={{ fontWeight: 600 }}>
-                      {totalCount} товара
+                      {totalCount} {t("orderSummary.items")}
                     </Typography>
                   </Box>
                   <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                    {totalPrice.toLocaleString("ru-RU")} Сум
+                    {totalPrice.toLocaleString("ru-RU")}{" "}
+                    {t("orderSummary.currency")}
                   </Typography>
                 </Box>
 
@@ -386,7 +386,7 @@ export default function BasketPage() {
                     "&:hover": { bgcolor: "#1a8ae5" },
                   }}
                 >
-                  Перейти к оформлению
+                  {t("orderSummary.checkout")}
                 </Button>
               </Paper>
             </Box>
