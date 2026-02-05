@@ -20,8 +20,9 @@ const Footer = () => {
 
   // Social media links
   const socialLinks = {
-    linkedin: "https://linkedin.com/company/your-company",
-    instagram: "https://instagram.com/protouch.uz",
+    linkedin: "https://www.linkedin.com/company/protouch-uz",
+    instagram:
+      "https://www.instagram.com/protouchuz?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
     telegram: "https://t.me/ProTouchUz",
     facebook: "https://facebook.com/your-company",
   };
@@ -272,49 +273,6 @@ const Footer = () => {
                 />
               </Box>
             </Box>
-            <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
-              <Image
-                src="/HayotBirja.svg"
-                width={180}
-                height={30}
-                alt="HayotBirja"
-                style={{ width: "100%", height: "auto", maxWidth: "180px" }}
-              />
-              <Image
-                src="/TenderWeek.svg"
-                width={180}
-                height={30}
-                alt="TenderWeek"
-                style={{ width: "100%", height: "auto", maxWidth: "180px" }}
-              />
-              <Box
-                sx={{
-                  width: "180px",
-                  "& img": {
-                    width: "100%",
-                    height: "auto",
-                    objectFit: "contain",
-                  },
-                }}
-              >
-                <Image
-                  src="/uzex.svg"
-                  width={180}
-                  height={30}
-                  alt="uzex"
-                  priority
-                />
-              </Box>
-              <Image
-                src="/UzExTender.svg"
-                width={180}
-                height={30}
-                alt="UzExTender"
-                style={{ width: "100%", height: "auto", maxWidth: "180px" }}
-              />
-            </Box>
-
-            {/* Payment Logos */}
             <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
               <Image
                 src="/Payme.svg"

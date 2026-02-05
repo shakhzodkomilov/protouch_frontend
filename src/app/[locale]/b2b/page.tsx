@@ -10,6 +10,19 @@ const B2BPageSimple = () => {
   const steps = t.raw("howToOrder.steps") as string[];
   const brands = t.raw("brands.list") as string[];
 
+  // Brand images mapping
+  const brandImages: Record<string, string> = {
+    Huawei: "/huawei.svg",
+    Dahua: "/dahua.svg",
+    Minew: "/minew.png",
+    Okview: "/okvBrend.png",
+    Yarmee: "/yamahaBrend.png", // or create a specific Yarmee icon
+    Eacome: "/shileBrand.png", // or create a specific Eacome icon
+    Minrray: "/minrray.svg",
+    "Pudu Robotics": "/porurobotics.svg",
+    "Orion Star": "/galaxyhub.svg", // or create a specific Orion Star icon
+  };
+
   return (
     <Box
       component="main"
@@ -64,20 +77,66 @@ const B2BPageSimple = () => {
               direction="row"
               alignItems="center"
               spacing={1}
-              sx={{ mb: 2 }}
+              sx={{ mb: 3 }}
             >
               <Verified sx={{ color: "#249FFC" }} />
               <Typography sx={{ fontWeight: 700, fontSize: 20, color: "#000" }}>
                 {t("brands.title")}
               </Typography>
             </Stack>
-            <Typography sx={{ color: "#333", lineHeight: 1.6 }}>
-              {brands.map((item, i) => (
-                <Typography key={i} sx={{ color: "#000" }}>
-                  {item}
-                </Typography>
+
+            {/* Brand Grid with Icons */}
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                  xs: "repeat(2, 1fr)",
+                  sm: "repeat(3, 1fr)",
+                },
+                gap: 2,
+                mb: 3,
+              }}
+            >
+              {brands.map((brand, i) => (
+                <Box
+                  key={i}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
+                    p: 2,
+                    bgcolor: "#fff",
+                    borderRadius: "12px",
+                    transition: "all 0.2s",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                    },
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={brandImages[brand]}
+                    alt={brand}
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      objectFit: "contain",
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      color: "#000",
+                      fontWeight: 600,
+                      fontSize: 14,
+                    }}
+                  >
+                    {brand}
+                  </Typography>
+                </Box>
               ))}
-            </Typography>
+            </Box>
+
             <Typography
               sx={{ fontWeight: 700, fontSize: 20, mt: 3, color: "#000" }}
             >
@@ -116,6 +175,7 @@ const B2BPageSimple = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     fontWeight: 700,
+                    flexShrink: 0,
                   }}
                 >
                   {i + 1}
