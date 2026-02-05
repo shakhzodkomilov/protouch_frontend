@@ -160,7 +160,7 @@ const BestSellers = () => {
       handleAddToBasket({
         id: numericId,
         productId: numericId,
-        title: item.description || "Product",
+        title: item.short_description,
         price: item.price,
         image: item.image,
         quantity: 1,

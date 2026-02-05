@@ -35,12 +35,12 @@ export default function BasketPage() {
   const t = useTranslations("basket");
   const { items, totalCount, totalPrice } = useUnit($basket);
   const loading = useUnit($basketLoading);
-
+  console.log(items);
   const loadBasketEv = useUnit(loadBasket);
   const updateBasketQty = useUnit(updateQuantity);
   const removeBasketItem = useUnit(removeFromBasket);
   const [mounted, setMounted] = useState(false);
-
+  console.log(`"Basket products" ${items}`);
   useEffect(() => {
     setMounted(true);
     loadBasketEv();
