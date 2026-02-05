@@ -8,8 +8,11 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 
 const Footer = () => {
+  const { locale } = useParams();
+
   const t = useTranslations("Footer");
   // Phone numbers array for easy management
   const phoneNumbers = [
@@ -85,7 +88,11 @@ const Footer = () => {
               {t("resources.title")}{" "}
             </Typography>
             <Stack spacing={1} mt={2} gap={3}>
-              <Link href="#" underline="hover" color="inherit">
+              <Link
+                href={`/${locale}/privacy-policy`}
+                underline="hover"
+                color="inherit"
+              >
                 {t("resources.personalData")}{" "}
               </Link>
               <Link href="#" underline="hover" color="inherit">
