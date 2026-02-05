@@ -68,7 +68,7 @@ const B2BPageSimple = () => {
             >
               <Verified sx={{ color: "#249FFC" }} />
               <Typography sx={{ fontWeight: 700, fontSize: 20, color: "#000" }}>
-                {t(" brands.title ")}
+                {t("brands.title")}
               </Typography>
             </Stack>
             <Typography sx={{ color: "#333", lineHeight: 1.6 }}>
@@ -77,6 +77,11 @@ const B2BPageSimple = () => {
                   {item}
                 </Typography>
               ))}
+            </Typography>
+            <Typography
+              sx={{ fontWeight: 700, fontSize: 20, mt: 3, color: "#000" }}
+            >
+              {t("brands.description")}
             </Typography>
           </Paper>
         </Box>
