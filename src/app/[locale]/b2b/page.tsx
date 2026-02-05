@@ -1,20 +1,14 @@
-"use client"; // ← Add this line at the very top
-
+"use client";
 import React from "react";
 import { Box, Typography, Paper, Stack } from "@mui/material";
-import {
-  Business,
-  Assignment,
-  Verified,
-  LocalShipping,
-  CheckCircle,
-} from "@mui/icons-material";
+import { Verified, CheckCircle } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
 
 const B2BPageSimple = () => {
   const t = useTranslations("b2b");
   const partners = t.raw("partners.list") as string[];
   const steps = t.raw("howToOrder.steps") as string[];
+  const brands = t.raw("brands.list") as string[];
 
   return (
     <Box
@@ -74,11 +68,15 @@ const B2BPageSimple = () => {
             >
               <Verified sx={{ color: "#249FFC" }} />
               <Typography sx={{ fontWeight: 700, fontSize: 20, color: "#000" }}>
-                {t("brands.title")}
+                {t(" brands.title ")}
               </Typography>
             </Stack>
             <Typography sx={{ color: "#333", lineHeight: 1.6 }}>
-              {t("brands.list")}
+              {brands.map((item, i) => (
+                <Typography key={i} sx={{ color: "#000" }}>
+                  {item}
+                </Typography>
+              ))}
             </Typography>
           </Paper>
         </Box>

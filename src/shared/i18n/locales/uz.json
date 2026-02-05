@@ -296,34 +296,88 @@
   "b2b": {
     "header": {
       "title": "Yuridik shaxslarga — interaktiv va ofis uskunalarini yetkazib berish",
-      "description": "Ushbu bo‘lim kompaniyalar va korporativ mijozlar uchun mo‘ljallangan bo‘lib, uskunalarni shaffof shartlarda xarid qilish imkonini beradi.",
-      "subDescription": "Biz uzoq muddatli hamkorlikka ochiqmiz va biznes uchun samarali yechimlarni taklif qilamiz."
+      "description": "Ushbu bo‘lim kompaniyalar va korporativ mijozlar uchun mo‘ljallangan bo‘lib, uskunalarni qulay va shaffof shartlarda xarid qilish imkonini beradi.",
+      "subDescription": "Biz uzoq muddatli hamkorlikka ochiqmiz va biznes hamda davlat tashkilotlari uchun samarali yechimlarni taklif qilamiz."
     },
+
     "partners": {
       "title": "Hamkorlar va dilerlar uchun",
       "description": "Biz yuridik shaxslar bilan hamkorlikdan mamnunmiz va kompaniyalarni rasmiy diler bo‘lishga taklif qilamiz.",
       "list": [
         "Maxsus dilerlik va ulgurji narxlar",
-        "Shaxsiy menejer va ustuvor xizmat",
+        "Shaxsiy menejer",
+        "Buyurtmalarni ustuvor ko‘rib chiqish",
         "Marketing va texnik qo‘llab-quvvatlash",
         "Rasmiy kafolat va ishlab chiqaruvchi qo‘llovi",
         "Mahsulotlar bo‘yicha o‘qitish va maslahatlar"
+      ],
+      "cta": "Agar hamkorlikka qiziqsangiz — biz bilan bog‘laning, sizga individual shartlarni taklif qilamiz."
+    },
+
+    "projects": {
+      "title": "Loyihaviy yetkazib berish va individual buyurtmalar",
+      "description": "Biz har qanday murakkablikdagi loyihalarni amalga oshiramiz — ofislar, konferensiya zallari, o‘quv va tibbiyot muassasalari uchun.",
+      "list": [
+        "Muqobil yoki original modellarni tanlash",
+        "Buyurtma asosida yetkazib berish",
+        "O‘zbekiston bo‘ylab yetkazib berish",
+        "O‘rnatish va servis xizmati"
       ]
     },
+
+    "brands": {
+      "title": "Rasmiy dilerlik va brendlar",
+      "list": [
+        "Huawei",
+        "Dahua",
+        "Minew",
+        "Okview",
+        "Yarmee",
+        "Eacome",
+        "Minrray",
+        "Pudu Robotics",
+        "Orion Star"
+      ],
+      "description": "Mahsulotlar original bo‘lib, rasmiy kafolat va texnik qo‘llab-quvvatlash bilan ta’minlanadi."
+    },
+
     "howToOrder": {
       "title": "Yuridik shaxs sifatida buyurtma berish tartibi",
       "steps": [
         "Kerakli mahsulotlarni tanlang",
-        "“Yuridik shaxs sifatida sotib olish” tugmasini bosing",
+        "«Yuridik shaxs sifatida sotib olish» tugmasini bosing",
         "Tashkilot rekvizitlarini kiriting",
-        "Tizim avtomatik ravishda shartnoma va hisob-fakturani tayyorlaydi (DOC/PDF)",
-        "Hujjatlar Didox yoki Soliq.uz orqali yuboriladi"
+        "Tizim shartnoma va hisob-fakturani avtomatik tayyorlaydi (DOC/PDF)",
+        "Hujjatlar Didox yoki Soliq.uz orqali yuboriladi",
+        "Shaxsiy menejer siz bilan bog‘lanadi"
       ]
     },
-    "brands": {
-      "title": "Rasmiy dilerlik va brendlar",
-      "list": "Huawei, Dahua, Minew, Okview, Yarmee, Eacome, Minrray, Pudu Robotics, Orion Star va boshqalar."
-    }
+
+    "documents": {
+      "title": "Taqdim etiladigan hujjatlar",
+      "list": [
+        "Yetkazib berish shartnomasi",
+        "Hisob-faktura",
+        "Elektron hisob-faktura (EHF)",
+        "Qabul-topshirish dalolatnomasi",
+        "Yuk xati",
+        "Kafolat va servis hujjatlari"
+      ]
+    },
+
+    "advantages": {
+      "title": "Nega bizni tanlashadi",
+      "list": [
+        "Rasmiy yetkazib beruvchi",
+        "Korporativ va davlat buyurtmalari tajribasi",
+        "Shaffof shartnomalar",
+        "Tezkor logistika",
+        "Texnik yordam",
+        "Hujjatlar avtomatlashtirilgan"
+      ]
+    },
+
+    "footerCta": "Maslahat olish, individual taklif yoki hamkorlik uchun biz bilan bog‘laning. Uzoq muddatli hamkorlikdan mamnun bo‘lamiz."
   },
 
   "basket": {

@@ -20,6 +20,7 @@ import {
   CheckCircle,
 } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
+import { color } from "framer-motion";
 
 const ProcurementPage = () => {
   const t = useTranslations("procurement");
@@ -101,7 +102,7 @@ const ProcurementPage = () => {
             <Box component="section" sx={{ flex: 2 }}>
               <Typography
                 variant="h2"
-                sx={{ fontWeight: 700, mb: 3, fontSize: 24 }}
+                sx={{ fontWeight: 700, mb: 3, fontSize: 24, color: "#000" }}
               >
                 {t("contacts.title")}
               </Typography>
@@ -164,7 +165,7 @@ const ProcurementPage = () => {
                 sx={{ mt: 3, color: "#555" }}
               >
                 <AccessTime sx={{ fontSize: 20 }} />
-                <Typography variant="body2">
+                <Typography variant="body2" sx={{ color: "#000" }}>
                   {t("contacts.workingHours")}
                 </Typography>
               </Stack>
@@ -185,9 +186,11 @@ const ProcurementPage = () => {
                     display: "flex",
                     alignItems: "center",
                     gap: 1,
+                    color: "#000",
                   }}
                 >
-                  <Gavel sx={{ fontSize: 22 }} /> {t("law.title")}
+                  <Gavel sx={{ fontSize: 22, color: "#000" }} />{" "}
+                  {t("law.title")}
                 </Typography>
                 <List dense>
                   {(t.raw("law.items") as string[]).map((text, i) => (
@@ -199,7 +202,10 @@ const ProcurementPage = () => {
                       </ListItemIcon>
                       <ListItemText
                         primary={text}
-                        primaryTypographyProps={{ fontSize: "14px" }}
+                        primaryTypographyProps={{
+                          fontSize: "14px",
+                          color: "#000",
+                        }}
                       />
                     </ListItem>
                   ))}
@@ -220,7 +226,7 @@ const ProcurementPage = () => {
           >
             <Typography
               variant="h2"
-              sx={{ fontWeight: 700, mb: 4, fontSize: 22 }}
+              sx={{ fontWeight: 700, mb: 4, fontSize: 22, color: "#000" }}
             >
               {t("platforms.title")}
             </Typography>
@@ -286,7 +292,7 @@ const ProcurementPage = () => {
           <Box component="section" sx={{ mb: 6 }}>
             <Typography
               variant="h2"
-              sx={{ fontWeight: 700, mb: 3, fontSize: 24 }}
+              sx={{ fontWeight: 700, mb: 3, fontSize: 24, color: "#000" }}
             >
               {t("experience.title")}
             </Typography>
@@ -315,7 +321,9 @@ const ProcurementPage = () => {
               {(t.raw("experience.list") as string[]).map((item, i) => (
                 <Stack key={i} direction="row" spacing={1} alignItems="center">
                   <CheckCircle sx={{ color: "#249FFC", fontSize: 16 }} />
-                  <Typography variant="body2">{item}</Typography>
+                  <Typography variant="body2" sx={{ color: "#000" }}>
+                    {item}
+                  </Typography>
                 </Stack>
               ))}
             </Box>
@@ -332,7 +340,7 @@ const ProcurementPage = () => {
           >
             <Typography
               variant="h2"
-              sx={{ fontWeight: 700, mb: 4, fontSize: 24 }}
+              sx={{ fontWeight: 700, mb: 4, fontSize: 24, color: "#000" }}
             >
               {t("advantages.title")}
             </Typography>
