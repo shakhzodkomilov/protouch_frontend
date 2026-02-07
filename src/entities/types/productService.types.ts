@@ -109,3 +109,10 @@ export type ProductsDetailResponse = {
   product_specification: ProductSpecification;
   gallery: Array<ProductGallery>;
 };
+
+export type formData = {
+  companyName: string;
+  phone: string;
+  inn: string;
+  telegramUser: string;
+};

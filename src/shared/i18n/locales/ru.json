@@ -440,6 +440,17 @@
     "title": "Контакты",
     "address": "Мирабадский район, МСГ Тонг Юлдузи"
   },
+  "legalEntity": {
+    "summary": "Сводка заказа",
+    "quantity": "Количество",
+    "count": "шт",
+    "tax": "НДС",
+    "client_info": "Данные покупателя",
+    "company_name": "Наименование организации",
+    "phone_number": "Телефон номер",
+    "inn": "ИНН",
+    "telegram": "Телеграм юзер @"
+  },
   "privacy_policy": {
     "title": "Политика обработки персональных данных",
     "company_name": "ООО PROTOUCH UZ",
