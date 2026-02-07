@@ -449,5 +449,16 @@
   "Contacts": {
     "title": "Kontaktlar",
     "address": "Mirobod tumani, Tong Yulduzi MFY"
+  },
+  "legalEntity": {
+    "summary": "buyurtma natijasi",
+    "quantity": "Mahsulotlar soni",
+    "count": "dona",
+    "tax": "QQS",
+    "client_info": "Haridor ma'lumotlari",
+    "company_name": "Tashkilot nomi",
+    "phone_number": "Telefon raqam",
+    "inn": "INN",
+    "telegram": "Telegram user @"
   }
 }
