@@ -26,7 +26,7 @@ const Footer = () => {
     linkedin: "https://www.linkedin.com/company/protouch-uz",
     instagram:
       "https://www.instagram.com/protouchuz?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
-    telegram: "https://t.me/ProTouchUz",
+    telegram: "https://t.me/ProtouchMarket",
     facebook: "https://facebook.com/your-company",
   };
 
@@ -89,16 +89,24 @@ const Footer = () => {
             </Typography>
             <Stack spacing={1} mt={2} gap={3}>
               <Link
-                href={`/${locale}/privacy-policy`}
+                href={`/${locale}/personal-data`}
                 underline="hover"
                 color="inherit"
               >
                 {t("resources.personalData")}{" "}
               </Link>
-              <Link href="#" underline="hover" color="inherit">
+              <Link
+                href={`/${locale}/privacy-policy`}
+                underline="hover"
+                color="inherit"
+              >
                 {t("resources.privacy")}{" "}
               </Link>
-              <Link href="#" underline="hover" color="inherit">
+              <Link
+                href={`/${locale}/service`}
+                underline="hover"
+                color="inherit"
+              >
                 {t("resources.serviceCenters")}{" "}
               </Link>
             </Stack>

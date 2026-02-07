@@ -561,5 +561,154 @@
       "phone_label": "Telefon:"
     },
     "footer_note": "Kompaniya Siyosatni yangilash huquqiga ega. Amaldagi versiya har doim Saytda mavjud bo'ladi."
+  },
+  "privacy": {
+    "title": "Maxfiylik",
+    "publish_date": "Oxirgi yangilanish sanasi: 06.02.2026",
+    "company_name": "«PROTOUCH UZ» MChJ",
+    "intro": "«PROTOUCH UZ» MChJ PROTOUCH.UZ sayti foydalanuvchilarining maxfiyligini hurmat qiladi va siz murojaat qilganingizda taqdim etgan ma'lumotlaringizga ehtiyotkorlik bilan yondashadi.",
+    "contacts": {
+      "title": "Kontaktlar",
+      "address_label": "Manzil:",
+      "address_val": "«PROTOUCH UZ» MChJ, O'zbekiston, Toshkent sh., Mirobod tumani, Tong Yulduzi ko'ch., Koshkupir ko'ch., 30-uy",
+      "email": "protouch.uz@gmail.com",
+      "phone": "+998 95 170 05 71"
+    },
+    "sections": {
+      "documents": {
+        "title": "Saytdagi hujjatlar haqida muhim ma'lumot (Tijorat taklifi/shartnoma loyihasi)",
+        "items": [
+          "Saytda tijorat taklifini va/yoki shartnoma loyihasini so'rash yoki shakllantirish imkoniyati mavjud bo'lishi mumkin.",
+          "Saytda shakllangan tijorat taklifi va/yoki shartnoma loyihasi dastlabki hisoblanadi va ommaviy oferta emas. «PROTOUCH UZ» MChJ majburiyatlari faqat menejer tomonidan shartlar tasdiqlanganidan va shartnoma belgilangan tartibda tuzilganidan keyin yuzaga keladi."
+        ]
+      },
+      "data_collection": {
+        "title": "Biz qanday ma'lumotlarni olishimiz mumkin",
+        "items": [
+          "Biz siz murojaat qilganingizda ixtiyoriy ravishda ko'rsatgan ma'lumotlarni olishimiz mumkin:",
+          "ism/FIO yoki tashkilot nomi",
+          "telefon raqami",
+          "elektron pochta manzili",
+          "manzil/shahar (yetkazib berish/chiqish/hujjatlar uchun zarur bo'lsa)",
+          "murojaat matni va arizada ko'rsatgan ma'lumotlar",
+          "Shuningdek, sayt saytning to'g'ri ishlashi va xizmat sifatini yaxshilash uchun zarur bo'lsa, texnik ma'lumotlarni (masalan, qurilma/brauzer turi, IP-manzil, cookie ma'lumotlari) avtomatik ravishda olishi mumkin."
+        ]
+      },
+      "data_usage": {
+        "title": "Ma'lumotlar nima uchun ishlatiladi",
+        "items": [
+          "Ma'lumotlar quyidagilar uchun ishlatiladi:",
+          "teskari aloqa va so'rovingizga javob berish",
+          "tijorat takliflari, hisoblar, spetsifikatsiyalar va shartnoma loyihalarini tayyorlash",
+          "yetkazib berish/ishlar/xizmatlar shartlarini kelishish",
+          "yetkazib berish, o'rnatish, xizmat va kafolat xizmatini tashkil qilish",
+          "sayt ishlashi va xizmat sifatini yaxshilash"
+        ]
+      },
+      "data_sharing": {
+        "title": "Ma'lumotlar kimga uzatilishi mumkin",
+        "items": [
+          "Biz sizning ma'lumotlaringizni begona reklama uchun uchinchi shaxslarga uzatmaymiz.",
+          "Ayrim hollarda ma'lumotlar faqat zarurat bo'yicha uzatilishi mumkin, masalan:",
+          "yetkazib berish xizmatlariga (yetkazib berish uchun)",
+          "xizmat ko'rsatuvchi pudratchilar (o'rnatish/ta'mirlash/chiqish uchun)",
+          "banklar/to'lov tashkilotlari (to'lov paytida)",
+          "davlat organlariga — qonuniy so'rov bo'yicha"
+        ]
+      },
+      "security": {
+        "title": "Xavfsizlik",
+        "items": [
+          "Biz ma'lumotlarni ruxsatsiz kirishdan va foydalanishdan himoya qilish uchun oqilona choralar ko'ramiz. Ma'lumotlarga faqat murojatingizni bajarish uchun zarur bo'lgan xodimlar/pudratchilar kirishi mumkin."
+        ]
+      },
+      "cookies": {
+        "title": "Cookie",
+        "items": [
+          "Sayt to'g'ri ishlashi va tahlil uchun cookie-dan foydalanishi mumkin. Siz cookie-ni brauzer sozlamalarida o'chirib qo'yishingiz mumkin, lekin saytning ba'zi funksiyalari noto'g'ri ishlashi mumkin."
+        ]
+      },
+      "contact": {
+        "title": "Biz bilan qanday bog'lanish mumkin",
+        "items": [
+          "Agar murojaat qilishda ko'rsatilgan ma'lumotlarni aniqlashtirmoqchi yoki o'zgartirmoqchi bo'lsangiz, bizga yozing: protouch.uz@gmail.com yoki qo'ng'iroq qiling: +998 95 170 05 71."
+        ]
+      }
+    },
+    "footer_note": "Barcha huquqlar himoyalangan."
+  },
+  "service": {
+    "title": "Servis markazlari va xizmat ko'rsatish",
+    "subtitle": "Butun O'zbekiston bo'ylab",
+    "intro": "«PROTOUCH UZ» MChJ O'zbekiston bo'ylab (barcha hududlarda) uskunalar uchun kafolatli va kafolatdan keyingi xizmat ko'rsatish, diagnostika, sozlash va ta'mirlash ishlarini amalga oshiradi.",
+    "how_to_apply": {
+      "title": "Servisga qanday murojaat qilish kerak",
+      "steps": [
+        "Saytda ariza qoldiring yoki biz bilan telefon/elektron pochta orqali bog'laning.",
+        "Muammo haqidagi ma'lumotlarni va materiallarni (foto/video) tayyorlang - ro'yxat quyida keltirilgan.",
+        "Biz qabul qilish tartibini tasdiqlaymiz, yetkazib berishni kelishamiz va qadoqlash bo'yicha ko'rsatma beramiz.",
+        "Diagnostikadan so'ng natija, muddatlar va narxni (agar kafolat muddati tugagan bo'lsa) ma'lum qilamiz."
+      ]
+    },
+    "requirements": {
+      "title": "Servis arizasiga nimalar yuborish kerak (majburiy)",
+      "items": {
+        "photos": {
+          "title": "Qurilma fotosuratlari",
+          "desc": "Qurilmaning umumiy ko'rinishi, ulagichlar va xatolik ko'rsatkichlari."
+        },
+        "serial": {
+          "title": "Shildik / Seriya raqami",
+          "desc": "Qurilma modeli va seriya raqami (S/N)."
+        },
+        "video": {
+          "title": "Nosozlik videosi",
+          "desc": "Muammoni ko'rsatuvchi 15-60 soniyali qisqa video."
+        },
+        "description": {
+          "title": "Batafsil tavsif",
+          "desc": "Nima ishlamayotgani va muammo qanday sharoitda paydo bo'lishi."
+        }
+      }
+    },
+    "logistics": {
+      "title": "Toshkentdagi bosh qofisga qanday yuborish kerak",
+      "text": "Yuborishdan oldin biz bilan bog'laning. Iloji bo'lsa, original qadoqdan yoki pufakchali plyonka bilan himoyalangan qattiq qutidan foydalaning.",
+      "important_note": "Qutining ichiga ma'lumotlaringiz: kontakt, model, S/N va muammo tavsifini yozib qoldiring."
+    },
+    "contacts": {
+      "office_title": "Bosh qofis",
+      "name": "«PROTOUCH UZ» MChJ",
+      "address": "Mirobod tumani, Tong Yulduzi ko'ch., Koshkupir ko'ch., 30-uy"
+    },
+    "regions": {
+      "title": "Xizmat ko'rsatish hududlari",
+      "list_label": "Barcha viloyatlar ro'yxati",
+      "warning": "DIQQAT: Agar hududingizda servis punkti bo'lmasa, uskunani Toshkentdagi bosh qofisga yuborish kerak.",
+      "items": [
+        "Toshkent sh.",
+        "Toshkent viloyati",
+        "Qoraqalpog'iston Respublikasi",
+        "Andijon viloyati",
+        "Buxoro viloyati",
+        "Jizzax viloyati",
+        "Qashqadaryo viloyati",
+        "Navoiy viloyati",
+        "Namangan viloyati",
+        "Samarqand viloyati",
+        "Surxondaryo viloyati",
+        "Sirdaryo viloyati",
+        "Farg'ona viloyati",
+        "Xorazm viloyati"
+      ]
+    },
+    "warranty": {
+      "title": "Kafolat xizmati",
+      "desc": "Foydalanish shartlariga rioya qilinganda va xarid hujjatlari mavjud bo'lganda amalga oshiriladi."
+    },
+    "timing": {
+      "title": "Diagnostika muddatlari",
+      "desc": "Uskunaning turiga bog'liq. Natija va ta'mirlash narxini tekshiruvdan so'ng darhol ma'lum qilamiz."
+    }
   }
 }

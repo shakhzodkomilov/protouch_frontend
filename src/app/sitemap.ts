@@ -19,7 +19,9 @@ const STATIC_ROUTES = [
   "/legaletity",
   "/login",
   "/product",
+  "/b2b",
   "/legaldoc",
+  "/privacy-policy",
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

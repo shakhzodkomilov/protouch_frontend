@@ -53,7 +53,7 @@ export default function MobileSettings() {
       icon: <LocalShippingOutlined />,
       path: "/delivery",
     },
-    { text: t("menu.about"), icon: <InfoOutlined />, path: "/about" },
+    { text: t("menu.about"), icon: <InfoOutlined />, path: "/about-us" },
     {
       text: t("menu.procurement"),
       icon: <AccountBalanceOutlined />,
