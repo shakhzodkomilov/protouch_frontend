@@ -460,5 +460,117 @@
     "phone_number": "Telefon raqam",
     "inn": "INN",
     "telegram": "Telegram user @"
+  },
+  "privacy_policy": {
+    "title": "Shaxsiy ma'lumotlarni qayta ishlash siyosati",
+    "company_name": "“PROTOUCH UZ” MChJ",
+    "publish_date": "Nashr qilingan sana: 05.02.2026",
+    "intro": "Ushbu Shaxsiy ma'lumotlarni qayta ishlash siyosati (keyingi o'rinlarda — «Siyosat») PROTOUCH sayti (keyingi o'rinlarda — «Sayt») foydalanuvchilari va kompaniya mijozlarining shaxsiy ma'lumotlarini qayta ishlash va himoya qilish tartibini belgilaydi.",
+    "sections": {
+      "definitions": {
+        "title": "Atamalar va ta'riflar",
+        "personal_data_term": "Shaxsiy ma'lumotlar",
+        "personal_data_def": "bevosita yoki bilvosita aniqlangan jismoniy shaxsga taalluqli har qanday ma'lumot.",
+        "processing_term": "Shaxsiy ma'lumotlarni qayta ishlash",
+        "processing_def": "shaxsiy ma'lumotlar bilan bog'liq har qanday harakatlar (yig'ish, yozib olish, tizimlashtirish, saqlash, foydalanish, uzatish, o'chirish va h.k.).",
+        "operator_term": "Operator",
+        "operator_def": "shaxsiy ma'lumotlarni qayta ishlovchi “PROTOUCH UZ” MChJ (keyingi o'rinlarda — «Kompaniya»)."
+      },
+      "data_types": {
+        "title": "Biz qaysi ma'lumotlarni qayta ishlashimiz mumkin",
+        "items": [
+          "F.I.Sh.",
+          "telefon raqami",
+          "elektron pochta (e-mail)",
+          "kompaniya nomi/lavozimi (agar ko'rsatilgan bo'lsa)",
+          "etkazib berish/ob'ekt manzili (buyurtmani bajarish/montaj uchun talab qilinsa)",
+          "murojaatlar mazmuni (ariza/xabar matni)",
+          "texnik ma'lumotlar: IP-manzil, qurilma turi, brauzer, cookies, Saytdagi harakatlar haqidagi ma'lumotlar (analitika)"
+        ]
+      },
+      "purposes": {
+        "title": "Shaxsiy ma'lumotlarni qayta ishlash maqsadlari",
+        "text": "Shaxsiy ma'lumotlar quyidagilar uchun qayta ishlanadi:",
+        "items": [
+          "ariza, qo'ng'iroq va murojaatlarni qayta ishlash",
+          "maslahat berish, mahsulot/xizmat tanlash, tijorat taklifini tayyorlash",
+          "shartnomalar tuzish va bajarish, buyurtmalarni rasmiylashtirish, etkazib berish/montaj (agar tegishli bo'lsa)",
+          "hisob-fakturalarni chiqarish va ishbilarmonlik yozishmalarini yuritish",
+          "foydalanuvchi bilan qayta aloqa o'rnatish",
+          "Sayt faoliyatini va xizmat ko'rsatish sifatini yaxshilash, tashriflar analitikasi",
+          "faqat rozilik mavjud bo'lganda axborot xabarlari va marketing materiallarini yuborish"
+        ]
+      },
+      "legal_basis": {
+        "title": "Qayta ishlashning huquqiy asoslari",
+        "text": "Kompaniya shaxsiy ma'lumotlarni quyidagilar asosida qayta ishlaydi:",
+        "items": [
+          "shaxsiy ma'lumotlar sub'ektining roziligi",
+          "ariza/shartnomani bajarish zarurati (shartnoma tuzilgunga qadar va keyin)",
+          "Kompaniyaning qonuniy manfaatlari (foydalanuvchi huquqlarini buzmagan holda), shu jumladan xavfsizlikni ta'minlash va firibgarlikning oldini olish",
+          "qonunchilik talablari"
+        ]
+      },
+      "collection_process": {
+        "title": "Yig'ish va qayta ishlash tartibi",
+        "text": "Ma'lumotlar foydalanuvchi tomonidan ixtiyoriy ravishda quyidagilar orqali taqdim etiladi:",
+        "items": [
+          "Saytdagi qayta aloqa/ariza shakllari",
+          "telefon orqali murojaatlar",
+          "e-mail/messendjerlar orqali yozishmalar",
+          "buyurtmani rasmiylashtirish (agar mavjud bo'lsa)",
+          "Saytdan foydalanish (cookies va texnik ma'lumotlar)"
+        ]
+      },
+      "cookies": {
+        "title": "Cookies va analitika",
+        "p1": "Sayt cookies va shunga o'xshash texnologiyalardan quyidagilar uchun foydalanishi mumkin:",
+        "list": "• Saytning to'g'ri ishlashi\n• foydalanuvchi sozlamalarini eslab qolish\n• tashriflarni tahlil qilish va funksionallikni yaxshilash",
+        "p2": "Foydalanuvchi brauzer sozlamalarida cookies-dan foydalanishni cheklashi mumkin. Cookies o'chirilganda Saytning ba'zi funksiyalari to'g'ri ishlamasligi mumkin."
+      },
+      "third_party": {
+        "title": "Shaxsiy ma'lumotlarni uchinchi shaxslarga berish",
+        "intro": "Kompaniya shaxsiy ma'lumotlarni uchinchi shaxslarga faqat zarurat tug'ilganda va qayta ishlash maqsadlari uchun talab qilinadigan hajmda berishi mumkin, masalan:",
+        "items": [
+          "IT-qo'llab-quvvatlash, xosting va Saytga xizmat ko'rsatish bo'yicha pudratchilarga",
+          "etkazib berish/kurerlik xizmatlariga (etkazib berish vaqtida)",
+          "CRM/call-tracking/analitik xizmatlarga (agar foydalanilsa)",
+          "banklar/to'lov tashkilotlariga — to'lovni amalga oshirishda (zarur bo'lganda)",
+          "davlat organlariga — qonuniy talabga binoan"
+        ],
+        "footer": "Kompaniya shaxsiy ma'lumotlarni sotmaydi va foydalanuvchining roziligisiz ularni uchinchi shaxslarga mustaqil marketing maqsadlari uchun bermaydi."
+      },
+      "security": {
+        "title": "Shaxsiy ma'lumotlar xavfsizligi",
+        "text": "Kompaniya shaxsiy ma'lumotlarni himoya qilish uchun oqilona tashkiliy va texnik choralarni ko'radi, jumladan:",
+        "items": [
+          "ma'lumotlarga kirishni cheklash",
+          "xodimlarning kirish huquqlarini tabaqalashtirish",
+          "parollar va himoya vositalaridan foydalanish",
+          "antivirus himoyasi va yangilanishlar",
+          "zaxira nusxasini yaratish (zarur bo'lganda)",
+          "ma'lumot uzatish kanallarini himoya qilish (masalan, HTTPS)"
+        ]
+      },
+      "user_rights": {
+        "title": "Foydalanuvchi huquqlari",
+        "text": "Foydalanuvchi quyidagi huquqlarga ega:",
+        "items": [
+          "shaxsiy ma'lumotlarini qayta ishlash haqida ma'lumot olish",
+          "shaxsiy ma'lumotlarini aniqlashtirish, bloklash yoki o'chirishni talab qilish",
+          "qayta ishlashga berilgan rozilikni qaytib olish",
+          "marketing xabarlaridan voz kechish",
+          "agar huquqlari buzilgan deb hisoblasa, vakolatli organlarga shikoyat bilan murojaat qilish"
+        ]
+      }
+    },
+    "contacts": {
+      "title": "Operator kontaktlari (“PROTOUCH UZ” MChJ)",
+      "address_label": "Manzil:",
+      "address_val": "O'zbekiston, Toshkent sh., Mirobod tumani, Tong Yulduzi, Ko'prik ko'chasi, 30-uy",
+      "email_label": "Email:",
+      "phone_label": "Telefon:"
+    },
+    "footer_note": "Kompaniya Siyosatni yangilash huquqiga ega. Amaldagi versiya har doim Saytda mavjud bo'ladi."
   }
 }
