@@ -102,7 +102,6 @@ export default function CatalogPage(props: {
   return (
     <Box sx={{ bgcolor: "#FAFAFA", minHeight: "100vh", width: "100%", py: 4 }}>
       <Container maxWidth={false} sx={{ py: 4, maxWidth: "1800px" }}>
-        {/* Sarlavha qismi */}
         <Typography
           variant="h1"
           sx={{
@@ -117,147 +116,278 @@ export default function CatalogPage(props: {
         >
           {displayTitle}
         </Typography>
-
-        <Box
-          sx={{
-            display: "grid",
-            gap: 2,
-            gridTemplateColumns: {
-              xs: "1fr",
-              sm: "repeat(2, 1fr)",
-              md: "repeat(3, 1fr)",
-              lg: "repeat(4, 1fr)",
-              xl: "repeat(5, 1fr)",
-            },
-            width: "100%",
-          }}
-        >
-          {products?.results?.map((item: ProductType) => (
-            <Link
-              key={item.id}
-              href={`/${locale}/product/${item.id}`}
-              style={{ textDecoration: "none" }}
-            >
-              <Box
+        <Box sx={{ display: "flex" }}>
+          {/* Sidebar Filter Box */}
+          <Box
+            sx={{
+              width: { xs: "100%", md: "300px" },
+              flexShrink: 0,
+              mr: { md: 4 },
+              display: { xs: "none", md: "flex" }, // Hide on mobile or make responsive
+              flexDirection: "column",
+              gap: 2,
+            }}
+          >
+            {/* Availability Section */}
+            <Box sx={{ borderBottom: "1px solid #eee", pb: 2 }}>
+              <Typography
+                variant="subtitle1"
                 sx={{
-                  width: "100%",
-                  maxWidth: "320px",
-                  margin: "0 auto",
-                  borderRadius: 3,
-                  p: 2,
-                  boxShadow: "0px 4px 20px rgba(0,0,0,0.08)",
-                  bgcolor: "#fff",
+                  fontWeight: 700,
+                  mb: 2,
                   display: "flex",
-                  minHeight: "420px",
-                  flexDirection: "column",
-                  position: "relative",
-                  transition: "transform 0.2s",
-                  "&:hover": { transform: "translateY(-5px)" },
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  color: "#000",
                 }}
               >
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                Наличие в магазинах
+                <Box
+                  component="span"
+                  sx={{ fontSize: "12px", transform: "rotate(0deg)" }}
+                >
+                  ▼
+                </Box>
+              </Typography>
+            </Box>
+            <Box sx={{ borderBottom: "1px solid #eee", pb: 2 }}></Box>
+
+            {/* Ratings and Badges */}
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                py: 2,
+                borderBottom: "1px solid #eee",
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <input
+                  type="checkbox"
+                  style={{ width: "18px", height: "18px" }}
+                />
+                <Box>
                   <Typography
                     sx={{
-                      px: 1.5,
-                      py: 0.5,
-                      borderRadius: "8px",
-                      fontSize: 12,
-                      fontWeight: 600,
-                      color: item.is_in_stock ? "#3BB351" : "#FF5F5F",
-                      bgcolor: item.is_in_stock ? "#D6F2DB" : "#FFE4E4",
+                      fontSize: "14px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                      color: "#000",
                     }}
                   >
-                    {item.is_in_stock
-                      ? locale === "ru"
-                        ? "В наличии"
-                        : "Mavjud"
-                      : locale === "ru"
-                        ? "По запросу"
-                        : "So'rov bo'yicha"}
+                    Надёжные модели <span style={{ color: "#999" }}>(436)</span>
+                    <span style={{ color: "#3BB351", fontSize: "14px" }}>
+                      ✔
+                    </span>
                   </Typography>
-                  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                    <Image
-                      src="/scale.svg"
-                      width={20}
-                      height={20}
-                      alt="scale"
-                    />
-                    <FavoriteBorderIcon
-                      sx={{ fontSize: 20, color: "#4E4E4E" }}
-                    />
-                  </Box>
+                  <Typography sx={{ fontSize: "12px", color: "#999" }}>
+                    минимум обращений в сервис
+                  </Typography>
                 </Box>
+              </Box>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <input
+                  type="checkbox"
+                  style={{ width: "18px", height: "18px" }}
+                />
+                <Typography sx={{ fontSize: "14px", color: "#000" }}>
+                  Есть обзор <span style={{ color: "#999" }}>(125)</span>
+                </Typography>
+              </Box>
+            </Box>
 
+            {/* Price Section */}
+            <Box sx={{ py: 2 }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 700, mb: 2, color: "#000" }}
+              >
+                Цена
+              </Typography>
+              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                 <Box
                   sx={{
-                    position: "relative",
-                    width: "100%",
-                    height: 200,
-                    mt: 2,
+                    border: "1px solid #E0E0E0",
+                    borderRadius: "8px",
+                    p: 1,
+                    flex: 1,
                   }}
                 >
-                  <Image
-                    src={item.image || "/placeholder.png"}
-                    alt={item.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 300px"
-                    style={{ objectFit: "contain" }}
-                  />
+                  <Typography sx={{ fontSize: "14px", color: "#999" }}>
+                    от
+                  </Typography>
+                  <Typography sx={{ fontSize: "14px", color: "#000" }}>
+                    499
+                  </Typography>
                 </Box>
+                <Box
+                  sx={{
+                    border: "1px solid #E0E0E0",
+                    borderRadius: "8px",
+                    p: 1,
+                    flex: 1,
+                  }}
+                >
+                  <Typography sx={{ fontSize: "14px", color: "#999" }}>
+                    до
+                  </Typography>
+                  <Typography sx={{ fontSize: "14px", color: "#000" }}>
+                    42{" "}
+                  </Typography>
+                </Box>
+                <Button>Click</Button>
+              </Box>
+            </Box>
+          </Box>{" "}
+          <Box
+            sx={{
+              display: "grid",
+              gap: 2,
+              gridTemplateColumns: {
+                xs: "1fr",
+                sm: "repeat(1, 1fr)",
+                md: "repeat(2, 1fr)",
+                lg: "repeat(3, 1fr)",
+                xl: "repeat(4, 1fr)",
+              },
+              width: "100%",
+            }}
+          >
+            {products?.results?.map((item: ProductType) => (
+              <Link
+                key={item.id}
+                href={`/${locale}/product/${item.id}`}
+                style={{ textDecoration: "none" }}
+              >
+                <Box
+                  sx={{
+                    width: "100%",
+                    maxWidth: "320px",
+                    margin: "0 auto",
+                    borderRadius: 3,
+                    p: 2,
+                    boxShadow: "0px 4px 20px rgba(0,0,0,0.08)",
+                    bgcolor: "#fff",
+                    display: "flex",
+                    minHeight: "420px",
+                    flexDirection: "column",
+                    position: "relative",
+                    transition: "transform 0.2s",
+                    "&:hover": { transform: "translateY(-5px)" },
+                  }}
+                >
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      sx={{
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: "8px",
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: item.is_in_stock ? "#3BB351" : "#FF5F5F",
+                        bgcolor: item.is_in_stock ? "#D6F2DB" : "#FFE4E4",
+                      }}
+                    >
+                      {item.is_in_stock
+                        ? locale === "ru"
+                          ? "В наличии"
+                          : "Mavjud"
+                        : locale === "ru"
+                          ? "По запросу"
+                          : "So'rov bo'yicha"}
+                    </Typography>
+                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                      <Image
+                        src="/scale.svg"
+                        width={20}
+                        height={20}
+                        alt="scale"
+                      />
+                      <FavoriteBorderIcon
+                        sx={{ fontSize: 20, color: "#4E4E4E" }}
+                      />
+                    </Box>
+                  </Box>
 
-                <Box sx={{ mt: 2, flexGrow: 1 }}>
-                  <Typography
+                  <Box
                     sx={{
-                      fontWeight: 600,
-                      fontSize: 16,
-                      color: "#4E4E4E",
-                      display: "-webkit-box",
-                      WebkitBoxOrient: "vertical",
-                      WebkitLineClamp: 2,
-                      overflow: "hidden",
+                      position: "relative",
+                      width: "100%",
+                      height: 200,
+                      mt: 2,
                     }}
                   >
-                    {item.title}
-                  </Typography>
-                  <Typography
-                    sx={{ fontWeight: 700, fontSize: 18, mt: 2, color: "#000" }}
+                    <Image
+                      src={item.image || "/placeholder.png"}
+                      alt={item.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 300px"
+                      style={{ objectFit: "contain" }}
+                    />
+                  </Box>
+
+                  <Box sx={{ mt: 2, flexGrow: 1 }}>
+                    <Typography
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: 16,
+                        color: "#4E4E4E",
+                        display: "-webkit-box",
+                        WebkitBoxOrient: "vertical",
+                        WebkitLineClamp: 2,
+                        overflow: "hidden",
+                      }}
+                    >
+                      {item.title}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: 18,
+                        mt: 2,
+                        color: "#000",
+                      }}
+                    >
+                      {new Intl.NumberFormat(
+                        locale === "ru" ? "ru-RU" : "uz-UZ",
+                      ).format(Number(item.price))}{" "}
+                      {locale === "ru" ? "сум" : "so'm"}
+                    </Typography>
+                  </Box>
+
+                  <Button
+                    sx={{
+                      bgcolor: "#249FFC",
+                      width: 50,
+                      height: 50,
+                      borderRadius: "50%",
+                      position: "absolute",
+                      bottom: 16,
+                      right: 16,
+                      minWidth: 0,
+                      "&:hover": { bgcolor: "#1a8ae5" },
+                    }}
                   >
-                    {new Intl.NumberFormat(
-                      locale === "ru" ? "ru-RU" : "uz-UZ",
-                    ).format(Number(item.price))}{" "}
-                    {locale === "ru" ? "сум" : "so'm"}
-                  </Typography>
+                    <Image
+                      src={
+                        item.is_in_stock
+                          ? "/basketIcon.svg"
+                          : "/call-outline_white.svg"
+                      }
+                      width={24}
+                      height={24}
+                      alt="action"
+                    />
+                  </Button>
                 </Box>
-
-                <Button
-                  sx={{
-                    bgcolor: "#249FFC",
-                    width: 50,
-                    height: 50,
-                    borderRadius: "50%",
-                    position: "absolute",
-                    bottom: 16,
-                    right: 16,
-                    minWidth: 0,
-                    "&:hover": { bgcolor: "#1a8ae5" },
-                  }}
-                >
-                  <Image
-                    src={
-                      item.is_in_stock
-                        ? "/basketIcon.svg"
-                        : "/call-outline_white.svg"
-                    }
-                    width={24}
-                    height={24}
-                    alt="action"
-                  />
-                </Button>
-              </Box>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </Box>
         </Box>
-
         <Box
           ref={ref}
           sx={{

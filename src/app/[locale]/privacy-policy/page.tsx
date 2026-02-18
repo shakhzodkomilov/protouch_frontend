@@ -16,7 +16,6 @@ import {
   Security,
   Description,
   ContactMail,
-  Shield,
   Assignment,
   Storage,
   Share,

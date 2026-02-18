@@ -16,7 +16,7 @@ const Brends = () => {
     { img: "/porurobotics.svg" },
     { img: "/vlinka.svg" },
     { img: "/iqonex.png" },
-    { img: "/HPBrand.jpg" },
+    { img: "/HPBrand.svg" },
     { img: "/Tenveo.jpg" },
     { img: "/minew.png" },
     { img: "/DellBrand.jpg" },
