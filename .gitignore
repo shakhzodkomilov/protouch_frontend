@@ -7,7 +7,7 @@
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
-!.yarn/releases
+!.yarn/releaseshttps://avatars.mds.yandex.net/get-altay/5487188/2a0000017fd512c299da26f10377cfac9920/L_height
 !.yarn/versions
 
 # testing
