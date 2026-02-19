@@ -1,9 +1,9 @@
 [phases.setup]
-nixPkgs = ["nodejs_20"]
+nixPkgs = ["nodejs_22"]  # Updated from nodejs_20
 
 [phases.install]
 cmds = ["npm ci"]
-cacheDirectories = ["node_modules/.cache"]
+# Removed cacheDirectories - don't cache node_modules/.cache during npm ci
 
 [phases.build]
 cmds = ["npm run build"]
