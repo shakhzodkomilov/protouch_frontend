@@ -1,16 +1,16 @@
 [phases.setup]
-nixPkgs = ["bun"]
+nixPkgs = ["nodejs_20"]
 
 [phases.install]
-cmds = ["bun install --frozen-lockfile"]
-cacheDirectories = [".next/cache", "node_modules/.cache"]
+cmds = ["npm ci"]
+cacheDirectories = ["node_modules/.cache"]
 
 [phases.build]
-cmds = ["bun run build"]
+cmds = ["npm run build"]
 cacheDirectories = [".next/cache"]
 
 [start]
-cmd = "bun run start"
+cmd = "npm run start"
 
 [variables]
 NODE_ENV = "production"
