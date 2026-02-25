@@ -183,6 +183,30 @@
       }
     }
   },
+  "newArrivals": {
+    "newArrivals": "Yangi mahsulotlar",
+    "bestSellers": "Eng ko'p sotilganlar",
+    "inStock": "Mavjud",
+    "outOfStock": "Mavjud emas",
+    "currency": "so'm",
+    "loading": "Yuklanmoqda...",
+    "addedToBasket": "Savatchaga qo'shildi!",
+    "favoriteAdded": "Sevimlilarga qo'shildi",
+    "favoriteRemoved": "Sevimlilardan o'chirildi",
+    "favoriteUpdated": "Sevimlilar yangilandi!"
+  },
+  "Recommend": {
+    "weRecommend": "Biz tavsiya etamiz",
+    "newArrivals": "Yangi mahsulotlar",
+    "bestSellers": "Eng ko'p sotilganlar",
+    "inStock": "Mavjud",
+    "outOfStock": "Mavjud emas",
+    "currency": "so'm",
+    "loading": "Yuklanmoqda...",
+    "addedToBasket": "Savatchaga qo'shildi!",
+    "favoriteAdded": "Sevimlilarga qo'shildi",
+    "favoriteRemoved": "Sevimlilardan o'chirildi"
+  },
   "About": {
     "heroTitle": "PROTOUCH — davlat va korporativ sektor uchun loyihalarni amalga oshirish tajribasiga ega kompaniya.",
 

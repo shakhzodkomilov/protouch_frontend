@@ -16,8 +16,8 @@ import Image from "next/image";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import DoneIcon from "@mui/icons-material/Done";
+import { useTranslations } from "next-intl";
 
-// Effector stores/events
 import {
   $newArrivals,
   $loadingArrivals,
@@ -40,6 +40,7 @@ interface ProductItem {
 
 const NewArrivals = () => {
   const { locale } = useParams();
+  const t = useTranslations("newArrivals");
 
   // Effector units
   const [arrivals, loading, loadArrivalsEv] = useUnit([
@@ -69,12 +70,13 @@ const NewArrivals = () => {
     hasMoved: false,
   });
 
+  // eslint-disable-next-line react-hooks/purity
   const getUniqueId = useMemo(() => Date.now(), []);
 
   useEffect(() => {
     loadArrivalsEv({ lang: (locale as string) || "ru" });
     loadFavoritesEv();
-  }, [loadArrivalsEv, loadFavoritesEv]);
+  }, [loadArrivalsEv, loadFavoritesEv, locale]);
 
   // Helpers
   const isItemInBasket = useCallback(
@@ -189,7 +191,7 @@ const NewArrivals = () => {
       behavior: "smooth",
     });
   };
-  console.log(arrivals);
+
   return (
     <Box sx={{ mt: "84px", userSelect: "none" }}>
       <Typography
@@ -200,7 +202,7 @@ const NewArrivals = () => {
           "@media (max-width: 900px)": { fontSize: "26px" },
         }}
       >
-        Новые поступления
+        {t("newArrivals")}
       </Typography>
 
       <Box sx={{ position: "relative", mt: "24px" }}>
@@ -210,9 +212,7 @@ const NewArrivals = () => {
           sx={{
             ...navBtnStyle,
             left: { xs: 8, md: -20 },
-            "@media (max-width:1000px)": {
-              display: "none",
-            },
+            "@media (max-width:1000px)": { display: "none" },
           }}
         >
           <Image src="/arrowleft.svg" width={28} height={28} alt="left" />
@@ -222,9 +222,7 @@ const NewArrivals = () => {
           sx={{
             ...navBtnStyle,
             right: { xs: 8, md: -20 },
-            "@media (max-width:1000px)": {
-              display: "none",
-            },
+            "@media (max-width:1000px)": { display: "none" },
           }}
         >
           <Image src="/arrowright.svg" width={28} height={28} alt="right" />
@@ -254,7 +252,7 @@ const NewArrivals = () => {
             },
           }}
         >
-          {loading && <Typography sx={{ p: 4 }}>Загрузка...</Typography>}
+          {loading && <Typography sx={{ p: 4 }}>{t("loading")}</Typography>}
 
           {arrivals?.results?.map((item: ProductItem) => {
             const inBasket = isItemInBasket(item.id);
@@ -273,7 +271,7 @@ const NewArrivals = () => {
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >
                     <Typography sx={statusBadgeStyle(item.is_in_stock)}>
-                      {item.is_in_stock ? "В наличии" : "Нет в наличии"}
+                      {item.is_in_stock ? t("inStock") : t("outOfStock")}
                     </Typography>
                     <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                       <Image
@@ -330,12 +328,11 @@ const NewArrivals = () => {
                         color: "#000",
                         fontWeight: 700,
                         fontSize: "20px",
-                        "@media (max-width:1000px)": {
-                          fontSize: "16px",
-                        },
+                        "@media (max-width:1000px)": { fontSize: "16px" },
                       }}
                     >
-                      {new Intl.NumberFormat("ru-RU").format(item.price)} сум
+                      {new Intl.NumberFormat("ru-RU").format(item.price)}{" "}
+                      {t("currency")}
                     </Typography>
                   </Box>
 
@@ -349,10 +346,6 @@ const NewArrivals = () => {
                       minWidth: { xs: "44px", md: "54px" },
                       "&:hover": {
                         bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
-                      },
-                      "& img": {
-                        width: { xs: "22px", md: "26px" },
-                        height: { xs: "22px", md: "26px" },
                       },
                     }}
                   >
@@ -393,7 +386,7 @@ const NewArrivals = () => {
           variant="filled"
           sx={{ borderRadius: "10px" }}
         >
-          Товар в корзине!
+          {t("addedToBasket")}
         </Alert>
       </Snackbar>
 
@@ -408,10 +401,7 @@ const NewArrivals = () => {
           variant="filled"
           sx={{ borderRadius: "10px" }}
         >
-          {lastActionType === "add"
-            ? "Добавлено в избранное"
-            : "Удалено из избранного"}
-          !
+          {lastActionType === "add" ? t("favoriteAdded") : t("favoriteRemoved")}
         </Alert>
       </Snackbar>
     </Box>

@@ -118,139 +118,20 @@ export default function CatalogPage(props: {
         </Typography>
         <Box sx={{ display: "flex" }}>
           {/* Sidebar Filter Box */}
-          <Box
-            sx={{
-              width: { xs: "100%", md: "300px" },
-              flexShrink: 0,
-              mr: { md: 4 },
-              display: { xs: "none", md: "flex" }, // Hide on mobile or make responsive
-              flexDirection: "column",
-              gap: 2,
-            }}
-          >
-            {/* Availability Section */}
-            <Box sx={{ borderBottom: "1px solid #eee", pb: 2 }}>
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  fontWeight: 700,
-                  mb: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  color: "#000",
-                }}
-              >
-                Наличие в магазинах
-                <Box
-                  component="span"
-                  sx={{ fontSize: "12px", transform: "rotate(0deg)" }}
-                >
-                  ▼
-                </Box>
-              </Typography>
-            </Box>
-            <Box sx={{ borderBottom: "1px solid #eee", pb: 2 }}></Box>
 
-            {/* Ratings and Badges */}
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-                py: 2,
-                borderBottom: "1px solid #eee",
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <input
-                  type="checkbox"
-                  style={{ width: "18px", height: "18px" }}
-                />
-                <Box>
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 0.5,
-                      color: "#000",
-                    }}
-                  >
-                    Надёжные модели <span style={{ color: "#999" }}>(436)</span>
-                    <span style={{ color: "#3BB351", fontSize: "14px" }}>
-                      ✔
-                    </span>
-                  </Typography>
-                  <Typography sx={{ fontSize: "12px", color: "#999" }}>
-                    минимум обращений в сервис
-                  </Typography>
-                </Box>
-              </Box>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <input
-                  type="checkbox"
-                  style={{ width: "18px", height: "18px" }}
-                />
-                <Typography sx={{ fontSize: "14px", color: "#000" }}>
-                  Есть обзор <span style={{ color: "#999" }}>(125)</span>
-                </Typography>
-              </Box>
-            </Box>
-
-            {/* Price Section */}
-            <Box sx={{ py: 2 }}>
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: 700, mb: 2, color: "#000" }}
-              >
-                Цена
-              </Typography>
-              <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                <Box
-                  sx={{
-                    border: "1px solid #E0E0E0",
-                    borderRadius: "8px",
-                    p: 1,
-                    flex: 1,
-                  }}
-                >
-                  <Typography sx={{ fontSize: "14px", color: "#999" }}>
-                    от
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px", color: "#000" }}>
-                    499
-                  </Typography>
-                </Box>
-                <Box
-                  sx={{
-                    border: "1px solid #E0E0E0",
-                    borderRadius: "8px",
-                    p: 1,
-                    flex: 1,
-                  }}
-                >
-                  <Typography sx={{ fontSize: "14px", color: "#999" }}>
-                    до
-                  </Typography>
-                  <Typography sx={{ fontSize: "14px", color: "#000" }}>
-                    42{" "}
-                  </Typography>
-                </Box>
-                <Button>Click</Button>
-              </Box>
-            </Box>
-          </Box>{" "}
           <Box
             sx={{
               display: "grid",
+              "@media (max-width:890px)": {
+                mt: 10,
+              },
               gap: 2,
               gridTemplateColumns: {
                 xs: "1fr",
-                sm: "repeat(1, 1fr)",
-                md: "repeat(2, 1fr)",
-                lg: "repeat(3, 1fr)",
-                xl: "repeat(4, 1fr)",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(3, 1fr)",
+                lg: "repeat(4, 1fr)",
+                xl: "repeat(5, 1fr)",
               },
               width: "100%",
             }}

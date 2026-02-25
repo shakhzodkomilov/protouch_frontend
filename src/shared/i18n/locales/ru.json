@@ -282,6 +282,30 @@
       ]
     }
   },
+  "newArrivals": {
+    "newArrivals": "Новые поступления",
+    "bestSellers": "Хиты продаж",
+    "inStock": "В наличии",
+    "outOfStock": "Нет в наличии",
+    "currency": "сум",
+    "loading": "Загрузка...",
+    "addedToBasket": "Товар в корзине!",
+    "favoriteAdded": "Добавлено в избранное",
+    "favoriteRemoved": "Удалено из избранного",
+    "favoriteUpdated": "Избранное обновлено!"
+  },
+  "Recommend": {
+    "weRecommend": "Мы рекомендуем",
+    "newArrivals": "Новые поступления",
+    "bestSellers": "Хиты продаж",
+    "inStock": "В наличии",
+    "outOfStock": "Нет в наличии",
+    "currency": "сум",
+    "loading": "Загрузка...",
+    "addedToBasket": "Товар в корзине!",
+    "favoriteAdded": "Добавлено в избранное",
+    "favoriteRemoved": "Удалено из избранного"
+  },
   "b2b": {
     "header": {
       "title": "Юридическим лицам — поставка интерактивного и офисного оборудования в Узбекистане",

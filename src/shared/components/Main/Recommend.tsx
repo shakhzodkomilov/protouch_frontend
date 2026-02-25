@@ -16,6 +16,7 @@ import Image from "next/image";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import DoneIcon from "@mui/icons-material/Done";
+import { useTranslations } from "next-intl";
 
 import {
   $Recommends,
@@ -39,7 +40,9 @@ interface ProductItem {
 
 export const Recommend = () => {
   const { locale } = useParams();
-  const [item, loading, loadRecommend] = useUnit([
+  const t = useTranslations("Recommend");
+
+  const [item, loading, loadRecommendEv] = useUnit([
     $Recommends,
     $loadingRecommend,
     loadRecommends,
@@ -56,6 +59,7 @@ export const Recommend = () => {
     null,
   );
 
+  // eslint-disable-next-line react-hooks/purity
   const getUniqueId = useMemo(() => Date.now(), []);
 
   // --- DRAG SCROLL LOGIC ---
@@ -68,9 +72,9 @@ export const Recommend = () => {
   });
 
   useEffect(() => {
-    loadRecommends({ lang: (locale as string) || "ru" });
+    loadRecommendEv({ lang: (locale as string) || "ru" });
     loadFavoritesEv();
-  }, [loadRecommend, loadFavoritesEv, locale]);
+  }, [loadRecommendEv, loadFavoritesEv, locale]);
 
   const isItemInBasket = useCallback(
     (productId: number | string) =>
@@ -130,7 +134,6 @@ export const Recommend = () => {
     }
   };
 
-  // --- ACTION HANDLERS ---
   const onFavoriteClick = useCallback(
     (e: React.MouseEvent, item: ProductItem) => {
       e.preventDefault();
@@ -185,27 +188,27 @@ export const Recommend = () => {
     });
   };
 
-  const formatPrice = useMemo(
-    () => (price: number) => new Intl.NumberFormat("ru-RU").format(price),
-    [],
-  );
-
   return (
     <Box sx={{ mt: "84px", userSelect: "none" }}>
-      <Typography sx={{ fontSize: "34px", fontWeight: 600, color: "#000" }}>
-        Мы рекомендуем
+      <Typography
+        sx={{
+          fontSize: "34px",
+          fontWeight: 600,
+          color: "#000",
+          "@media (max-width: 900px)": { fontSize: "26px" },
+        }}
+      >
+        {t("weRecommend")}
       </Typography>
 
-      {/* MAIN SECTION */}
       <Box sx={{ position: "relative", mt: "34px" }}>
+        {/* Navigation */}
         <IconButton
           onClick={() => scrollBtn("left")}
           sx={{
             ...navBtnStyle,
             left: { xs: 8, md: -20 },
-            "@media (max-width:1000px)": {
-              display: "none",
-            },
+            "@media (max-width:1000px)": { display: "none" },
           }}
         >
           <Image src="/arrowleft.svg" width={28} height={28} alt="left" />
@@ -215,9 +218,7 @@ export const Recommend = () => {
           sx={{
             ...navBtnStyle,
             right: { xs: 8, md: -20 },
-            "@media (max-width:1000px)": {
-              display: "none",
-            },
+            "@media (max-width:1000px)": { display: "none" },
           }}
         >
           <Image src="/arrowright.svg" width={28} height={28} alt="right" />
@@ -231,7 +232,7 @@ export const Recommend = () => {
           onMouseLeave={stopDragging}
           sx={scrollContainerStyle}
         >
-          {loading && <Typography>Загрузка...</Typography>}
+          {loading && <Typography>{t("loading")}</Typography>}
           {item?.results?.map((item: ProductItem) => {
             const inBasket = isItemInBasket(item.id);
             const isFavorite = isItemFavorite(item.id);
@@ -249,7 +250,7 @@ export const Recommend = () => {
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >
                     <Typography sx={statusBadgeStyle(item.is_in_stock)}>
-                      {item.is_in_stock ? "В наличии" : "Нет в наличии"}
+                      {item.is_in_stock ? t("inStock") : t("outOfStock")}
                     </Typography>
                     <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                       <Image
@@ -301,12 +302,11 @@ export const Recommend = () => {
                         color: "#000",
                         fontWeight: 700,
                         fontSize: "20px",
-                        "@media (max-width:1000px)": {
-                          fontSize: "16px",
-                        },
+                        "@media (max-width:1000px)": { fontSize: "16px" },
                       }}
                     >
-                      {formatPrice(item.price)} сум
+                      {new Intl.NumberFormat("ru-RU").format(item.price)}{" "}
+                      {t("currency")}
                     </Typography>
                   </Box>
                   <Button
@@ -317,13 +317,7 @@ export const Recommend = () => {
                       width: { xs: "44px", md: "54px" },
                       height: { xs: "44px", md: "54px" },
                       minWidth: { xs: "44px", md: "54px" },
-                      "&:hover": {
-                        bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
-                      },
-                      "& img": {
-                        width: { xs: "22px", md: "26px" },
-                        height: { xs: "22px", md: "26px" },
-                      },
+                      "&:hover": { bgcolor: inBasket ? "#2e8b40" : "#1a8ae5" },
                     }}
                   >
                     {inBasket ? (
@@ -363,7 +357,7 @@ export const Recommend = () => {
           variant="filled"
           sx={{ borderRadius: "10px" }}
         >
-          Товар в корзине!
+          {t("addedToBasket")}
         </Alert>
       </Snackbar>
       <Snackbar
@@ -377,13 +371,14 @@ export const Recommend = () => {
           variant="filled"
           sx={{ borderRadius: "10px" }}
         >
-          {lastActionType === "add" ? "Добавлено" : "Удалено"}!
+          {lastActionType === "add" ? t("favoriteAdded") : t("favoriteRemoved")}
         </Alert>
       </Snackbar>
     </Box>
   );
 };
 
+// ... Stillar o'zgarishsiz qoladi
 const navBtnStyle = {
   position: "absolute",
   top: "50%",
