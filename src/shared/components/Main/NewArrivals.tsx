@@ -8,7 +8,7 @@ import {
   Alert,
   Button,
 } from "@mui/material";
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useUnit } from "effector-react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
@@ -42,7 +42,6 @@ const NewArrivals = () => {
   const { locale } = useParams();
   const t = useTranslations("newArrivals");
 
-  // Effector units
   const [arrivals, loading, loadArrivalsEv] = useUnit([
     $newArrivals,
     $loadingArrivals,
@@ -54,14 +53,12 @@ const NewArrivals = () => {
   const handleToggleFavorite = useUnit(toggleFavorite);
   const loadFavoritesEv = useUnit(loadFavorites);
 
-  // UI States
   const [openBasketToast, setOpenBasketToast] = useState(false);
   const [openFavoriteToast, setOpenFavoriteToast] = useState(false);
   const [lastActionType, setLastActionType] = useState<"add" | "remove" | null>(
     null,
   );
 
-  // --- DRAG SCROLL LOGIC ---
   const scrollRef = useRef<HTMLDivElement>(null);
   const dragInfo = useRef({
     isDown: false,
@@ -70,15 +67,11 @@ const NewArrivals = () => {
     hasMoved: false,
   });
 
-  // eslint-disable-next-line react-hooks/purity
-  const getUniqueId = useMemo(() => Date.now(), []);
-
   useEffect(() => {
     loadArrivalsEv({ lang: (locale as string) || "ru" });
     loadFavoritesEv();
   }, [loadArrivalsEv, loadFavoritesEv, locale]);
 
-  // Helpers
   const isItemInBasket = useCallback(
     (productId: string | number) =>
       basketItems.some((item) => String(item.productId) === String(productId)),
@@ -95,12 +88,10 @@ const NewArrivals = () => {
   const handleMouseDown = (e: React.MouseEvent) => {
     const slider = scrollRef.current;
     if (!slider) return;
-
     dragInfo.current.isDown = true;
     dragInfo.current.hasMoved = false;
     dragInfo.current.startX = e.pageX - slider.offsetLeft;
     dragInfo.current.scrollLeft = slider.scrollLeft;
-
     slider.style.cursor = "grabbing";
     slider.style.scrollSnapType = "none";
   };
@@ -108,23 +99,16 @@ const NewArrivals = () => {
   const handleMouseMove = (e: React.MouseEvent) => {
     const slider = scrollRef.current;
     if (!slider || !dragInfo.current.isDown) return;
-
     e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
     const distance = x - dragInfo.current.startX;
-
-    if (Math.abs(distance) > 5) {
-      dragInfo.current.hasMoved = true;
-    }
-
-    const walk = distance * 1.5;
-    slider.scrollLeft = dragInfo.current.scrollLeft - walk;
+    if (Math.abs(distance) > 5) dragInfo.current.hasMoved = true;
+    slider.scrollLeft = dragInfo.current.scrollLeft - distance * 1.5;
   };
 
   const stopDragging = () => {
     const slider = scrollRef.current;
     if (!slider) return;
-
     dragInfo.current.isDown = false;
     slider.style.cursor = "grab";
     slider.style.scrollSnapType = "x mandatory";
@@ -137,7 +121,6 @@ const NewArrivals = () => {
     }
   };
 
-  // --- ACTION HANDLERS ---
   const onFavoriteClick = useCallback(
     (e: React.MouseEvent, item: ProductItem) => {
       e.preventDefault();
@@ -146,7 +129,7 @@ const NewArrivals = () => {
 
       const wasFavorite = isItemFavorite(item.id);
       handleToggleFavorite({
-        id: getUniqueId,
+        id: Number(new Date()),
         productId: item.id,
         title: item.short_description || "Product",
         image: item.image,
@@ -155,7 +138,7 @@ const NewArrivals = () => {
       setLastActionType(wasFavorite ? "remove" : "add");
       setOpenFavoriteToast(true);
     },
-    [getUniqueId, handleToggleFavorite, isItemFavorite],
+    [handleToggleFavorite, isItemFavorite],
   );
 
   const onBasketClick = useCallback(
@@ -196,17 +179,17 @@ const NewArrivals = () => {
     <Box sx={{ mt: "84px", userSelect: "none" }}>
       <Typography
         sx={{
-          fontSize: "34px",
+          fontSize: "32px",
           fontWeight: 600,
           color: "#000",
-          "@media (max-width: 900px)": { fontSize: "26px" },
+          "@media (max-width:900px)": { fontSize: "26px" },
         }}
       >
         {t("newArrivals")}
       </Typography>
 
-      <Box sx={{ position: "relative", mt: "24px" }}>
-        {/* Navigation Buttons */}
+      <Box sx={{ position: "relative", mt: "14px" }}>
+        {/* Nav Arrows */}
         <IconButton
           onClick={() => scrollBtn("left")}
           sx={{
@@ -240,141 +223,150 @@ const NewArrivals = () => {
             overflowX: "auto",
             py: 3,
             px: { xs: 2, md: 6 },
-            cursor: "grab",
             scrollSnapType: "x mandatory",
             WebkitOverflowScrolling: "touch",
             scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            cursor: "grab",
             "&::-webkit-scrollbar": { display: "none" },
             "& > a": {
               flexShrink: 0,
               scrollSnapAlign: "start",
+              userSelect: "none",
               WebkitUserDrag: "none",
             },
           }}
         >
-          {loading && <Typography sx={{ p: 4 }}>{t("loading")}</Typography>}
-
-          {arrivals?.results?.map((item: ProductItem) => {
-            const inBasket = isItemInBasket(item.id);
-            const isFavorite = isItemFavorite(item.id);
-
-            return (
-              <Link
-                key={item.id}
-                href={`/${locale}/product/${item.id}`}
-                style={{ textDecoration: "none" }}
-                onClickCapture={preventClickIfDragged}
-                onDragStart={(e) => e.preventDefault()}
-              >
-                <Box sx={cardStyle}>
-                  <Box
-                    sx={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <Typography sx={statusBadgeStyle(item.is_in_stock)}>
-                      {item.is_in_stock ? t("inStock") : t("outOfStock")}
-                    </Typography>
-                    <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                      <Image
-                        src="/scale.svg"
-                        height={24}
-                        width={24}
-                        alt="compare"
-                      />
-                      <IconButton
-                        size="small"
-                        onClick={(e) => onFavoriteClick(e, item)}
-                        sx={{
-                          p: 0.25,
-                          color: isFavorite ? "#ff4444" : "#4E4E4E",
-                        }}
+          {loading ? (
+            <Typography sx={{ p: 4 }}>{t("loading")}</Typography>
+          ) : (
+            arrivals?.results?.map((item: ProductItem) => {
+              const inBasket = isItemInBasket(item.id);
+              const isFavorite = isItemFavorite(item.id);
+              return (
+                <Link
+                  key={item.id}
+                  href={`/${locale}/product/${item.id}`}
+                  style={{ textDecoration: "none" }}
+                  onClickCapture={preventClickIfDragged}
+                  onDragStart={(e) => e.preventDefault()}
+                >
+                  <Box sx={cardStyle}>
+                    <Box
+                      sx={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <Typography sx={statusBadgeStyle(item.is_in_stock)}>
+                        {item.is_in_stock ? t("inStock") : t("outOfStock")}
+                      </Typography>
+                      <Box
+                        sx={{ display: "flex", gap: 1, alignItems: "center" }}
                       >
-                        {isFavorite ? (
-                          <FavoriteIcon />
-                        ) : (
-                          <FavoriteBorderOutlinedIcon />
-                        )}
-                      </IconButton>
+                        <Image
+                          src="/scale.svg"
+                          height={24}
+                          width={24}
+                          alt="compare"
+                        />
+                        <IconButton
+                          size="small"
+                          onClick={(e) => onFavoriteClick(e, item)}
+                          sx={{
+                            p: 0.25,
+                            color: isFavorite ? "#ff4444" : "#4E4E4E",
+                          }}
+                        >
+                          {isFavorite ? (
+                            <FavoriteIcon />
+                          ) : (
+                            <FavoriteBorderOutlinedIcon />
+                          )}
+                        </IconButton>
+                      </Box>
                     </Box>
-                  </Box>
 
-                  <Box
-                    sx={{
-                      position: "relative",
-                      width: "100%",
-                      height: "230px",
-                      my: 2,
-                      pointerEvents: "none",
-                      "@media (max-width:900px)": {
-                        height: "140px",
-                        width: "120px",
-                        margin: "0 auto",
-                      },
-                    }}
-                  >
-                    <Image
-                      src={item.image}
-                      alt="product"
-                      fill
-                      style={{ objectFit: "contain" }}
-                    />
-                  </Box>
-
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography sx={descriptionStyle}>
-                      {item.short_description}
-                    </Typography>
-                    <Typography
+                    <Box
                       sx={{
-                        color: "#000",
-                        fontWeight: 700,
-                        fontSize: "20px",
-                        "@media (max-width:1000px)": { fontSize: "16px" },
+                        position: "relative",
+                        width: "100%",
+                        height: "180px",
+                        my: 2,
+                        pointerEvents: "none",
+                        "@media (max-width:900px)": {
+                          height: "140px",
+                          width: "120px",
+                          margin: "0 auto",
+                        },
                       }}
                     >
-                      {new Intl.NumberFormat("ru-RU").format(item.price)}{" "}
-                      {t("currency")}
-                    </Typography>
-                  </Box>
-
-                  <Button
-                    onClick={(e) => onBasketClick(e, item)}
-                    sx={{
-                      ...actionBtnStyle,
-                      bgcolor: inBasket ? "#3BB351" : "#249FFC",
-                      width: { xs: "44px", md: "54px" },
-                      height: { xs: "44px", md: "54px" },
-                      minWidth: { xs: "44px", md: "54px" },
-                      "&:hover": {
-                        bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
-                      },
-                    }}
-                  >
-                    {inBasket ? (
-                      <DoneIcon
-                        sx={{ color: "#fff", fontSize: { xs: 24, md: 30 } }}
-                      />
-                    ) : (
                       <Image
-                        src={
-                          item.is_in_stock
-                            ? "/basketIcon.svg"
-                            : "/call-outline_white.svg"
-                        }
-                        alt="icon"
-                        width={26}
-                        height={26}
+                        src={item.image}
+                        alt="product"
+                        fill
                         style={{ objectFit: "contain" }}
                       />
-                    )}
-                  </Button>
-                </Box>
-              </Link>
-            );
-          })}
+                    </Box>
+
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography sx={descriptionStyle}>
+                        {item.short_description}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          color: "#000",
+                          fontWeight: 700,
+                          fontSize: "18px",
+                          "@media (max-width:1000px)": { fontSize: "16px" },
+                        }}
+                      >
+                        {new Intl.NumberFormat("ru-RU").format(item.price)}{" "}
+                        {t("currency")}
+                      </Typography>
+                    </Box>
+
+                    <Button
+                      onClick={(e) => onBasketClick(e, item)}
+                      sx={{
+                        ...actionBtnStyle,
+                        bgcolor: inBasket ? "#3BB351" : "#249FFC",
+                        width: { xs: "40px", md: "50px" },
+                        height: { xs: "44px", md: "50px" },
+                        minWidth: { xs: "44px", md: "54px" },
+                        "&:hover": {
+                          bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
+                        },
+                        "& img": {
+                          width: { xs: "22px", md: "26px" },
+                          height: { xs: "22px", md: "26px" },
+                        },
+                      }}
+                    >
+                      {inBasket ? (
+                        <DoneIcon
+                          sx={{ color: "#fff", fontSize: { xs: 24, md: 30 } }}
+                        />
+                      ) : (
+                        <Image
+                          src={
+                            item.is_in_stock
+                              ? "/basketIcon.svg"
+                              : "/call-outline_white.svg"
+                          }
+                          alt="icon"
+                          width={24}
+                          height={24}
+                          style={{ objectFit: "contain" }}
+                        />
+                      )}
+                    </Button>
+                  </Box>
+                </Link>
+              );
+            })
+          )}
         </Box>
       </Box>
 
-      {/* Snackbar Toasts */}
+      {/* Toasts */}
       <Snackbar
         open={openBasketToast}
         autoHideDuration={3000}
@@ -421,9 +413,10 @@ const navBtnStyle = {
   borderRadius: "50%",
   "&:hover": { bgcolor: "#f0f0f0" },
 };
+
 const cardStyle = {
   width: 300,
-  minHeight: "480px",
+  minHeight: "420px",
   borderRadius: 3,
   p: 2,
   boxShadow: "0px 4px 20px rgba(0,0,0,0.08)",

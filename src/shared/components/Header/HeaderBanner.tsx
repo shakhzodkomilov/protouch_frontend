@@ -24,6 +24,7 @@ const HeaderBanner = () => {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            px: 14,
           }}
         >
           <Button

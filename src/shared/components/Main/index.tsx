@@ -164,19 +164,18 @@ export default function HomeCategories() {
           "@media (max-width:900px)": { mt: 12 },
         }}
       >
-        {/* SIDEBAR - Tarjima qo'shildi */}
         <Box
           sx={{
             bgcolor: "#FFF7DA",
-            width: 400,
-            p: "24px 44px",
+            width: 360,
+            p: "20px 40px",
             borderRadius: "24px",
             display: { xs: "none", md: "flex" },
             flexDirection: "column",
             justifyContent: "space-between",
             color: "#000",
             flexShrink: 0,
-            height: "260px",
+            height: "240px",
           }}
         >
           <Box>
@@ -215,20 +214,19 @@ export default function HomeCategories() {
             </Button>
           </Box>
         </Box>
-
         {/* SLIDER */}
         <Box sx={{ position: "relative", flex: 1, overflow: "hidden" }}>
           <IconButton
             onClick={() => scrollBtn("left")}
             sx={{ ...navBtnStyle, left: 0 }}
           >
-            <Image src="/arrowleft.svg" width={32} height={32} alt="left" />
+            <Image src="/arrowleft.svg" width={30} height={30} alt="left" />
           </IconButton>
           <IconButton
             onClick={() => scrollBtn("right")}
             sx={{ ...navBtnStyle, right: 0 }}
           >
-            <Image src="/arrowright.svg" width={32} height={32} alt="right" />
+            <Image src="/arrowright.svg" width={30} height={30} alt="right" />
           </IconButton>
 
           <Box
@@ -254,8 +252,8 @@ export default function HomeCategories() {
                 key={i}
                 onClick={() => handleCategoryClick(item.url)}
                 sx={{
-                  width: { xs: "280px" },
-                  height: 260,
+                  width: { xs: "260px" },
+                  height: 240,
                   borderRadius: "24px",
                   background: item.bg,
                   p: 3,
@@ -300,8 +298,8 @@ export default function HomeCategories() {
                     position: "absolute",
                     right: 20,
                     bottom: 20,
-                    width: "55%",
-                    height: "55%",
+                    width: "47%",
+                    height: "47%",
                     objectFit: "contain",
                     zIndex: 2,
                     pointerEvents: "none",
@@ -331,7 +329,7 @@ const navBtnStyle = {
   zIndex: 10,
   bgcolor: "#fff",
   boxShadow: 3,
-  width: 44,
-  height: 44,
+  width: 38,
+  height: 38,
   "&:hover": { bgcolor: "#f5f5f5" },
 };

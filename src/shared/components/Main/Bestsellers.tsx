@@ -16,15 +16,7 @@ import Image from "next/image";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import DoneIcon from "@mui/icons-material/Done";
-
-interface ProductItem {
-  id: number | string;
-  description?: string;
-  short_description?: string;
-  image: string;
-  price: number;
-  is_in_stock: boolean;
-}
+import { useTranslations } from "next-intl";
 
 import {
   $bestSellers,
@@ -37,11 +29,20 @@ import {
   loadFavorites,
   $favorites,
 } from "../../../entities/favourite/model/store";
-import { useTranslations } from "next-intl";
+
+interface ProductItem {
+  id: number | string;
+  description?: string;
+  short_description?: string;
+  image: string;
+  price: number;
+  is_in_stock: boolean;
+}
 
 const BestSellers = () => {
   const { locale } = useParams();
-  const t = useTranslations("main");
+  const t = useTranslations("newArrivals");
+
   const [items, loading, loadSellersEv] = useUnit([
     $bestSellers,
     $loadingSellers,
@@ -55,7 +56,9 @@ const BestSellers = () => {
 
   const [openToast, setOpenToast] = useState(false);
   const [favoriteToast, setFavoriteToast] = useState(false);
-  const [lastToggledId, setLastToggledId] = useState<number | string>(0);
+  const [lastActionType, setLastActionType] = useState<"add" | "remove" | null>(
+    null,
+  );
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const dragInfo = useRef({
@@ -67,23 +70,18 @@ const BestSellers = () => {
 
   useEffect(() => {
     loadSellersEv({ lang: (locale as string) || "ru" });
-  }, [loadSellersEv, locale]);
+    loadFavoritesEv();
+  }, [loadSellersEv, loadFavoritesEv, locale]);
 
   const isItemInBasket = useCallback(
-    (productId: number | string) => {
-      return basketItems.some(
-        (item) => String(item.productId) === String(productId),
-      );
-    },
+    (productId: number | string) =>
+      basketItems.some((item) => String(item.productId) === String(productId)),
     [basketItems],
   );
 
   const isItemFavorite = useCallback(
-    (productId: number | string) => {
-      return favorites.some(
-        (item) => String(item.productId) === String(productId),
-      );
-    },
+    (productId: number | string) =>
+      favorites.some((item) => String(item.productId) === String(productId)),
     [favorites],
   );
 
@@ -91,12 +89,10 @@ const BestSellers = () => {
   const handleMouseDown = (e: React.MouseEvent) => {
     const slider = scrollRef.current;
     if (!slider) return;
-
     dragInfo.current.isDown = true;
     dragInfo.current.hasMoved = false;
     dragInfo.current.startX = e.pageX - slider.offsetLeft;
     dragInfo.current.scrollLeft = slider.scrollLeft;
-
     slider.style.cursor = "grabbing";
     slider.style.scrollSnapType = "none";
   };
@@ -104,23 +100,16 @@ const BestSellers = () => {
   const handleMouseMove = (e: React.MouseEvent) => {
     const slider = scrollRef.current;
     if (!slider || !dragInfo.current.isDown) return;
-
     e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
     const distance = x - dragInfo.current.startX;
-
-    if (Math.abs(distance) > 5) {
-      dragInfo.current.hasMoved = true;
-    }
-
-    const walk = distance * 1.5;
-    slider.scrollLeft = dragInfo.current.scrollLeft - walk;
+    if (Math.abs(distance) > 5) dragInfo.current.hasMoved = true;
+    slider.scrollLeft = dragInfo.current.scrollLeft - distance * 1.5;
   };
 
   const stopDragging = () => {
     const slider = scrollRef.current;
     if (!slider) return;
-
     dragInfo.current.isDown = false;
     slider.style.cursor = "grab";
     slider.style.scrollSnapType = "x mandatory";
@@ -133,50 +122,56 @@ const BestSellers = () => {
     }
   };
 
-  const onFavoriteClick = (e: React.MouseEvent, item: ProductItem) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (dragInfo.current.hasMoved) return;
+  const onFavoriteClick = useCallback(
+    (e: React.MouseEvent, item: ProductItem) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (dragInfo.current.hasMoved) return;
 
-    setLastToggledId(item.id);
-    handleToggleFavorite({
-      id: Number(new Date()),
-      productId: item.id,
-      title: item.description || "Product",
-      image: item.image,
-      price: item.price,
-    });
-    setFavoriteToast(true);
-  };
-
-  const onBasketClick = (e: React.MouseEvent, item: ProductItem) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (dragInfo.current.hasMoved) return;
-
-    if (item.is_in_stock) {
-      const numericId =
-        typeof item.id === "string" ? parseInt(item.id, 10) : item.id;
-      handleAddToBasket({
-        id: numericId,
-        productId: numericId,
-        title: item.short_description,
-        price: item.price,
+      const wasFavorite = isItemFavorite(item.id);
+      handleToggleFavorite({
+        id: Number(new Date()),
+        productId: item.id,
+        title: item.description || "Product",
         image: item.image,
-        quantity: 1,
-        isInStock: item.is_in_stock,
+        price: item.price,
       });
-      setOpenToast(true);
-    } else {
-      window.location.href = `tel:+998000000000`;
-    }
-  };
+      setLastActionType(wasFavorite ? "remove" : "add");
+      setFavoriteToast(true);
+    },
+    [handleToggleFavorite, isItemFavorite],
+  );
+
+  const onBasketClick = useCallback(
+    (e: React.MouseEvent, item: ProductItem) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (dragInfo.current.hasMoved) return;
+
+      if (item.is_in_stock) {
+        const numericId =
+          typeof item.id === "string" ? parseInt(item.id, 10) : item.id;
+        handleAddToBasket({
+          id: numericId,
+          productId: numericId,
+          title: item.short_description,
+          price: item.price,
+          image: item.image,
+          quantity: 1,
+          isInStock: item.is_in_stock,
+        });
+        setOpenToast(true);
+      } else {
+        window.location.href = `tel:+998000000000`;
+      }
+    },
+    [handleAddToBasket],
+  );
 
   const scrollBtn = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
-    const scrollAmount = 300;
     scrollRef.current.scrollBy({
-      left: dir === "left" ? -scrollAmount : scrollAmount,
+      left: dir === "left" ? -300 : 300,
       behavior: "smooth",
     });
   };
@@ -185,16 +180,15 @@ const BestSellers = () => {
     <Box sx={{ mt: "84px", userSelect: "none" }}>
       <Typography
         sx={{
-          fontSize: "34px",
+          fontSize: "32px",
           fontWeight: 600,
           color: "#000",
-          "@media (max-width:900px)": {
-            fontSize: "26px",
-          },
+          "@media (max-width:900px)": { fontSize: "26px" },
         }}
       >
         {t("bestSellers")}
       </Typography>
+
       <Box sx={{ position: "relative", mt: "14px" }}>
         {/* Nav Arrows */}
         <IconButton
@@ -202,26 +196,17 @@ const BestSellers = () => {
           sx={{
             ...navBtnStyle,
             left: { xs: 8, md: -20 },
-            width: 40,
-            height: 40,
-            "@media (max-width:1000px)": {
-              display: "none",
-            },
+            "@media (max-width:1000px)": { display: "none" },
           }}
         >
           <Image src="/arrowleft.svg" width={28} height={28} alt="left" />
         </IconButton>
-
         <IconButton
           onClick={() => scrollBtn("right")}
           sx={{
             ...navBtnStyle,
             right: { xs: 8, md: -20 },
-            width: 40,
-            height: 40,
-            "@media (max-width:1000px)": {
-              display: "none",
-            },
+            "@media (max-width:1000px)": { display: "none" },
           }}
         >
           <Image src="/arrowright.svg" width={28} height={28} alt="right" />
@@ -254,7 +239,7 @@ const BestSellers = () => {
           }}
         >
           {loading ? (
-            <Typography>Загрузка...</Typography>
+            <Typography sx={{ p: 4 }}>{t("loading")}</Typography>
           ) : (
             items?.results?.map((item) => {
               const inBasket = isItemInBasket(item.id);
@@ -272,7 +257,7 @@ const BestSellers = () => {
                       sx={{ display: "flex", justifyContent: "space-between" }}
                     >
                       <Typography sx={statusBadgeStyle(item.is_in_stock)}>
-                        {item.is_in_stock ? "В наличии" : "Нет в наличии"}
+                        {item.is_in_stock ? t("inStock") : t("outOfStock")}
                       </Typography>
                       <Box
                         sx={{ display: "flex", gap: 1, alignItems: "center" }}
@@ -304,8 +289,8 @@ const BestSellers = () => {
                       sx={{
                         position: "relative",
                         width: "100%",
-                        height: "230px",
-                        my: 2,
+                        height: "180px",
+                        my: 1,
                         pointerEvents: "none",
                         "@media (max-width:900px)": {
                           height: "140px",
@@ -330,14 +315,12 @@ const BestSellers = () => {
                         sx={{
                           color: "#000",
                           fontWeight: 700,
-                          fontSize: "20px",
-                          "@media (max-width:1000px)": {
-                            fontSize: "16px",
-                          },
+                          fontSize: "18px",
+                          "@media (max-width:1000px)": { fontSize: "16px" },
                         }}
                       >
                         {new Intl.NumberFormat("ru-RU").format(item.price)}{" "}
-                        {t("summary")}
+                        {t("currency")}
                       </Typography>
                     </Box>
 
@@ -346,8 +329,8 @@ const BestSellers = () => {
                       sx={{
                         ...actionBtnStyle,
                         bgcolor: inBasket ? "#3BB351" : "#249FFC",
-                        width: { xs: "44px", md: "54px" },
-                        height: { xs: "44px", md: "54px" },
+                        width: { xs: "40px", md: "50px" },
+                        height: { xs: "44px", md: "50px" },
                         minWidth: { xs: "44px", md: "54px" },
                         "&:hover": {
                           bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
@@ -370,8 +353,8 @@ const BestSellers = () => {
                               : "/call-outline_white.svg"
                           }
                           alt="icon"
-                          width={26}
-                          height={26}
+                          width={24}
+                          height={24}
                           style={{ objectFit: "contain" }}
                         />
                       )}
@@ -396,7 +379,7 @@ const BestSellers = () => {
           variant="filled"
           sx={{ borderRadius: "10px" }}
         >
-          Товар в корзине!
+          {t("addedToBasket")}
         </Alert>
       </Snackbar>
 
@@ -406,21 +389,26 @@ const BestSellers = () => {
         onClose={() => setFavoriteToast(false)}
         anchorOrigin={{ vertical: "top", horizontal: "left" }}
       >
-        <Alert severity="info" variant="filled" sx={{ borderRadius: "10px" }}>
-          Избранное обновлено!
+        <Alert
+          severity={lastActionType === "add" ? "success" : "info"}
+          variant="filled"
+          sx={{ borderRadius: "10px" }}
+        >
+          {lastActionType === "add" ? t("favoriteAdded") : t("favoriteRemoved")}
         </Alert>
       </Snackbar>
     </Box>
   );
 };
 
+// --- STYLES ---
 const navBtnStyle = {
   position: "absolute",
   top: "50%",
   transform: "translateY(-50%)",
   zIndex: 20,
-  width: 50,
-  height: 50,
+  width: 40,
+  height: 40,
   bgcolor: "#fff",
   boxShadow: 3,
   borderRadius: "50%",
@@ -429,7 +417,7 @@ const navBtnStyle = {
 
 const cardStyle = {
   width: 300,
-  minHeight: "480px",
+  minHeight: "400px",
   borderRadius: 3,
   p: 2,
   boxShadow: "0px 4px 20px rgba(0,0,0,0.08)",
@@ -448,6 +436,7 @@ const statusBadgeStyle = (isInStock: boolean) => ({
   padding: "4px 12px",
   borderRadius: "8px",
   fontSize: "14px",
+  fontWeight: 500,
   color: isInStock ? "#3BB351" : "#FF5F5F",
   bgcolor: isInStock ? "#D6F2DB" : "#FFE4E4",
 });

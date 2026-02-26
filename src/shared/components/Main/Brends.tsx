@@ -101,7 +101,7 @@ const Brends = () => {
     <Box sx={{ mt: "44px" }}>
       <Typography
         sx={{
-          fontSize: "34px",
+          fontSize: "32px",
           fontWeight: 600,
           color: "#000",
           "@media (max-width:900px)": {
@@ -109,56 +109,53 @@ const Brends = () => {
           },
         }}
       >
-        {t("brands")} {/* "Бренды" o'rniga tarjima funksiyasi */}
+        {t("brands")}
       </Typography>
 
       <Box sx={{ position: "relative", mt: "14px" }}>
-        {/* CHAP TUGMA */}
         <IconButton
           onClick={() => scrollBtn("left")}
           sx={{
             position: "absolute",
             left: -20,
-            top: "50%", // Markazlashtirish to'g'rilandi
+            top: "55%",
             transform: "translateY(-50%)",
             zIndex: 10,
             bgcolor: "#fff",
             boxShadow: 2,
-            width: 40,
-            height: 40,
+            width: 38,
+            height: 38,
             display: { xs: "none", md: "flex" },
             "&:hover": { bgcolor: "#f5f5f5" },
           }}
         >
-          <Image src="/arrowleft.svg" width={32} height={32} alt="arrow left" />
+          <Image src="/arrowleft.svg" width={30} height={30} alt="arrow left" />
         </IconButton>
 
-        {/* O'NG TUGMA */}
         <IconButton
           onClick={() => scrollBtn("right")}
           sx={{
             position: "absolute",
             right: -20,
-            top: "50%", // Markazlashtirish to'g'rilandi
+            top: "55%",
             transform: "translateY(-50%)",
             zIndex: 10,
             bgcolor: "#fff",
             boxShadow: 2,
-            width: 40,
-            height: 40,
+            width: 38,
+            height: 38,
             display: { xs: "none", md: "flex" },
             "&:hover": { bgcolor: "#f5f5f5" },
           }}
         >
           <Image
             src="/arrowright.svg"
-            width={32}
-            height={32}
+            width={30}
+            height={30}
             alt="arrow right"
           />
         </IconButton>
 
-        {/* SCROLL KONTEYNERI */}
         <Box
           ref={scrollRef}
           onMouseDown={handleMouseDown}
@@ -184,8 +181,8 @@ const Brends = () => {
             <Box
               key={i}
               sx={{
-                minWidth: "280px",
-                width: "280px",
+                minWidth: "240px",
+                width: "240px",
                 height: "100px",
                 borderRadius: "18px",
                 border: "1px solid #DDDDDD",
@@ -200,7 +197,7 @@ const Brends = () => {
               <Image
                 src={item.img}
                 alt="brand"
-                width={190}
+                width={150}
                 height={60}
                 style={{ objectFit: "contain", pointerEvents: "none" }}
               />

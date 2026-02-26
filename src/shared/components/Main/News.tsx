@@ -413,7 +413,7 @@ Qisqacha biriktiring: tajriba, shahar, kontaktlar (va dizaynerlar uchun — port
     <Box sx={{ mt: "50px" }}>
       <Typography
         sx={{
-          fontSize: "34px",
+          fontSize: "32px",
           fontWeight: 600,
           color: "#000",
           "@media (max-width: 900px)": { fontSize: "26px" },
@@ -463,8 +463,8 @@ Qisqacha biriktiring: tajriba, shahar, kontaktlar (va dizaynerlar uchun — port
               key={i}
               onClick={() => item.modalContent && setOpenModal(i)}
               sx={{
-                width: 300,
-                height: 250,
+                width: 280,
+                height: 230,
                 borderRadius: "16px",
                 p: 2,
                 background: `linear-gradient(90deg, ${item.linearColor1} 0%, ${item.linearColor2} 100%)`,
