@@ -1,6 +1,8 @@
 import { Box, Container, Button } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 const HeaderBanner = () => {
+  const router = useRouter();
   return (
     <Box
       sx={{
@@ -28,6 +30,7 @@ const HeaderBanner = () => {
           }}
         >
           <Button
+            onClick={() => router.push(`/checkout/`)}
             sx={{
               borderRadius: "14px",
               padding: "8px 18px",
@@ -56,6 +59,7 @@ const HeaderBanner = () => {
           </Button>
 
           <Button
+            onClick={() => router.push(`/checkout/`)}
             sx={{
               borderRadius: "14px",
               padding: "8px 18px",

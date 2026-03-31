@@ -26,7 +26,7 @@ const Footer = () => {
     linkedin: "https://www.linkedin.com/company/protouch-uz",
     instagram:
       "https://www.instagram.com/protouchuz?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
-    telegram: "https://t.me/ProtouchMarket",
+    telegram: "https://t.me/ProTouchUz",
     facebook: "https://facebook.com/your-company",
   };
 

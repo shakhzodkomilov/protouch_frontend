@@ -69,9 +69,8 @@ const Banners = () => {
   };
 
   return (
-    <Box sx={{ mt: "50px", userSelect: "none" }}>
+    <Box sx={{ mt: "50px", mb: "90px", userSelect: "none" }}>
       <Box sx={{ position: "relative", mt: 3 }}>
-        
         {/* LEFT ARROW */}
         <IconButton
           onClick={() => scroll("left")}
@@ -93,7 +92,12 @@ const Banners = () => {
             "@media (max-width:900px)": { display: "none" },
           }}
         >
-          <Image src="/arrowright.svg" width={32} height={32} alt="arrow right" />
+          <Image
+            src="/arrowright.svg"
+            width={32}
+            height={32}
+            alt="arrow right"
+          />
         </IconButton>
 
         {/* SCROLL CONTAINER */}
@@ -136,10 +140,10 @@ const Banners = () => {
                 fill
                 alt={`Banner ${i + 1}`}
                 onDragStart={(e) => e.preventDefault()}
-                style={{ 
-                  objectFit: "cover", 
+                style={{
+                  objectFit: "cover",
                   borderRadius: "16px",
-                  pointerEvents: "none" // Drag paytida rasm ajralib chiqmasligi uchun
+                  pointerEvents: "none", // Drag paytida rasm ajralib chiqmasligi uchun
                 }}
               />
             </Box>

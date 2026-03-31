@@ -104,6 +104,20 @@ export const getRecommendsFx = createEffect<{ lang?: string }, PaginationType>(
   },
 );
 
+//Steam and podcast
+export const getStearmAndPodcast = createEffect<
+  { lang?: string },
+  PaginationType
+>(async ({ lang }) => {
+  const { data } = await axios.get(
+    `${API_URL}/api/v1/products/?slug=studio-audio-equipment/stream-and-podcast`,
+    {
+      params: { is_new: true, lang: lang || "ru" },
+    },
+  );
+  return data;
+});
+
 export const getProductsByCategoryFx = createEffect<
   { slugs?: string; page: number; lang?: string },
   PaginationType

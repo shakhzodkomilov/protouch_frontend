@@ -129,7 +129,7 @@ const Navbar = () => {
         >
           <MuiLink href="tel:+998977782347" underline="none" sx={contactStyle}>
             <Image src="/call-outline.svg" alt="call" width={18} height={18} />
-            +998 97 778 23 47
+            +998 78 333 10 70
           </MuiLink>
 
           <MuiLink href="tel:+998951700571" underline="none" sx={contactStyle}>

@@ -50,7 +50,7 @@
     "collapse": "Yig‘ish",
     "inStock": "Mavjud",
     "notAvailable": "Talab bo'yicha",
-
+    "buyNow": "Hozir sotib olish",
     "breadcrumbs": {
       "home": "Bosh sahifa"
     },
@@ -197,6 +197,8 @@
   },
   "Recommend": {
     "weRecommend": "Biz tavsiya etamiz",
+    "noProducts": "Ko'rsatish uchun mahsulotlar mavjud emas",
+    "steamAndPodcast": "Strim va podkastlar",
     "newArrivals": "Yangi mahsulotlar",
     "bestSellers": "Eng ko'p sotilganlar",
     "inStock": "Mavjud",
@@ -745,5 +747,15 @@
       "title": "Diagnostika muddatlari",
       "desc": "Uskunaning turiga bog'liq. Natija va ta'mirlash narxini tekshiruvdan so'ng darhol ma'lum qilamiz."
     }
+  },
+  "checkout": {
+    "title": "Xaridor ma'lumotlari",
+    "name": "Ism",
+    "phone": "Telefon raqami:",
+    "address": "Manzil",
+    "confirm": "Tasdiqlash",
+    "errorPhone": "Iltimos, telefon raqamingizni to'liq kiriting (+998XXXXXXXXX)",
+    "errorGeneral": "Xatolik yuz berdi",
+    "success": "Ma'lumotlar qabul qilindi"
   }
 }

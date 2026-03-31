@@ -30,6 +30,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import DoneIcon from "@mui/icons-material/Done";
+import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 import Accessories from "../../../../shared/components/Accessories/Accessories";
 import { $basket, addToBasket } from "../../../../entities/basket/model/store";
 import {
@@ -108,6 +109,23 @@ export default function ProductDetailPage() {
         isInStock: product.is_in_stock,
       });
       setOpenToast(true);
+    }
+  };
+
+  // Add to basket then navigate to checkout
+  const onCheckoutClick = () => {
+    if (!product) return;
+    if (product.is_in_stock) {
+      handleAddToBasket({
+        id: Number(product.id),
+        productId: Number(product.id),
+        title: product.title || "Product",
+        price: product.price,
+        image: product.images?.[0]?.url || "/placeholder.jpg",
+        quantity: 1,
+        isInStock: product.is_in_stock,
+      });
+      router.push(`/${locale}/checkout/`);
     }
   };
 
@@ -338,6 +356,7 @@ export default function ProductDetailPage() {
                 </Button>
               </Box>
 
+              {/* ADD TO CART */}
               <Button
                 fullWidth
                 onClick={onBasketClick}
@@ -367,6 +386,29 @@ export default function ProductDetailPage() {
                 {inBasket ? t("actions.added") : t("actions.addToCart")}
               </Button>
 
+              {/* CHECKOUT — adds product & goes to checkout page */}
+              <Button
+                fullWidth
+                onClick={onCheckoutClick}
+                disabled={!product.is_in_stock}
+                sx={{
+                  bgcolor: "#FF8C00",
+                  color: "#fff",
+                  py: 1.5,
+                  borderRadius: 3,
+                  fontSize: 16,
+                  mb: 2,
+                  display: "flex",
+                  gap: 1,
+                  textTransform: "none",
+                  "&:hover": { bgcolor: "#e07b00" },
+                  "&.Mui-disabled": { bgcolor: "#f5c07a", color: "#fff" },
+                }}
+              >
+                <ShoppingCartCheckoutIcon />
+                {t("buyNow") ?? "Купить сейчас"}
+              </Button>
+
               <Button
                 fullWidth
                 onClick={() => router.push(`/${locale}/legalentity/`)}
@@ -376,7 +418,6 @@ export default function ProductDetailPage() {
                   py: 1.5,
                   borderRadius: 3,
                   textTransform: "none",
-
                   "&:hover": { bgcolor: "#1FA754" },
                 }}
               >

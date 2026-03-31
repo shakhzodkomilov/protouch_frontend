@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useUnit } from "effector-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -33,15 +33,16 @@ import {
 export default function BasketPage() {
   const { locale } = useParams();
   const t = useTranslations("basket");
+  const router = useRouter();
   const { items, totalCount, totalPrice } = useUnit($basket);
   const loading = useUnit($basketLoading);
-  console.log(items);
   const loadBasketEv = useUnit(loadBasket);
   const updateBasketQty = useUnit(updateQuantity);
   const removeBasketItem = useUnit(removeFromBasket);
   const [mounted, setMounted] = useState(false);
   console.log(`"Basket products" ${items}`);
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     loadBasketEv();
   }, [loadBasketEv]);
@@ -384,6 +385,7 @@ export default function BasketPage() {
                 <Button
                   fullWidth
                   variant="contained"
+                  onClick={() => router.push("/checkout")}
                   sx={{
                     py: 1.5,
                     borderRadius: "10px",

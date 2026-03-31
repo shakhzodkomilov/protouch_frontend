@@ -69,29 +69,21 @@ type Props = {
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
   const messages = await getMessages({ locale });
-  const googleId = process.env.NEXT_PUBLIC_CLIENT_ID;
+  const googleId =
+    process.env.NEXT_PUBLIC_CLIENT_ID ?? process.env.VITE_CLIENT_ID;
 
-  return (
-    <html lang={locale}>
-      <body>
-        {googleId ? (
-          <GoogleOAuthProvider clientId={googleId}>
-            <NextIntlClientProvider locale={locale} messages={messages}>
-              <Header />
-              <main>{children}</main>
-              <Footer />
-              <MobileBottomNav />
-            </NextIntlClientProvider>
-          </GoogleOAuthProvider>
-        ) : (
-          <NextIntlClientProvider locale={locale} messages={messages}>
-            <Header />
-            <main>{children}</main>
-            <Footer />
-            <MobileBottomNav />
-          </NextIntlClientProvider>
-        )}
-      </body>
-    </html>
+  const layoutContent = (
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <Header />
+      <main>{children}</main>
+      <Footer />
+      <MobileBottomNav />
+    </NextIntlClientProvider>
+  );
+
+  return googleId ? (
+    <GoogleOAuthProvider clientId={googleId}>{layoutContent}</GoogleOAuthProvider>
+  ) : (
+    layoutContent
   );
 }

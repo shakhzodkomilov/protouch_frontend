@@ -22,6 +22,9 @@ import {
   $Recommends,
   $loadingRecommend,
   loadRecommends,
+  $steamAndPodcast,
+  $loadingSteamAndPodcast,
+  loadSteamAndPodcast,
 } from "../../../entities/product/model";
 import { addToBasket, $basket } from "../../../entities/basket/model/store";
 import {
@@ -38,27 +41,31 @@ interface ProductItem {
   is_in_stock: boolean;
 }
 
-export const Recommend = () => {
-  const { locale } = useParams();
-  const t = useTranslations("Recommend");
+// ─── Reusable Product Scroll Section ─────────────────────────────────────────
 
-  const [item, loading, loadRecommendEv] = useUnit([
-    $Recommends,
-    $loadingRecommend,
-    loadRecommends,
-  ]);
-  const { items: basketItems } = useUnit($basket);
-  const favorites = useUnit($favorites);
-  const handleAddToBasket = useUnit(addToBasket);
-  const handleToggleFavorite = useUnit(toggleFavorite);
-  const loadFavoritesEv = useUnit(loadFavorites);
+interface ProductSectionProps {
+  title: string;
+  items: ProductItem[] | undefined;
+  loading: boolean;
+  locale: string | string[];
+  isItemInBasket: (id: number | string) => boolean;
+  isItemFavorite: (id: number | string) => boolean;
+  onBasketClick: (e: React.MouseEvent, item: ProductItem) => void;
+  onFavoriteClick: (e: React.MouseEvent, item: ProductItem) => void;
+  t: ReturnType<typeof useTranslations>;
+}
 
-  const [openBasketToast, setOpenBasketToast] = useState(false);
-  const [openFavoriteToast, setOpenFavoriteToast] = useState(false);
-  const [lastActionType, setLastActionType] = useState<"add" | "remove" | null>(
-    null,
-  );
-
+const ProductSection = ({
+  title,
+  items,
+  loading,
+  locale,
+  isItemInBasket,
+  isItemFavorite,
+  onBasketClick,
+  onFavoriteClick,
+  t,
+}: ProductSectionProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const dragInfo = useRef({
     isDown: false,
@@ -67,31 +74,15 @@ export const Recommend = () => {
     hasMoved: false,
   });
 
-  useEffect(() => {
-    loadRecommendEv({ lang: (locale as string) || "ru" });
-    loadFavoritesEv();
-  }, [loadRecommendEv, loadFavoritesEv, locale]);
-
-  const isItemInBasket = useCallback(
-    (productId: number | string) =>
-      basketItems.some((item) => String(item.productId) === String(productId)),
-    [basketItems],
-  );
-
-  const isItemFavorite = useCallback(
-    (productId: number | string) =>
-      favorites.some((item) => String(item.productId) === String(productId)),
-    [favorites],
-  );
-
-  // --- DRAG HANDLERS ---
   const handleMouseDown = (e: React.MouseEvent) => {
     const slider = scrollRef.current;
     if (!slider) return;
-    dragInfo.current.isDown = true;
-    dragInfo.current.hasMoved = false;
-    dragInfo.current.startX = e.pageX - slider.offsetLeft;
-    dragInfo.current.scrollLeft = slider.scrollLeft;
+    dragInfo.current = {
+      isDown: true,
+      hasMoved: false,
+      startX: e.pageX - slider.offsetLeft,
+      scrollLeft: slider.scrollLeft,
+    };
     slider.style.cursor = "grabbing";
     slider.style.scrollSnapType = "none";
   };
@@ -121,52 +112,6 @@ export const Recommend = () => {
     }
   };
 
-  const onFavoriteClick = useCallback(
-    (e: React.MouseEvent, item: ProductItem) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (dragInfo.current.hasMoved) return;
-
-      const wasFavorite = isItemFavorite(item.id);
-      handleToggleFavorite({
-        id: Number(new Date()),
-        productId: item.id,
-        title: item.short_description || "Product",
-        image: item.image,
-        price: item.price,
-      });
-      setLastActionType(wasFavorite ? "remove" : "add");
-      setOpenFavoriteToast(true);
-    },
-    [handleToggleFavorite, isItemFavorite],
-  );
-
-  const onBasketClick = useCallback(
-    (e: React.MouseEvent, item: ProductItem) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (dragInfo.current.hasMoved) return;
-
-      if (item.is_in_stock) {
-        const numericId =
-          typeof item.id === "string" ? parseInt(item.id, 10) : item.id;
-        handleAddToBasket({
-          id: numericId,
-          productId: numericId,
-          title: item.short_description || "Product",
-          price: item.price,
-          image: item.image,
-          quantity: 1,
-          isInStock: true,
-        });
-        setOpenBasketToast(true);
-      } else {
-        window.location.href = `tel:+998000000000`;
-      }
-    },
-    [handleAddToBasket],
-  );
-
   const scrollBtn = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollBy({
@@ -176,7 +121,7 @@ export const Recommend = () => {
   };
 
   return (
-    <Box sx={{ mt: "84px", userSelect: "none" }}>
+    <Box sx={{ mt: "40px", userSelect: "none" }}>
       <Typography
         sx={{
           fontSize: "32px",
@@ -185,11 +130,11 @@ export const Recommend = () => {
           "@media (max-width:900px)": { fontSize: "26px" },
         }}
       >
-        {t("weRecommend")}
+        {title}
       </Typography>
 
       <Box sx={{ position: "relative", mt: "14px" }}>
-        {/* Navigation */}
+        {/* Left nav button */}
         <IconButton
           onClick={() => scrollBtn("left")}
           sx={{
@@ -200,6 +145,8 @@ export const Recommend = () => {
         >
           <Image src="/arrowleft.svg" width={28} height={28} alt="left" />
         </IconButton>
+
+        {/* Right nav button */}
         <IconButton
           onClick={() => scrollBtn("right")}
           sx={{
@@ -221,8 +168,12 @@ export const Recommend = () => {
         >
           {loading ? (
             <Typography sx={{ p: 4 }}>{t("loading")}</Typography>
+          ) : !items || items.length === 0 ? (
+            <Typography sx={{ p: 4, color: "#999" }}>
+              {t("noProducts")}
+            </Typography>
           ) : (
-            item?.results?.map((item: ProductItem) => {
+            items.map((item: ProductItem) => {
               const inBasket = isItemInBasket(item.id);
               const isFavorite = isItemFavorite(item.id);
 
@@ -235,6 +186,7 @@ export const Recommend = () => {
                   onDragStart={(e) => e.preventDefault()}
                 >
                   <Box sx={cardStyle}>
+                    {/* Top row */}
                     <Box
                       sx={{ display: "flex", justifyContent: "space-between" }}
                     >
@@ -267,6 +219,7 @@ export const Recommend = () => {
                       </Box>
                     </Box>
 
+                    {/* Product image */}
                     <Box
                       sx={{
                         position: "relative",
@@ -289,6 +242,7 @@ export const Recommend = () => {
                       />
                     </Box>
 
+                    {/* Info */}
                     <Box sx={{ flexGrow: 1 }}>
                       <Typography sx={descriptionStyle}>
                         {item.short_description || "Product"}
@@ -306,6 +260,7 @@ export const Recommend = () => {
                       </Typography>
                     </Box>
 
+                    {/* Basket button */}
                     <Button
                       onClick={(e) => onBasketClick(e, item)}
                       sx={{
@@ -316,10 +271,6 @@ export const Recommend = () => {
                         minWidth: { xs: "44px", md: "54px" },
                         "&:hover": {
                           bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
-                        },
-                        "& img": {
-                          width: { xs: "22px", md: "26px" },
-                          height: { xs: "22px", md: "26px" },
                         },
                       }}
                     >
@@ -348,6 +299,127 @@ export const Recommend = () => {
           )}
         </Box>
       </Box>
+    </Box>
+  );
+};
+
+// ─── Main Export ──────────────────────────────────────────────────────────────
+
+export const Recommend = () => {
+  const { locale } = useParams();
+  const t = useTranslations("Recommend");
+
+  const [recommendItems, loadingRecommend, loadRecommendEv] = useUnit([
+    $Recommends,
+    $loadingRecommend,
+    loadRecommends,
+  ]);
+
+  const [steamItems, loadingSteam, loadSteamEv] = useUnit([
+    $steamAndPodcast,
+    $loadingSteamAndPodcast,
+    loadSteamAndPodcast,
+  ]);
+
+  const { items: basketItems } = useUnit($basket);
+  const favorites = useUnit($favorites);
+  const handleAddToBasket = useUnit(addToBasket);
+  const handleToggleFavorite = useUnit(toggleFavorite);
+  const loadFavoritesEv = useUnit(loadFavorites);
+
+  const [openBasketToast, setOpenBasketToast] = useState(false);
+  const [openFavoriteToast, setOpenFavoriteToast] = useState(false);
+  const [lastActionType, setLastActionType] = useState<"add" | "remove" | null>(
+    null,
+  );
+
+  useEffect(() => {
+    const lang = (locale as string) || "ru";
+    loadRecommendEv({ lang });
+    loadSteamEv({ lang });
+    loadFavoritesEv();
+  }, [loadRecommendEv, loadSteamEv, loadFavoritesEv, locale]);
+
+  const isItemInBasket = useCallback(
+    (productId: number | string) =>
+      basketItems.some((item) => String(item.productId) === String(productId)),
+    [basketItems],
+  );
+
+  const isItemFavorite = useCallback(
+    (productId: number | string) =>
+      favorites.some((item) => String(item.productId) === String(productId)),
+    [favorites],
+  );
+
+  const onFavoriteClick = useCallback(
+    (e: React.MouseEvent, item: ProductItem) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const wasFavorite = isItemFavorite(item.id);
+      handleToggleFavorite({
+        id: Number(new Date()),
+        productId: item.id,
+        title: item.short_description || "Product",
+        image: item.image,
+        price: item.price,
+      });
+      setLastActionType(wasFavorite ? "remove" : "add");
+      setOpenFavoriteToast(true);
+    },
+    [handleToggleFavorite, isItemFavorite],
+  );
+
+  const onBasketClick = useCallback(
+    (e: React.MouseEvent, item: ProductItem) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (item.is_in_stock) {
+        const numericId =
+          typeof item.id === "string" ? parseInt(item.id, 10) : item.id;
+        handleAddToBasket({
+          id: numericId,
+          productId: numericId,
+          title: item.short_description || "Product",
+          price: item.price,
+          image: item.image,
+          quantity: 1,
+          isInStock: true,
+        });
+        setOpenBasketToast(true);
+      } else {
+        window.location.href = `tel:+998000000000`;
+      }
+    },
+    [handleAddToBasket],
+  );
+
+  const sharedProps = {
+    locale,
+    isItemInBasket,
+    isItemFavorite,
+    onBasketClick,
+    onFavoriteClick,
+    t,
+  };
+
+  return (
+    <Box>
+      {/* Section 1 — We Recommend */}
+      <ProductSection
+        title={t("weRecommend")}
+        items={recommendItems?.results}
+        loading={loadingRecommend}
+        {...sharedProps}
+      />
+
+      {/* Section 2 — Steam and Podcast */}
+      <ProductSection
+        title={t("steamAndPodcast")}
+        items={steamItems?.results}
+        loading={loadingSteam}
+        {...sharedProps}
+      />
 
       {/* Snackbars */}
       <Snackbar
@@ -364,6 +436,7 @@ export const Recommend = () => {
           {t("addedToBasket")}
         </Alert>
       </Snackbar>
+
       <Snackbar
         open={openFavoriteToast}
         autoHideDuration={2000}
@@ -382,7 +455,8 @@ export const Recommend = () => {
   );
 };
 
-// --- STYLES ---
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
 const navBtnStyle = {
   position: "absolute",
   top: "50%",
@@ -451,9 +525,7 @@ const descriptionStyle = {
   WebkitBoxOrient: "vertical",
   WebkitLineClamp: 2,
   overflow: "hidden",
-  "@media (max-width:1000px)": {
-    fontSize: "14px",
-  },
+  "@media (max-width:1000px)": { fontSize: "14px" },
 };
 
 const actionBtnStyle = {
@@ -466,8 +538,6 @@ const actionBtnStyle = {
   "@media (max-width:1000px)": {
     minWidth: "44px",
     height: "44px",
-    borderRadius: "50%",
-    position: "absolute",
     right: "15px",
     bottom: "15px",
   },

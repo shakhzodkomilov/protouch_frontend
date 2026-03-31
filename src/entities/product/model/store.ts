@@ -8,6 +8,7 @@ import {
   searchProductsFx,
   getNewArrivalsFx,
   getRecommendsFx,
+  getStearmAndPodcast,
 } from "./effects";
 import { CategoryType, PaginationType, ProductDetailType } from "./types";
 
@@ -43,6 +44,7 @@ export const searchProducts = createEvent<{
 export const loadSellers = createEvent<{ lang?: string }>();
 export const loadArrivals = createEvent<{ lang?: string }>();
 export const loadRecommends = createEvent<{ lang?: string }>();
+export const loadSteamAndPodcast = createEvent<{ lang?: string }>();
 export const loadProductDetail = createEvent<{
   product_id: string;
   lang?: string;
@@ -56,6 +58,11 @@ export const clearProducts = createEvent();
 // 1. Qidiruv store
 export const $searchProducts = createStore<PaginationType | null>(null).on(
   searchProductsFx.doneData,
+  (_, data) => data,
+);
+
+export const $steamAndPodcast = createStore<PaginationType | null>(null).on(
+  getStearmAndPodcast.doneData,
   (_, data) => data,
 );
 export const $searchLoading = searchProductsFx.pending;
@@ -84,7 +91,7 @@ export const $bestSellers = createStore<PaginationType | null>(null).on(
   getBestSellersFx.doneData,
   (_, data) => data,
 );
-
+export const $loadingSteamAndPodcast = getStearmAndPodcast.pending;
 export const $newArrivals = createStore<PaginationType | null>(null).on(
   getNewArrivalsFx.doneData,
   (_, data) => data,
@@ -141,3 +148,7 @@ sample({ clock: loadProductDetail, target: getProductDetailFx });
 sample({ clock: loadProductsByCategory, target: getProductsByCategoryFx });
 sample({ clock: loadRecommends, target: getRecommendsFx });
 sample({ clock: searchProducts, target: searchProductsFx });
+sample({
+  clock: loadSteamAndPodcast,
+  target: getStearmAndPodcast,
+});
