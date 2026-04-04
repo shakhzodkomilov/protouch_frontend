@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createEffect, createStore, createEvent, combine } from "effector";
 import { $api } from "../config/base";
 
@@ -13,6 +14,7 @@ export const loginFx = createEffect(async (payload: any) => {
   return response.data;
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const registerFx = createEffect(async (payload: any) => {
   const response = await $api.post("/api/v1/auth/register/", payload);
   return response.data;
