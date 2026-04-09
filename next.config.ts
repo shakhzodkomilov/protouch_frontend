@@ -3,6 +3,14 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/shared/i18n/request.ts");
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+let apiUrlObj: URL | undefined;
+try {
+  apiUrlObj = apiUrl ? new URL(apiUrl) : undefined;
+} catch {
+  apiUrlObj = undefined;
+}
+
 const nextConfig: NextConfig = {
   output: "standalone",
   experimental: {
@@ -18,6 +26,33 @@ const nextConfig: NextConfig = {
         hostname: "api.protouch.uz",
         pathname: "/media/**",
       },
+      {
+        protocol: "http",
+        hostname: "46.62.220.230",
+        pathname: "/media/**",
+      },
+      {
+        protocol: "http",
+        hostname: "46.62.220.230",
+        port: "9000",
+        pathname: "/media/**",
+      },
+      {
+        protocol: "https",
+        hostname: "46.62.220.230",
+        port: "9000",
+        pathname: "/media/**",
+      },
+      ...(apiUrlObj
+        ? [
+            {
+              protocol: apiUrlObj.protocol.replace(":", "") as "http" | "https",
+              hostname: apiUrlObj.hostname,
+              port: apiUrlObj.port || undefined,
+              pathname: "/media/**",
+            },
+          ]
+        : []),
     ],
   },
   webpack: (config, { dev, isServer }) => {

@@ -1,7 +1,47 @@
 import axios from "axios";
 import { createEffect } from "effector";
 import { API_URL } from "../../config/base";
-import { CategoryType, PaginationType, ProductDetailType } from "./types";
+import {
+  CategoryType,
+  Image,
+  PaginationType,
+  Product,
+  ProductDetailType,
+} from "./types";
+
+const ensureHttps = (url?: string) => {
+  if (!url) {
+    return url;
+  }
+
+  // Media server at 46.62.220.230:9000 does not serve HTTPS (no valid TLS),
+  // so always use plain HTTP for that origin.
+  if (
+    url.startsWith("https://46.62.220.230:9000/") ||
+    url.startsWith("http://46.62.220.230:9000/")
+  ) {
+    return `http://${url.slice(url.indexOf("46.62.220.230:9000/"))}`;
+  }
+
+  if (url.startsWith("http://")) {
+    return `https://${url.slice("http://".length)}`;
+  }
+
+  return url;
+};
+
+const normalizeImage = (image?: Image) =>
+  image ? { ...image, url: ensureHttps(image.url) } : image;
+
+const normalizeProduct = (product: Product): Product => ({
+  ...product,
+  image: ensureHttps(product.image),
+});
+
+const normalizePagination = (pagination: PaginationType): PaginationType => ({
+  ...pagination,
+  results: pagination.results.map(normalizeProduct),
+});
 
 export const getCategoriesFx = createEffect<
   { is_carousel?: string; lang?: string },
@@ -16,7 +56,10 @@ export const getCategoriesFx = createEffect<
       },
     },
   );
-  return data;
+  return data.map((category: CategoryType) => ({
+    ...category,
+    image: normalizeImage(category.image),
+  }));
 });
 
 export const getProductsFx = createEffect<
@@ -35,7 +78,7 @@ export const getProductsFx = createEffect<
       lang: params.lang || "ru",
     },
   });
-  return data;
+  return normalizePagination(data);
 });
 
 export const getProductDetailFx = createEffect<
@@ -50,6 +93,8 @@ export const getProductDetailFx = createEffect<
   return {
     ...data,
     price: Number(data.price),
+    image: ensureHttps(data.image),
+    images: data.images?.map((image) => normalizeImage(image)) ?? [],
   };
 });
 
@@ -61,7 +106,7 @@ export const getBestSellersFx = createEffect<{ lang?: string }, PaginationType>(
         params: { is_bestseller: true, lang: lang || "ru" },
       },
     );
-    return data;
+    return normalizePagination(data);
   },
 );
 
@@ -87,7 +132,7 @@ export const getNewArrivalsFx = createEffect<{ lang?: string }, PaginationType>(
         params: { is_new: true, lang: lang || "ru" },
       },
     );
-    return data;
+    return normalizePagination(data);
   },
 );
 
@@ -100,7 +145,7 @@ export const getRecommendsFx = createEffect<{ lang?: string }, PaginationType>(
         params: { is_new: true, lang: lang || "ru" },
       },
     );
-    return data;
+    return normalizePagination(data);
   },
 );
 
@@ -115,7 +160,7 @@ export const getStearmAndPodcast = createEffect<
       params: { is_new: true, lang: lang || "ru" },
     },
   );
-  return data;
+  return normalizePagination(data);
 });
 
 export const getProductsByCategoryFx = createEffect<
@@ -130,7 +175,7 @@ export const getProductsByCategoryFx = createEffect<
       lang: lang || "ru",
     },
   });
-  return data;
+  return normalizePagination(data);
 });
 
 export const searchProductsFx = createEffect<
@@ -144,5 +189,5 @@ export const searchProductsFx = createEffect<
       lang: lang || "ru",
     },
   });
-  return data;
+  return normalizePagination(data);
 });

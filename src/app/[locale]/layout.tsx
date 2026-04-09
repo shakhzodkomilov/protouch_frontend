@@ -15,7 +15,6 @@ export const metadata: Metadata = {
   description:
     "Интерактивные инфокиоски, сенсорные панели, рекламные дисплеи и промо-роботы в Ташкенте. Protouch — ваш надежный партнер в цифровых решениях для бизнеса и образования. Высокое качество, современный дизайн и установка под ключ.",
   keywords: [
-    "Инфокиоски в Узбекистане — производство и продажа Современные инфокиоски с сенсорным экраном. Разработка, производство и монтаж. Индивидуальные решения для вашего бизнеса",
     "интерактивный киоск Ташкент",
     "сенсорная панель Узбекистан",
     "инфокиоск купить",
@@ -69,21 +68,27 @@ type Props = {
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
   const messages = await getMessages({ locale });
-  const googleId =
-    process.env.NEXT_PUBLIC_CLIENT_ID ?? process.env.VITE_CLIENT_ID;
+  const googleId = process.env.NEXT_PUBLIC_CLIENT_ID;
 
-  const layoutContent = (
-    <NextIntlClientProvider locale={locale} messages={messages}>
-      <Header />
-      <main>{children}</main>
-      <Footer />
-      <MobileBottomNav />
-    </NextIntlClientProvider>
-  );
-
-  return googleId ? (
-    <GoogleOAuthProvider clientId={googleId}>{layoutContent}</GoogleOAuthProvider>
-  ) : (
-    layoutContent
+  return (
+    <>
+      {googleId ? (
+        <GoogleOAuthProvider clientId={googleId}>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <Header />
+            <main>{children}</main>
+            <Footer />
+            <MobileBottomNav />
+          </NextIntlClientProvider>
+        </GoogleOAuthProvider>
+      ) : (
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <Header />
+          <main>{children}</main>
+          <Footer />
+          <MobileBottomNav />
+        </NextIntlClientProvider>
+      )}
+    </>
   );
 }
