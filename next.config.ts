@@ -3,14 +3,6 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/shared/i18n/request.ts");
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-let apiUrlObj: URL | undefined;
-try {
-  apiUrlObj = apiUrl ? new URL(apiUrl) : undefined;
-} catch {
-  apiUrlObj = undefined;
-}
-
 const nextConfig: NextConfig = {
   output: "standalone",
   experimental: {
@@ -21,38 +13,36 @@ const nextConfig: NextConfig = {
     imageSizes: [16, 32, 48, 64, 96],
     minimumCacheTTL: 60,
     remotePatterns: [
+      // 1. Asosiy domen
       {
         protocol: "https",
         hostname: "api.protouch.uz",
         pathname: "/media/**",
       },
+      // 2. Traefik domeni (Wildcard bilan hamma traefik.me subdomainlariga ruxsat)
       {
-        protocol: "http",
-        hostname: "46.62.220.230",
+        protocol: "https",
+        hostname: "*.traefik.me",
         pathname: "/media/**",
       },
+      // 3. IP manzil va 9000 port (Xatoni aynan shu tuzatadi)
       {
         protocol: "http",
         hostname: "46.62.220.230",
         port: "9000",
+        pathname: "/media/**",
+      },
+      // 4. IP manzil portiz (agar port bo'lmasa)
+      {
+        protocol: "http",
+        hostname: "46.62.220.230",
         pathname: "/media/**",
       },
       {
         protocol: "https",
-        hostname: "46.62.220.230",
-        port: "9000",
-        pathname: "/media/**",
+        hostname: "cdn.raumkraft.uz",
+        pathname: "/uploads/**",
       },
-      ...(apiUrlObj
-        ? [
-            {
-              protocol: apiUrlObj.protocol.replace(":", "") as "http" | "https",
-              hostname: apiUrlObj.hostname,
-              port: apiUrlObj.port || undefined,
-              pathname: "/media/**",
-            },
-          ]
-        : []),
     ],
   },
   webpack: (config, { dev, isServer }) => {

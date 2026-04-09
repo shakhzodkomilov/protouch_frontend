@@ -142,8 +142,6 @@ const BestSellers = () => {
     [handleToggleFavorite, isItemFavorite],
   );
 
-  console.log("BestSellers items:", items);
-
   const onBasketClick = useCallback(
     (e: React.MouseEvent, item: ProductItem) => {
       e.preventDefault();
@@ -246,7 +244,6 @@ const BestSellers = () => {
             items?.results?.map((item) => {
               const inBasket = isItemInBasket(item.id);
               const isFavorite = isItemFavorite(item.id);
-              console.log("item:", item.image);
               return (
                 <Link
                   key={item.id}

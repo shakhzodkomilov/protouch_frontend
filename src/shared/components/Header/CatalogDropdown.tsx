@@ -54,7 +54,6 @@ export const CatalogDropdown: React.FC<CatalogDropdownProps> = ({
   const router = useRouter();
   const { locale } = useParams();
   const categories = useUnit($categories) as ModelCategoryType[];
-  console.log(categories);
   if (!isOpen || categories.length === 0) return null;
 
   const handleCategoryClick = (slug: string) => {

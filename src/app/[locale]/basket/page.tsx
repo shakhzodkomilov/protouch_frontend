@@ -40,7 +40,6 @@ export default function BasketPage() {
   const updateBasketQty = useUnit(updateQuantity);
   const removeBasketItem = useUnit(removeFromBasket);
   const [mounted, setMounted] = useState(false);
-  console.log(`"Basket products" ${items}`);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);

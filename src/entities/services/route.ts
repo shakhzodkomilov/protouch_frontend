@@ -30,7 +30,6 @@ export async function POST(request: Request) {
     );
 
     const resultText = await amoResponse.text();
-    console.log("AmoCRM Response:", resultText);
 
     return NextResponse.json({ success: true, debug: resultText });
   } catch (error: any) {
