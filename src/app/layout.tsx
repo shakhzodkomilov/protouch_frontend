@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: "Protouch",
     images: [
       {
-        url: "/faviconn.png",
+        url: "/favicon.png",
         width: 1200,
         height: 630,
         alt: "Интерактивный инфокиоск Protouch в Ташкенте",

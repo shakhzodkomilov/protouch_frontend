@@ -16,7 +16,6 @@ export default function Header() {
         padding: "0 0",
       }}
     >
-      <HeaderBanner />
       <Container
         maxWidth={false}
         sx={{
@@ -25,6 +24,7 @@ export default function Header() {
           padding: "0 0",
         }}
       >
+        <HeaderBanner />
         <Navbar />
         <NavbarCotalog />
       </Container>

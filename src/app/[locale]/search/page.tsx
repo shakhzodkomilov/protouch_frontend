@@ -24,7 +24,6 @@ import {
   loadProducts,
   $loadingProducts,
 } from "../../../entities/product/model";
-import { $basket } from "../../../entities/basket/model/store";
 import Image from "next/image";
 
 const NavbarCatalog = () => {
@@ -35,7 +34,6 @@ const NavbarCatalog = () => {
   const searchRef = useRef<HTMLDivElement>(null);
 
   // Global state
-  const basket = useUnit($basket);
   const productsResponse = useUnit($products);
   const loading = useUnit($loadingProducts);
   const fetchProducts = useUnit(loadProducts);

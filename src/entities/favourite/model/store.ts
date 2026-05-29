@@ -1,5 +1,6 @@
 import { createStore, createEvent, sample, createEffect } from "effector";
 import { FavoriteItem } from "./model";
+import { fetchFavoritesFx, addFavoriteFx, removeFavoriteFx } from "../api";
 
 export const toggleFavorite = createEvent<FavoriteItem>();
 export const loadFavorites = createEvent();
@@ -28,7 +29,11 @@ export const $isFavorite = (productId: string | number) =>
 // Persistence
 const persistFavoritesFx = createEffect<void, void, void>(() => {
   if (typeof window !== "undefined") {
-    localStorage.setItem("favorites", JSON.stringify($favorites.getState()));
+    try {
+      localStorage.setItem("favorites", JSON.stringify($favorites.getState()));
+    } catch (e) {
+      console.error("[Favorites] Failed to persist:", e);
+    }
   }
 });
 
@@ -42,8 +47,56 @@ const loadFavoritesFx = createEffect<void, FavoriteItem[], Error>(async () => {
   }
 });
 
-sample({ clock: toggleFavorite, target: persistFavoritesFx });
-sample({ clock: loadFavorites, target: loadFavoritesFx });
+export const $favoritesLoading = loadFavoritesFx.pending;
+
+// Sync toggle to API if authenticated
+const syncFavoritesApiFx = createEffect(async (item: FavoriteItem) => {
+  const token =
+    typeof window !== "undefined" && localStorage.getItem("accessToken");
+  if (!token) return;
+
+  const productId = Number(item.productId);
+  const current = $favorites.getState();
+  const exists = current.some(
+    (f) => String(f.productId) === String(productId),
+  );
+
+  try {
+    if (exists) {
+      await addFavoriteFx(productId);
+    } else {
+      await removeFavoriteFx(productId);
+    }
+  } catch {
+    // revert on next load
+  }
+});
+
+// Load: if auth → API, else → localStorage
+const loadFavoritesRouterFx = createEffect(async () => {
+  const token =
+    typeof window !== "undefined" && localStorage.getItem("accessToken");
+  if (token) {
+    try {
+      const data = await fetchFavoritesFx();
+      localStorage.setItem("favorites", JSON.stringify(data));
+      return data;
+    } catch {
+      return loadFavoritesFx();
+    }
+  }
+  return loadFavoritesFx();
+});
+
+sample({ clock: toggleFavorite, target: [persistFavoritesFx, syncFavoritesApiFx] });
+sample({ clock: loadFavorites, target: loadFavoritesRouterFx });
+
+sample({
+  clock: loadFavoritesRouterFx.doneData,
+  fn: (items) => items,
+  target: $favorites,
+});
+
 sample({
   clock: loadFavoritesFx.doneData,
   fn: (items) => items,

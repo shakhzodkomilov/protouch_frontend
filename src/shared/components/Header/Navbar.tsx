@@ -166,7 +166,7 @@ const Navbar = () => {
               href={`/${locale}${item.href}`}
               sx={{
                 fontWeight: 500,
-                color: "#4E4E4E",
+                color: "#1D1D1F",
                 textTransform: "none",
                 borderRadius: 1,
                 fontSize: 16,
@@ -186,7 +186,7 @@ const Navbar = () => {
 
 const contactStyle = {
   fontWeight: 600,
-  color: "#4E4E4E",
+  color: "#1D1D1F",
   fontSize: 14,
   display: "flex",
   alignItems: "center",
@@ -200,7 +200,7 @@ const contactStyle = {
 
 const contactStyleResponsive = {
   fontWeight: 600,
-  color: "#4E4E4E",
+  color: "#1D1D1F",
   fontSize: 14,
   alignItems: "center",
   gap: 1,

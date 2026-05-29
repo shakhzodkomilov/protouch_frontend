@@ -7,21 +7,17 @@ import {
   Typography,
   TextField,
   Button,
-  IconButton,
-  InputAdornment,
-  Divider,
   Alert,
   CircularProgress,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useUnit } from "effector-react";
 import {
-  loginFx,
-  $authError,
-  $isAuthPending,
+  clientLoginFx,
+  partnerLoginFx,
+  distributorLoginFx,
   $loginSuccess,
   resetAuthStatus,
 } from "../../../entities/form/model";
@@ -29,103 +25,93 @@ import {
 export default function LoginPage() {
   const { locale } = useParams();
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
 
-  const [handleLogin, pending, error, isSuccess, reset] = useUnit([
-    loginFx,
-    $isAuthPending,
-    $authError,
-    $loginSuccess,
-    resetAuthStatus,
-  ]);
+  const [logSuccess, reset] = useUnit([$loginSuccess, resetAuthStatus]);
 
-  const [loginData, setLoginData] = useState({
-    emailOrPhone: "",
-    password: "",
-  });
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (isSuccess) {
+    if (logSuccess) {
       router.push(`/${locale}/`);
       reset();
     }
-    return () => reset();
-  }, [isSuccess, locale, router, reset]);
+  }, [logSuccess, locale, router, reset]);
 
-  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let input = e.target.value;
-    if (/\d/.test(input)) {
-      if (!input.startsWith("+998 ")) {
-        input = "+998 " + input;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isValid) return;
+    setPending(true);
+    setError(null);
+
+    const attempts = [clientLoginFx, partnerLoginFx, distributorLoginFx];
+    let lastError: string | null = null;
+
+    for (const attempt of attempts) {
+      try {
+        await attempt({ login, password });
+        return;
+      } catch (err: any) {
+        lastError =
+          err.response?.data?.detail ||
+          err.response?.data?.message ||
+          null;
       }
     }
-    if (input.trim() === "" || input === "+998 ") {
-      setLoginData({ ...loginData, emailOrPhone: "" });
-      return;
-    }
-    if (/\d/.test(input) && /[a-zA-Zа-яА-Я]/.test(input)) {
-      input = input.replace("+998 ", "");
-    }
-    setLoginData({ ...loginData, emailOrPhone: input });
+
+    setError(lastError || "Login yoki parol xato");
+    setPending(false);
   };
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const submitData = {
-      email_or_phone: loginData.emailOrPhone
-        .replace("+", "")
-        .replace(/\s/g, ""),
-      password: loginData.password,
-    };
-    handleLogin(submitData);
-  };
+  const isValid = login.length >= 4 && password.length >= 6;
 
-  // Yozuvlar rangi #000 bo'lishi uchun stil
   const textFieldStyle = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "12px",
-      color: "#000", // Asosiy matn rangi
+      color: "#000",
       "&.Mui-focused fieldset": { borderColor: "#249FFC" },
     },
     "& .MuiInputLabel-root.Mui-focused": { color: "#249FFC" },
-    "& .MuiInputBase-input": {
-      color: "#000", // Input ichiga yozilayotgan qiymat rangi
-      "&::placeholder": { opacity: 0.7 },
-    },
-  };
-
-  const handleGoogleClick = () => {
-    console.log("Google Login clicked");
+    "& .MuiInputBase-input": { color: "#000" },
   };
 
   return (
-    <Container maxWidth="sm" sx={{ py: { xs: 4, md: 10 } }}>
+    <Container maxWidth="sm" sx={{ py: { xs: 4, md: 8 } }}>
       <Box
-        component="form"
-        onSubmit={onSubmit}
         sx={{
           p: 4,
           borderRadius: 4,
           boxShadow: "0px 10px 40px rgba(0,0,0,0.08)",
           bgcolor: "#fff",
-          textAlign: "center",
         }}
       >
-        <Link href={`/${locale}`}>
-          <Image
-            src="/LOGOPROTOUCH.svg"
-            width={160}
-            height={60}
-            alt="Logo"
-            style={{ marginBottom: "24px", objectFit: "contain" }}
-          />
-        </Link>
+        <Box sx={{ textAlign: "center", mb: 3 }}>
+          <Link href={`/${locale}`}>
+            <Image
+              src="/LOGOPROTOUCH.svg"
+              width={160}
+              height={60}
+              alt="Logo"
+              style={{ objectFit: "contain" }}
+            />
+          </Link>
+        </Box>
 
-        <Typography variant="h5" fontWeight={700} sx={{ mb: 1, color: "#000" }}>
-          Вход в систему
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          sx={{ mb: 1, textAlign: "center", color: "#000" }}
+        >
+          {locale === "ru" ? "Вход" : "Kirish"}
         </Typography>
-        <Typography sx={{ mb: 4, color: "#666", fontSize: "14px" }}>
-          Введите свои данные, чтобы продолжить покупки
+        <Typography
+          sx={{ mb: 4, textAlign: "center", color: "#666", fontSize: "14px" }}
+        >
+          {locale === "ru"
+            ? "Введите телефон или email и пароль"
+            : "Telefon yoki email va parolni kiriting"}
         </Typography>
 
         {error && (
@@ -134,61 +120,40 @@ export default function LoginPage() {
           </Alert>
         )}
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
+        >
           <TextField
             fullWidth
-            label="Email yoki Телефон"
+            label={locale === "ru" ? "Телефон или Email" : "Telefon yoki Email"}
             variant="outlined"
-            value={loginData.emailOrPhone}
-            onChange={handlePhoneNumberChange}
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
             disabled={pending}
+            type="text"
+            placeholder="+998331234567 yoki email@example.com"
             sx={textFieldStyle}
-            placeholder="+998"
           />
 
           <TextField
             fullWidth
-            label="Пароль"
-            type={showPassword ? "text" : "password"}
+            label={locale === "ru" ? "Пароль" : "Parol"}
             variant="outlined"
-            value={loginData.password}
-            onChange={(e) =>
-              setLoginData({ ...loginData, password: e.target.value })
-            }
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             disabled={pending}
+            placeholder="••••••"
             sx={textFieldStyle}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowPassword(!showPassword)}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
           />
-
-          <Box sx={{ textAlign: "right" }}>
-            <Link
-              href="#"
-              style={{
-                color: "#249FFC",
-                textDecoration: "none",
-                fontSize: "14px",
-              }}
-            >
-              Забыли пароль?
-            </Link>
-          </Box>
 
           <Button
-            fullWidth
             type="submit"
+            fullWidth
             variant="contained"
-            disabled={!loginData.emailOrPhone || !loginData.password || pending}
+            disabled={!isValid || pending}
             sx={{
               py: 1.6,
               bgcolor: "#249FFC",
@@ -203,41 +168,25 @@ export default function LoginPage() {
               },
             }}
           >
-            {pending ? <CircularProgress size={24} color="inherit" /> : "Войти"}
+            {pending ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : locale === "ru" ? (
+              "Войти"
+            ) : (
+              "Kirish"
+            )}
           </Button>
         </Box>
 
-        <Divider sx={{ my: 4, color: "#999", fontSize: "13px" }}>
-          Или войти через
-        </Divider>
-
-        <Button
-          fullWidth
-          variant="outlined"
-          onClick={handleGoogleClick}
-          sx={{
-            py: 1.2,
-            borderRadius: "12px",
-            borderColor: "#ddd",
-            color: "#000",
-            textTransform: "none",
-            "&:hover": { borderColor: "#249FFC", bgcolor: "#f9f9f9" },
-          }}
-        >
-          Войти через Google
-        </Button>
-
-        <Typography variant="body2" color="#666" sx={{ mt: 4 }}>
-          Нет аккаунта?{" "}
+        <Typography sx={{ mt: 3, textAlign: "center", color: "#666", fontSize: 14 }}>
+          {locale === "ru"
+            ? "Нет аккаунта?"
+            : "Akkauntingiz yo'qmi?"}{" "}
           <Link
             href={`/${locale}/register`}
-            style={{
-              color: "#249FFC",
-              fontWeight: 600,
-              textDecoration: "none",
-            }}
+            style={{ color: "#249FFC", fontWeight: 600, textDecoration: "none" }}
           >
-            Зарегистрироваться
+            {locale === "ru" ? "Зарегистрироваться" : "Ro'yxatdan o'tish"}
           </Link>
         </Typography>
       </Box>

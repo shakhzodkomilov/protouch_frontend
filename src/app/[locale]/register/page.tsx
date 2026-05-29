@@ -1,105 +1,111 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Container,
   Typography,
   TextField,
   Button,
-  Checkbox,
-  FormControlLabel,
   Alert,
   CircularProgress,
-  Divider,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useUnit } from "effector-react";
-import { useGoogleLogin } from "@react-oauth/google"; // Google hook
-import {
-  registerFx,
-  authGoogleFx,
-  $authError,
-  $isAuthPending,
-  $registerSuccess,
-  $loginSuccess,
-  resetAuthStatus,
-} from "../../../entities/form/model";
+import { clientRegisterFx, partnerRegisterFx } from "../../../entities/form/model";
+
+type Tab = "individual" | "legal";
+
+const REGIONS = [
+  "г. Ташкент", "Ташкентская область", "Республика Каракалпакстан",
+  "Андижанская область", "Бухарская область", "Джизакская область",
+  "Кашкадарьинская область", "Навоийская область", "Наманганская область",
+  "Самаркандская область", "Сурхандарьинская область", "Сырдарьинская область",
+  "Ферганская область", "Хорезмская область",
+];
 
 export default function RegisterPage() {
   const { locale } = useParams();
   const router = useRouter();
 
-  // Effector units
-  const [
-    handleRegister,
-    handleGoogleAuth,
-    pending,
-    error,
-    regSuccess,
-    logSuccess,
-    reset,
-  ] = useUnit([
-    registerFx,
-    authGoogleFx,
-    $isAuthPending,
-    $authError,
-    $registerSuccess,
-    $loginSuccess,
-    resetAuthStatus,
-  ]);
+  const [tab, setTab] = useState<Tab>("individual");
+  const [phone, setPhone] = useState("+998");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [inn, setInn] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [region, setRegion] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-  const [formData, setFormData] = useState({
-    emailOrPhone: "",
-    password: "",
-    confirmPassword: "",
-  });
-
-  const [isChecked, setIsChecked] = useState<boolean>(false);
-
-  // Yo'naltirish mantiqi
-  useEffect(() => {
-    if (regSuccess) {
-      router.push(`/${locale}/login`);
-      reset();
-    }
-    if (logSuccess) {
-      router.push(`/${locale}/`);
-      reset();
-    }
-    return () => reset();
-  }, [regSuccess, logSuccess, locale, router, reset]);
-
-  // Google login funksiyasi
-  const loginWithGoogle = useGoogleLogin({
-    onSuccess: (tokenResponse) => {
-      handleGoogleAuth(tokenResponse.access_token);
-    },
-    onError: () => console.log("Google Auth Failed"),
-  });
-
-  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let input = e.target.value;
-    if (/\d/.test(input)) {
-      if (!input.startsWith("+998 ")) input = "+998 " + input;
-    }
-    if (input.trim() === "" || input === "+998 ") {
-      setFormData({ ...formData, emailOrPhone: "" });
-      return;
-    }
-    setFormData({ ...formData, emailOrPhone: input });
+  const handlePhone = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let v = e.target.value.replace(/[^\d+]/g, "");
+    if (!v.startsWith("+998")) v = "+998";
+    if (v.length > 13) v = v.slice(0, 13);
+    setPhone(v);
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const handleInn = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInn(e.target.value.replace(/\D/g, "").slice(0, 9));
+  };
+
+  const individualValid =
+    phone.length >= 13 &&
+    firstName.trim() !== "" &&
+    lastName.trim() !== "" &&
+    password.length >= 6 &&
+    password === confirmPassword;
+
+  const legalValid =
+    individualValid &&
+    inn.length >= 9 &&
+    companyName.trim() !== "" &&
+    region !== "";
+
+  const isValid = tab === "legal" ? legalValid : individualValid;
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const submitData = {
-      email_or_phone: formData.emailOrPhone.replace("+", "").replace(/\s/g, ""),
-      password: formData.password,
-      confirm_password: formData.confirmPassword,
-    };
-    handleRegister(submitData);
+    if (!isValid) return;
+    setLoading(true);
+    setError(null);
+    try {
+      if (tab === "individual") {
+        await clientRegisterFx({
+          phone,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          password,
+        });
+      } else {
+        await partnerRegisterFx({
+          phone,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          password,
+          companyName: companyName.trim(),
+          inn,
+          region,
+        });
+      }
+      setSuccess(true);
+    } catch (err: any) {
+      setError(
+        err.response?.data?.detail ||
+          err.response?.data?.message ||
+          "Ro'yxatdan o'tishda xatolik",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const textFieldStyle = {
@@ -112,11 +118,79 @@ export default function RegisterPage() {
     "& .MuiInputBase-input": { color: "#000" },
   };
 
+  const tabStyle = (active: boolean) => ({
+    py: 1.2,
+    borderRadius: "10px",
+    border: "none",
+    cursor: "pointer",
+    fontSize: 14,
+    fontWeight: active ? 700 : 500,
+    color: active ? "#fff" : "#64748B",
+    bgcolor: active ? "#249FFC" : "transparent",
+    transition: "all 0.2s ease",
+    "&:hover": active ? {} : { bgcolor: "rgba(36,159,252,0.1)", color: "#249FFC" },
+  });
+
+  if (success) {
+    return (
+      <Container maxWidth="sm" sx={{ py: { xs: 4, md: 8 } }}>
+        <Box
+          sx={{
+            p: 4,
+            borderRadius: 4,
+            boxShadow: "0px 10px 40px rgba(0,0,0,0.08)",
+            bgcolor: "#fff",
+            textAlign: "center",
+          }}
+        >
+          <Box
+            sx={{
+              width: 72,
+              height: 72,
+              borderRadius: "50%",
+              bgcolor: "#D6F2DB",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              mx: "auto",
+              mb: 3,
+            }}
+          >
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#3BB351" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </Box>
+          <Typography variant="h6" fontWeight={700} color="#111" mb={1}>
+            {locale === "ru" ? "Регистрация завершена!" : "Ro'yxatdan o'tish yakunlandi!"}
+          </Typography>
+          <Typography color="#666" mb={3}>
+            {locale === "ru"
+              ? "Теперь вы можете войти в аккаунт"
+              : "Endi akkauntingizga kirishingiz mumkin"}
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={() => router.push(`/${locale}/login`)}
+            sx={{
+              py: 1.5,
+              px: 4,
+              borderRadius: "10px",
+              bgcolor: "#249FFC",
+              textTransform: "none",
+              fontWeight: 600,
+              "&:hover": { bgcolor: "#1a8ae5" },
+            }}
+          >
+            {locale === "ru" ? "Войти" : "Kirish"}
+          </Button>
+        </Box>
+      </Container>
+    );
+  }
+
   return (
     <Container maxWidth="sm" sx={{ py: { xs: 4, md: 8 } }}>
       <Box
-        component="form"
-        onSubmit={onSubmit}
         sx={{
           p: 4,
           borderRadius: 4,
@@ -141,12 +215,14 @@ export default function RegisterPage() {
           fontWeight={700}
           sx={{ mb: 1, textAlign: "center", color: "#000" }}
         >
-          Создать аккаунт
+          {locale === "ru" ? "Регистрация" : "Ro'yxatdan o'tish"}
         </Typography>
         <Typography
           sx={{ mb: 4, textAlign: "center", color: "#666", fontSize: "14px" }}
         >
-          Присоединяйтесь к нам и получайте бонусы
+          {locale === "ru"
+            ? "Выберите тип и заполните данные"
+            : "Turini tanlang va ma'lumotlarni to'ldiring"}
         </Typography>
 
         {error && (
@@ -155,82 +231,166 @@ export default function RegisterPage() {
           </Alert>
         )}
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+        <Box
+          sx={{
+            display: "flex",
+            bgcolor: "#F1F5F9",
+            borderRadius: "12px",
+            p: 0.5,
+            mb: 3,
+          }}
+        >
+          <Box
+            component="button"
+            type="button"
+            onClick={() => setTab("individual")}
+            sx={{ flex: 1, ...tabStyle(tab === "individual") }}
+          >
+            {locale === "ru" ? "Физическое лицо" : "Jismoniy shaxs"}
+          </Box>
+          <Box
+            component="button"
+            type="button"
+            onClick={() => setTab("legal")}
+            sx={{ flex: 1, ...tabStyle(tab === "legal") }}
+          >
+            {locale === "ru" ? "Юридическое лицо" : "Yuridik shaxs"}
+          </Box>
+        </Box>
+
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
+        >
+          <Box sx={{ display: "flex", gap: 2 }}>
+            <TextField
+              label={locale === "ru" ? "Имя" : "Ism"}
+              required
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              disabled={loading}
+              placeholder="Diyorbek"
+              sx={{ flex: 1, ...textFieldStyle }}
+            />
+            <TextField
+              label={locale === "ru" ? "Фамилия" : "Familiya"}
+              required
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              disabled={loading}
+              placeholder="Mansurov"
+              sx={{ flex: 1, ...textFieldStyle }}
+            />
+          </Box>
+
           <TextField
-            fullWidth
-            label="Email yoki Telefon"
-            variant="outlined"
-            value={formData.emailOrPhone}
-            onChange={handlePhoneNumberChange}
-            disabled={pending}
+            label={locale === "ru" ? "Телефон" : "Telefon"}
+            required
+            value={phone}
+            onChange={handlePhone}
+            disabled={loading}
+            type="tel"
+            placeholder="+998 33 234 43 67"
             sx={textFieldStyle}
-          />
-          <TextField
-            fullWidth
-            label="Пароль"
-            type="password"
-            variant="outlined"
-            value={formData.password}
-            onChange={(e) =>
-              setFormData({ ...formData, password: e.target.value })
-            }
-            disabled={pending}
-            sx={textFieldStyle}
-          />
-          <TextField
-            fullWidth
-            label="Подтвердите пароль"
-            type="password"
-            variant="outlined"
-            value={formData.confirmPassword}
-            onChange={(e) =>
-              setFormData({ ...formData, confirmPassword: e.target.value })
-            }
-            disabled={pending}
-            sx={textFieldStyle}
-            error={
-              formData.confirmPassword !== "" &&
-              formData.password !== formData.confirmPassword
-            }
-            helperText={
-              formData.confirmPassword !== "" &&
-              formData.password !== formData.confirmPassword
-                ? "Пароли не совпадают"
-                : ""
-            }
           />
 
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                sx={{ color: "#249FFC", "&.Mui-checked": { color: "#249FFC" } }}
+          {tab === "legal" && (
+            <>
+              <TextField
+                label={locale === "ru" ? "Название компании" : "Tashkilot nomi"}
+                required
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                disabled={loading}
+                placeholder='ООО "PROTOUCH SOLUTIONS"'
+                sx={textFieldStyle}
               />
-            }
-            label={
-              <Typography variant="body2" color="#000">
-                Я согласен с{" "}
-                <Link
-                  href="#"
-                  style={{ color: "#249FFC", textDecoration: "none" }}
+              <TextField
+                label="ИНН"
+                required
+                value={inn}
+                onChange={handleInn}
+                disabled={loading}
+                placeholder="309876543"
+                inputProps={{ maxLength: 9, inputMode: "numeric" }}
+                sx={textFieldStyle}
+              />
+              <FormControl fullWidth>
+                <InputLabel
+                  sx={{
+                    fontSize: 14,
+                    color: region ? "#2563EB" : "#999",
+                    "&.Mui-focused": { color: "#2563EB" },
+                    "&.MuiInputLabel-shrink": { color: "#2563EB" },
+                  }}
+                  id="region-label"
                 >
-                  условиями
-                </Link>
-              </Typography>
+                  {locale === "ru" ? "Выберите регион" : "Hududni tanlang"}
+                </InputLabel>
+                <Select
+                  labelId="region-label"
+                  value={region}
+                  label={locale === "ru" ? "Выберите регион" : "Hududni tanlang"}
+                  onChange={(e) => setRegion(e.target.value as string)}
+                  sx={{
+                    borderRadius: "12px",
+                    color: region ? "#111" : "#999",
+                    bgcolor: "#f5f6f8",
+                    fontSize: 14,
+                    "& fieldset": { borderColor: "#e0e0e0" },
+                    "&.Mui-focused fieldset": { borderColor: "#249FFC" },
+                    "& .MuiSelect-select": { py: 1.5 },
+                  }}
+                  MenuProps={{
+                    PaperProps: { sx: { maxHeight: 300, borderRadius: "12px", mt: 0.5 } },
+                  }}
+                >
+                  {REGIONS.map((r) => (
+                    <MenuItem key={r} value={r} sx={{ fontSize: 14, color: "#111" }}>
+                      {r}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </>
+          )}
+
+          <TextField
+            label={locale === "ru" ? "Пароль" : "Parol"}
+            required
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
+            placeholder="••••••"
+            sx={textFieldStyle}
+          />
+
+          <TextField
+            label={locale === "ru" ? "Подтвердите пароль" : "Parolni tasdiqlang"}
+            required
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            disabled={loading}
+            placeholder="••••••"
+            error={confirmPassword !== "" && password !== confirmPassword}
+            helperText={
+              confirmPassword !== "" && password !== confirmPassword
+                ? locale === "ru"
+                  ? "Пароли не совпадают"
+                  : "Parollar mos emas"
+                : ""
             }
+            sx={textFieldStyle}
           />
 
           <Button
-            fullWidth
             type="submit"
+            fullWidth
             variant="contained"
-            disabled={
-              !formData.emailOrPhone ||
-              !formData.password ||
-              !isChecked ||
-              pending
-            }
+            disabled={!isValid || loading}
             sx={{
               py: 1.6,
               bgcolor: "#249FFC",
@@ -245,47 +405,25 @@ export default function RegisterPage() {
               },
             }}
           >
-            {pending ? (
+            {loading ? (
               <CircularProgress size={24} color="inherit" />
-            ) : (
+            ) : locale === "ru" ? (
               "Зарегистрироваться"
+            ) : (
+              "Ro'yxatdan o'tish"
             )}
           </Button>
         </Box>
 
-        <Divider sx={{ my: 4, fontSize: "13px", color: "#999" }}>Или</Divider>
-
-        <Button
-          fullWidth
-          variant="outlined"
-          onClick={() => loginWithGoogle()}
-          disabled={pending}
-          sx={{
-            py: 1.2,
-            borderRadius: "12px",
-            borderColor: "#ddd",
-            color: "#000",
-            textTransform: "none",
-            "&:hover": { borderColor: "#249FFC", bgcolor: "#f9f9f9" },
-          }}
-        >
-          {pending ? <CircularProgress size={20} /> : "Войти через Google"}
-        </Button>
-
-        <Typography
-          variant="body2"
-          sx={{ mt: 4, textAlign: "center", color: "#666" }}
-        >
-          Уже есть аккаунт?{" "}
+        <Typography sx={{ mt: 3, textAlign: "center", color: "#666", fontSize: 14 }}>
+          {locale === "ru"
+            ? "Уже есть аккаунт?"
+            : "Akkauntingiz bormi?"}{" "}
           <Link
             href={`/${locale}/login`}
-            style={{
-              color: "#249FFC",
-              fontWeight: 600,
-              textDecoration: "none",
-            }}
+            style={{ color: "#249FFC", fontWeight: 600, textDecoration: "none" }}
           >
-            Войти
+            {locale === "ru" ? "Войти" : "Kirish"}
           </Link>
         </Typography>
       </Box>

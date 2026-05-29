@@ -1,25 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useUnit } from "effector-react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   Box,
   Container,
   Typography,
-  IconButton,
   Button,
   Paper,
   Breadcrumbs,
-  Divider,
 } from "@mui/material";
-
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import BalanceIcon from "@mui/icons-material/Balance";
 import { useTranslations } from "next-intl";
 
 import {
@@ -29,19 +21,30 @@ import {
   removeFromBasket,
   updateQuantity,
 } from "../../../entities/basket/model/store";
+import BasketItemCard from "../../../shared/components/Basket/BasketItemCard";
+import OrderSummary from "../../../shared/components/Basket/OrderSummary";
+import CheckoutModal from "../../../shared/components/Checkout/CheckoutModal";
+import { $isAuth, $user } from "../../../entities/form/model";
+import { API_URL } from "../../../entities/config/base";
 
 export default function BasketPage() {
   const { locale } = useParams();
   const t = useTranslations("basket");
-  const router = useRouter();
+  const checkoutT = useTranslations("checkout");
   const { items, totalCount, totalPrice } = useUnit($basket);
   const loading = useUnit($basketLoading);
+  const isAuth = useUnit($isAuth);
+  const user = useUnit($user);
   const loadBasketEv = useUnit(loadBasket);
   const updateBasketQty = useUnit(updateQuantity);
   const removeBasketItem = useUnit(removeFromBasket);
   const [mounted, setMounted] = useState(false);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     loadBasketEv();
   }, [loadBasketEv]);
@@ -49,13 +52,51 @@ export default function BasketPage() {
   const handleQuantityChange = (productId: number, delta: number) => {
     const item = items.find((i) => i.productId === productId);
     if (!item) return;
-
     const newQty = item.quantity + delta;
-
     if (newQty <= 0) {
       removeBasketItem(productId);
     } else {
       updateBasketQty({ productId, quantity: newQty });
+    }
+  };
+
+  const handleCheckoutClick = () => {
+    const u = user as Record<string, unknown> | null;
+    if (isAuth && u?.firstName && (u?.phone || u?.email)) {
+      handleAutoSubmit();
+    } else {
+      setModalOpen(true);
+    }
+  };
+
+  const handleAutoSubmit = async () => {
+    setSubmitting(true);
+    try {
+      const productIds = items.map((item) => item.productId);
+      const u = user as Record<string, unknown>;
+      const isPartner = !!(u.companyName || u.partnerProfile);
+      const body: Record<string, unknown> = {
+        type: isPartner ? "LEGAL" : "INDIVIDUAL",
+        phone: u.phone || u.email || "",
+        firstName: u.firstName || "",
+        lastName: u.lastName || "",
+        productIds,
+        totalPrice,
+      };
+      if (isPartner) {
+        body.companyName = u.companyName || "";
+        body.inn = (u.partnerProfile as Record<string, unknown>)?.inn || "";
+        body.region = (u.partnerProfile as Record<string, unknown>)?.region || "";
+      }
+      const res = await fetch(`${API_URL}/api/b2b-applications/public`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error("Ошибка при отправке данных");
+      setOrderSuccess(true);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -67,18 +108,12 @@ export default function BasketPage() {
         py: 4,
         bgcolor: "#fff",
         minHeight: "100vh",
-        "@media (max-width:800px)": {
-          mt: 15,
-        },
+        "@media (max-width:800px)": { mt: 15 },
       }}
     >
       <Container maxWidth="lg">
-        {/* Breadcrumbs */}
         <Breadcrumbs sx={{ mb: 2, fontSize: "14px" }}>
-          <Link
-            href={`/${locale}`}
-            style={{ color: "#000", textDecoration: "none" }}
-          >
+          <Link href={`/${locale}`} style={{ color: "#000", textDecoration: "none" }}>
             {t("breadcrumbs.home")}
           </Link>
           <Typography color="text.secondary" sx={{ fontSize: "14px" }}>
@@ -107,302 +142,82 @@ export default function BasketPage() {
             </Button>
           </Paper>
         ) : (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              gap: 2,
-            }}
-          >
-            {/* Left Side: Product Cards */}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <Box
-              sx={{ flex: 2, display: "flex", flexDirection: "column", gap: 2 }}
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                gap: 2,
+              }}
             >
-              {items.map((item) => (
-                <Paper
-                  key={item.productId}
-                  elevation={0}
-                  sx={{
-                    p: 3,
-                    border: "1px solid #E5EAF2",
-                    borderRadius: "12px",
-                    position: "relative",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      display: "flex",
-                      gap: 3,
-                      flexDirection: { xs: "column", sm: "row" },
-                    }}
-                  >
-                    {/* Product Image */}
-                    <Box
-                      sx={{
-                        width: 180,
-                        height: 140,
-                        position: "relative",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        fill
-                        style={{ objectFit: "contain" }}
-                      />
-                    </Box>
+              <Box sx={{ flex: 2, display: "flex", flexDirection: "column", gap: 2 }}>
+                {items.map((item) => (
+                  <BasketItemCard
+                    key={item.productId}
+                    item={item}
+                    quantityLabel={t("quantity")}
+                    inStockLabel={t("inStock")}
+                    onQuantityChange={handleQuantityChange}
+                  />
+                ))}
+              </Box>
 
-                    {/* Product Info */}
-                    <Box sx={{ flex: 1 }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "flex-start",
-                        }}
-                      >
-                        <Typography
-                          sx={{
-                            bgcolor: "#D6F2DB",
-                            color: "#3BB351",
-                            fontSize: "12px",
-                            px: 1,
-                            borderRadius: "4px",
-                            display: "inline-block",
-                            mb: 1,
-                          }}
-                        >
-                          {t("inStock")}
-                        </Typography>
-                        <Box>
-                          <IconButton size="small">
-                            <BalanceIcon fontSize="small" />
-                          </IconButton>
-                          <IconButton size="small">
-                            <FavoriteBorderIcon fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      </Box>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          mt: 2,
-                          justifyContent: "space-between",
-                          gap: 2,
-                        }}
-                      >
-                        {/* <Typography
-                          sx={{
-                            fontSize: "14px",
-                            color: "#666",
-                            mb: 2,
-                            lineHeight: 1.4,
-                          }}
-                        >
-                          {item.title}
-                        </Typography> */}
-                        <Box
-                          sx={{
-                            textAlign: "right",
-                            minWidth: "120px",
-                            color: "#000",
-                          }}
-                        >
-                          <Typography
-                            variant="h6"
-                            sx={{ fontWeight: 700, color: "#000" }}
-                          >
-                            {new Intl.NumberFormat("ru-RU").format(
-                              item.price,
-                            )}{" "}
-                          </Typography>
-                          <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                            {t("orderSummary.currency")}
-                          </Typography>
-                        </Box>
-                      </Box>
-
-                      <Typography
-                        sx={{
-                          fontSize: "14px",
-                          fontWeight: 600,
-                          mb: 1,
-                          color: "#000",
-                        }}
-                      >
-                        {t("quantity")}
-                      </Typography>
-
-                      <Box
-                        sx={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          borderRadius: "8px",
-                          p: "4px",
-                        }}
-                      >
-                        <IconButton
-                          size="small"
-                          sx={{ bgcolor: "#F4F4F4", borderRadius: "8px" }}
-                          onClick={() =>
-                            handleQuantityChange(item.productId, -1)
-                          }
-                        >
-                          <RemoveIcon fontSize="small" sx={{ color: "#000" }} />
-                        </IconButton>
-                        <Typography
-                          sx={{ mx: 2, fontWeight: 600, color: "#000" }}
-                        >
-                          {item.quantity}
-                        </Typography>
-                        <IconButton
-                          size="small"
-                          sx={{ bgcolor: "#F4F4F4", borderRadius: "8px" }}
-                          onClick={() =>
-                            handleQuantityChange(item.productId, 1)
-                          }
-                        >
-                          <AddIcon fontSize="small" sx={{ color: "#000" }} />
-                        </IconButton>
-                      </Box>
-                    </Box>
-                  </Box>
-                </Paper>
-              ))}
+              <Box sx={{ flex: 0.9 }}>
+                <OrderSummary
+                  totalCount={totalCount}
+                  totalPrice={totalPrice}
+                  submitting={submitting}
+                  deliveryLabel={t("orderSummary.delivery")}
+                  pickupLabel={t("orderSummary.pickup")}
+                  regionalDeliveryLabel={t("orderSummary.regionalDelivery")}
+                  totalLabel={t("orderSummary.total")}
+                  itemsLabel={t("orderSummary.items")}
+                  currencyLabel={t("orderSummary.currency")}
+                  checkoutLabel={t("orderSummary.checkout")}
+                  onCheckout={handleCheckoutClick}
+                />
+              </Box>
             </Box>
 
-            {/* Right Side: Order Summary */}
-            <Box sx={{ flex: 0.9 }}>
-              <Paper
-                elevation={0}
-                sx={{ p: 3, border: "1px solid #E5EAF2", borderRadius: "12px" }}
-              >
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: 700, mb: 3, color: "#000" }}
-                >
-                  {t("orderSummary.title")}
+            {orderSuccess && (
+              <Paper elevation={0} sx={{ p: 6, textAlign: "center", borderRadius: "12px", border: "1px solid #E5EAF2" }}>
+                <Box sx={{ width: 72, height: 72, borderRadius: "50%", bgcolor: "#D6F2DB", display: "flex", alignItems: "center", justifyContent: "center", mx: "auto", mb: 3 }}>
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#3BB351" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                </Box>
+                <Typography variant="h5" sx={{ fontWeight: 700, color: "#111", mb: 1 }}>
+                  {checkoutT("successTitle")}
                 </Typography>
-
-                {/* Delivery Info Boxes */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 2,
-                    mb: 3,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      bgcolor: "#F8F9FA",
-                      p: 2,
-                      borderRadius: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1.5,
-                    }}
-                  >
-                    <Image
-                      src={"/Delivery.svg"}
-                      width={24}
-                      height={24}
-                      alt="Delivery"
-                    />
-                    <Typography sx={{ fontSize: "13px", color: "#444" }}>
-                      {t("orderSummary.delivery")}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      bgcolor: "#F8F9FA",
-                      p: 2,
-                      borderRadius: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1.5,
-                    }}
-                  >
-                    <Image
-                      src={"/Pickup.svg"}
-                      width={24}
-                      height={24}
-                      alt="Pickup"
-                    />
-                    <Typography sx={{ fontSize: "13px", color: "#444" }}>
-                      {t("orderSummary.pickup")}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      bgcolor: "#F8F9FA",
-                      p: 2,
-                      borderRadius: "8px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1.5,
-                    }}
-                  >
-                    <Image
-                      src={"/Delivery.svg"}
-                      width={24}
-                      height={24}
-                      alt="Regional Delivery"
-                    />
-                    <Typography sx={{ fontSize: "13px", color: "#444" }}>
-                      {t("orderSummary.regionalDelivery")}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Divider sx={{ mb: 2 }} />
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    mb: 3,
-                    color: "#000",
-                  }}
-                >
-                  <Box>
-                    <Typography sx={{ color: "#999", fontSize: "14px" }}>
-                      {t("orderSummary.total")}
-                    </Typography>
-                    <Typography sx={{ fontWeight: 600 }}>
-                      {totalCount} {t("orderSummary.items")}
-                    </Typography>
-                  </Box>
-                  <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                    {totalPrice.toLocaleString("ru-RU")}{" "}
-                    {t("orderSummary.currency")}
-                  </Typography>
-                </Box>
-
+                <Typography sx={{ color: "#666", mb: 3 }}>
+                  {checkoutT("successMessage")}
+                </Typography>
                 <Button
-                  fullWidth
                   variant="contained"
-                  onClick={() => router.push("/checkout")}
+                  component={Link}
+                  href={`/${locale}`}
                   sx={{
-                    py: 1.5,
-                    borderRadius: "10px",
-                    bgcolor: "#249FFC",
-                    textTransform: "none",
-                    fontSize: "16px",
-                    fontWeight: 600,
-                    color: "#fff",
-                    "&:hover": { bgcolor: "#1a8ae5" },
+                    py: 1.5, px: 4, borderRadius: "10px", bgcolor: "#249FFC",
+                    textTransform: "none", fontSize: "15px", fontWeight: 600,
+                    color: "#fff", "&:hover": { bgcolor: "#1a8ae5" },
                   }}
                 >
-                  {t("orderSummary.checkout")}
+                  {t("orderForm.toCatalog")}
                 </Button>
               </Paper>
-            </Box>
+            )}
           </Box>
         )}
       </Container>
+
+      {/* ─── Checkout Modal ─── */}
+      <CheckoutModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSuccess={() => setOrderSuccess(true)}
+        totalPrice={totalPrice}
+        productIds={items.map((item) => item.productId)}
+      />
     </Box>
   );
 }

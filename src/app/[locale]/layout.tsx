@@ -4,7 +4,6 @@ import { getMessages } from "next-intl/server";
 import Header from "../../shared/components/Header";
 import Footer from "../../shared/components/Footer/Footer";
 import { MobileBottomNav } from "../../shared/components/Bottom/MobileBottomNav";
-import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export const metadata: Metadata = {
   title: {
@@ -68,27 +67,13 @@ type Props = {
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
   const messages = await getMessages({ locale });
-  const googleId = process.env.NEXT_PUBLIC_CLIENT_ID;
 
   return (
-    <>
-      {googleId ? (
-        <GoogleOAuthProvider clientId={googleId}>
-          <NextIntlClientProvider locale={locale} messages={messages}>
-            <Header />
-            <main>{children}</main>
-            <Footer />
-            <MobileBottomNav />
-          </NextIntlClientProvider>
-        </GoogleOAuthProvider>
-      ) : (
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <Header />
-          <main>{children}</main>
-          <Footer />
-          <MobileBottomNav />
-        </NextIntlClientProvider>
-      )}
-    </>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <Header />
+      <main>{children}</main>
+      <Footer />
+      <MobileBottomNav />
+    </NextIntlClientProvider>
   );
 }

@@ -1,18 +1,24 @@
 "use client";
 
-import { Box, IconButton } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import Image from "next/image";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
+import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import bannerData from "./bannerData";
+import NewsModal from "./NewsModal";
 
 const Banners = () => {
-  const banners = [
-    { img: "/Banner2.svg" },
-    { img: "/Banner1.svg" },
-    { img: "/Banner3.svg" },
-    { img: "/Banner4.svg" },
-  ];
+  const [openModal, setOpenModal] = useState<number | null>(null);
+  const { locale } = useParams();
+  const t = useTranslations("main");
 
-  // --- DRAG SCROLL LOGIC ---
+  const banners = bannerData[locale as string] || bannerData.ru;
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const dragInfo = useRef({
     isDown: false,
@@ -24,98 +30,72 @@ const Banners = () => {
   const handleMouseDown = (e: React.MouseEvent) => {
     const slider = scrollRef.current;
     if (!slider) return;
-
     dragInfo.current.isDown = true;
     dragInfo.current.hasMoved = false;
     dragInfo.current.startX = e.pageX - slider.offsetLeft;
     dragInfo.current.scrollLeft = slider.scrollLeft;
-
     slider.style.cursor = "grabbing";
-    slider.style.scrollSnapType = "none"; // Surayotganda silliq harakatlanishi uchun
+    slider.style.scrollSnapType = "none";
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const slider = scrollRef.current;
     if (!slider || !dragInfo.current.isDown) return;
-
     e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
     const distance = x - dragInfo.current.startX;
-
-    if (Math.abs(distance) > 5) {
-      dragInfo.current.hasMoved = true;
-    }
-
-    const walk = distance * 1.5; // Surish tezligi
-    slider.scrollLeft = dragInfo.current.scrollLeft - walk;
+    if (Math.abs(distance) > 5) dragInfo.current.hasMoved = true;
+    slider.scrollLeft = dragInfo.current.scrollLeft - distance * 1.5;
   };
 
   const stopDragging = () => {
-    const slider = scrollRef.current;
-    if (!slider) return;
-
-    dragInfo.current.isDown = false;
-    slider.style.cursor = "grab";
-    slider.style.scrollSnapType = "x mandatory"; // To'xtaganda joyiga tushishi uchun
+    if (scrollRef.current) {
+      dragInfo.current.isDown = false;
+      scrollRef.current.style.cursor = "grab";
+      scrollRef.current.style.scrollSnapType = "x mandatory";
+    }
   };
 
-  const scroll = (dir: "left" | "right") => {
+  const scrollBtn = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
-    const scrollAmount = 350;
     scrollRef.current.scrollBy({
-      left: dir === "left" ? -scrollAmount : scrollAmount,
+      left: dir === "left" ? -300 : 300,
       behavior: "smooth",
     });
   };
 
   return (
-    <Box sx={{ mt: "50px", mb: "90px", userSelect: "none" }}>
-      <Box sx={{ position: "relative", mt: 3 }}>
-        {/* LEFT ARROW */}
+    <Box sx={{ mt: "50px" }}>
+      <Box sx={{ position: "relative" }}>
         <IconButton
-          onClick={() => scroll("left")}
-          sx={{
-            ...navBtnStyle,
-            left: { xs: 8, md: -20 },
-            "@media (max-width:900px)": { display: "none" },
-          }}
+          onClick={() => scrollBtn("left")}
+          sx={{ ...navBtnStyle, left: -20 }}
         >
-          <Image src="/arrowleft.svg" width={32} height={32} alt="arrow left" />
+          <Image src="/arrowleft.svg" width={32} height={32} alt="left" />
+        </IconButton>
+        <IconButton
+          onClick={() => scrollBtn("right")}
+          sx={{ ...navBtnStyle, right: -20 }}
+        >
+          <Image src="/arrowright.svg" width={32} height={32} alt="right" />
         </IconButton>
 
-        {/* RIGHT ARROW */}
-        <IconButton
-          onClick={() => scroll("right")}
-          sx={{
-            ...navBtnStyle,
-            right: { xs: 8, md: -20 },
-            "@media (max-width:900px)": { display: "none" },
-          }}
-        >
-          <Image
-            src="/arrowright.svg"
-            width={32}
-            height={32}
-            alt="arrow right"
-          />
-        </IconButton>
-
-        {/* SCROLL CONTAINER */}
         <Box
           ref={scrollRef}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={stopDragging}
           onMouseLeave={stopDragging}
+          onClickCapture={(e) =>
+            dragInfo.current.hasMoved && e.stopPropagation()
+          }
           sx={{
             display: "flex",
-            alignItems: "center",
             gap: 2,
             overflowX: "auto",
             scrollbarWidth: "none",
             "&::-webkit-scrollbar": { display: "none" },
-            py: 2,
-            px: { xs: 2, md: 0 },
+            pt: "20px",
             cursor: "grab",
             scrollSnapType: "x mandatory",
             WebkitOverflowScrolling: "touch",
@@ -125,46 +105,94 @@ const Banners = () => {
           {banners.map((item, i) => (
             <Box
               key={i}
+              onClick={() => item.modalContent && setOpenModal(i)}
               sx={{
-                minWidth: { xs: "280px", sm: "350px", md: "480px" },
-                height: { xs: "180px", sm: "220px", md: "250px" },
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "12px",
+                justifyContent: "space-around",
+                width: 320,
+                height: 300,
                 borderRadius: "16px",
+                p: 3,
+                bgcolor: "#fff",
+                border: "1px solid #EBEBEB",
+                textAlign: "center",
                 flexShrink: 0,
-                position: "relative",
                 scrollSnapAlign: "start",
-                overflow: "hidden",
+                cursor: item.modalContent ? "pointer" : "default",
+                transition: "box-shadow 0.2s, transform 0.2s",
+                "&:hover": {
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                  transform: "translateY(-4px)",
+                },
+                "@media (max-width: 900px)": { width: 170, p: 2.5 },
               }}
             >
-              <Image
-                src={item.img}
-                fill
-                alt={`Banner ${i + 1}`}
-                onDragStart={(e) => e.preventDefault()}
-                style={{
-                  objectFit: "cover",
-                  borderRadius: "16px",
-                  pointerEvents: "none", // Drag paytida rasm ajralib chiqmasligi uchun
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "12px",
+                  justifyContent: "space-between",
                 }}
-              />
+              >
+                <Image
+                  src={item.icon}
+                  width={48}
+                  height={48}
+                  alt={item.title}
+                  style={{ objectFit: "contain" }}
+                />
+                <Typography
+                  sx={{
+                    fontSize: "15px",
+                    fontWeight: 600,
+                    color: "#000",
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {item.title}
+                </Typography>
+              </Box>
+
+              <Typography
+                sx={{
+                  fontSize: "13px",
+                  color: "#666",
+                  lineHeight: 1.5,
+                  fontWeight: 400,
+                }}
+              >
+                {item.text}
+              </Typography>
             </Box>
           ))}
         </Box>
       </Box>
+
+      <NewsModal
+        item={openModal !== null ? banners[openModal] || null : null}
+        open={openModal !== null}
+        closeLabel={t("close")}
+        onClose={() => setOpenModal(null)}
+      />
     </Box>
   );
 };
 
-// --- STYLES ---
 const navBtnStyle = {
   position: "absolute",
   top: "50%",
   transform: "translateY(-50%)",
-  zIndex: 20,
+  zIndex: 10,
   bgcolor: "#fff",
-  boxShadow: 3,
-  width: 45,
-  height: 45,
-  borderRadius: "50%",
+  boxShadow: 2,
+  width: 40,
+  height: 40,
+  "@media (max-width:900px)": { display: "none" },
   "&:hover": { bgcolor: "#f5f5f5" },
 };
 

@@ -10,35 +10,30 @@ import {
   Button,
   Container,
   Skeleton,
-  Divider,
   Breadcrumbs,
   Chip,
   Snackbar,
   Alert,
 } from "@mui/material";
-import Image from "next/image";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
+import Accessories from "../../../../shared/components/Accessories/Accessories";
+import ProductGallery from "../../../../shared/components/Product/ProductGallery";
+import ProductBuyBlock from "../../../../shared/components/Product/ProductBuyBlock";
+import SpecRow from "../../../../shared/components/Product/SpecRow";
 import {
   $loadingProductDetail,
   $productDetail,
   loadProductDetail,
 } from "../../../../entities/product/model";
-import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
-import NavigateNextOutlinedIcon from "@mui/icons-material/NavigateNextOutlined";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import TelegramIcon from "@mui/icons-material/Telegram";
-import DoneIcon from "@mui/icons-material/Done";
-import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
-import Accessories from "../../../../shared/components/Accessories/Accessories";
 import { $basket, addToBasket } from "../../../../entities/basket/model/store";
 import {
   $favorites,
   loadFavorites,
   toggleFavorite,
 } from "../../../../entities/favourite/model/store";
-import CallIcon from "@mui/icons-material/Call";
+import { $isDistributor } from "../../../../entities/form/model";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -50,24 +45,40 @@ export default function ProductDetailPage() {
 
   const { id, locale } = useParams();
   const t = useTranslations("ObjectDetail");
-  // Effector units
+
   const product = useUnit($productDetail);
   const loading = useUnit($loadingProductDetail);
   const loadProductDetailEv = useUnit(loadProductDetail);
-
-  // State management
+  console.log(
+    "ProductDetailPage rendered with product:",
+    product,
+    "and loading:",
+    loading,
+  );
   const [openToast, setOpenToast] = useState(false);
   const [favoriteToast, setFavoriteToast] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Global state
   const { items: basketItems } = useUnit($basket);
   const favorites = useUnit($favorites);
+  const isDistributor = useUnit($isDistributor);
   const handleAddToBasket = useUnit(addToBasket);
   const handleToggleFavorite = useUnit(toggleFavorite);
   const loadFavoritesEv = useUnit(loadFavorites);
   const router = useRouter();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isProductInStock = (p: any) => {
+    if (!p) return false;
+    if (typeof p.is_in_stock === "boolean") return p.is_in_stock;
+    const status = String(p.inventoryStatus ?? p.availability ?? "");
+    if (status === "IN_STOCK") return true;
+    if (status === "OUT_OF_STOCK") return false;
+    if (typeof p.quantityInStock === "number") return p.quantityInStock > 0;
+    return Boolean(p.underOrder);
+  };
+
   const productId = useMemo(() => {
     return product?.id ? Number(product.id) : null;
   }, [product]);
@@ -98,32 +109,39 @@ export default function ProductDetailPage() {
 
   const onBasketClick = () => {
     if (!product) return;
-    if (product.is_in_stock) {
+    if (isProductInStock(product)) {
       handleAddToBasket({
         id: Number(product.id),
         productId: Number(product.id),
-        title: product.title || "Product",
-        price: product.price,
-        image: product.images?.[0]?.url || "/placeholder.jpg",
+        title: product.name || product.title || t("fallback.product"),
+        price: Number(product.displayPrice ?? product.price ?? 0),
+        image:
+          product.images?.[0]?.url ??
+          product.media?.[0]?.url ??
+          product.image ??
+          "/placeholder.jpg",
         quantity: 1,
-        isInStock: product.is_in_stock,
+        isInStock: isProductInStock(product),
       });
       setOpenToast(true);
     }
   };
 
-  // Add to basket then navigate to checkout
   const onCheckoutClick = () => {
     if (!product) return;
-    if (product.is_in_stock) {
+    if (isProductInStock(product)) {
       handleAddToBasket({
         id: Number(product.id),
         productId: Number(product.id),
-        title: product.title || "Product",
-        price: product.price,
-        image: product.images?.[0]?.url || "/placeholder.jpg",
+        title: product.name || product.title || t("fallback.product"),
+        price: Number(product.displayPrice ?? product.price ?? 0),
+        image:
+          product.images?.[0]?.url ??
+          product.media?.[0]?.url ??
+          product.image ??
+          "/placeholder.jpg",
         quantity: 1,
-        isInStock: product.is_in_stock,
+        isInStock: isProductInStock(product),
       });
       router.push(`/${locale}/checkout/`);
     }
@@ -136,9 +154,6 @@ export default function ProductDetailPage() {
     }
   }, [id, locale, loadProductDetailEv, loadFavoritesEv]);
 
-  const formatPrice = (price: number) =>
-    new Intl.NumberFormat("ru-RU").format(price);
-
   if (loading || !product) {
     return (
       <Container sx={{ mt: 8 }}>
@@ -147,13 +162,60 @@ export default function ProductDetailPage() {
     );
   }
 
-  const images: ProductImage[] = product.images ?? [];
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const imagesFromApi: ProductImage[] = (product.images?.map((img) => ({
+    id: String(img.id),
+    url: img.url,
+  })) ??
+    product.media?.map((m) => ({ id: String(m.id), url: m.url })) ??
+    []) as ProductImage[];
+  const images: ProductImage[] = imagesFromApi.length
+    ? imagesFromApi
+    : [{ id: "0", url: "/placeholder.jpg" }];
+  const title =
+    product.name || product.title || product.shortText || t("fallback.product");
+  const finalPrice = (() => {
+    if (isDistributor && product.dealerPrice != null) {
+      return Number(product.dealerPrice);
+    }
+    if (isDistributor && product.partnerPrice != null) {
+      return Number(product.partnerPrice);
+    }
+    return Number(product.displayPrice ?? product.price ?? 0);
+  })();
+  const oldPrice = product.oldPrice ?? null;
+  const hasDiscount =
+    oldPrice != null ||
+    (typeof product.salePrice === "number" &&
+      product.salePrice !== null &&
+      Number(product.salePrice) < Number(product.price));
+
+  // Use features array for characteristics (with fallback to characteristics/details)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const characteristics = (product.characteristics?.map((f: any) => ({
+    id: String(f.id),
+    key: f.key,
+    value: f.value,
+  })) ??
+    product.characteristics?.map((c) => ({
+      id: String(c.id),
+      key: c.key,
+      value: c.value,
+    })) ??
+    product.details?.map((d, idx) => ({
+      id: String(idx),
+      key: d.key,
+      value: d.value,
+    })) ??
+    []) as Array<{ id: string; key: string; value: string }>;
+
   return (
-    <Box sx={{ width: "100%", height: "auto", bgcolor: "#FAFAFA" }}>
-      <Container maxWidth={false} sx={{ py: 4, maxWidth: "1800px" }}>
-        {/* Breadcrumbs */}
-        <Box sx={{ mb: 4 }}>
+    <Box sx={{ width: "100%", bgcolor: "#FAFAFA" }}>
+      <Container
+        maxWidth={false}
+        sx={{ py: { xs: 2, md: 4 }, maxWidth: "1800px" }}
+      >
+        {/* Breadcrumbs — desktop only */}
+        <Box sx={{ mb: 3, display: { xs: "none", md: "block" } }}>
           <Breadcrumbs
             separator={<NavigateNextOutlinedIcon fontSize="small" />}
           >
@@ -164,108 +226,76 @@ export default function ProductDetailPage() {
                 sx={{ bgcolor: "transparent", color: "#000" }}
               />
             </Link>
-            <Typography sx={{ color: "#000", fontWeight: 500 }}>
-              {product.title}
+            <Typography
+              sx={{ color: "#000", fontWeight: 500, textAlign: "center" }}
+            >
+              {title}
             </Typography>
           </Breadcrumbs>
         </Box>
 
+        {/* ─── DESKTOP LAYOUT ─────────────────────────────────────────── */}
         <Box
-          sx={{ bgcolor: "#fff", py: 4, px: { xs: 2, md: 6 }, borderRadius: 3 }}
+          sx={{
+            display: { xs: "none", md: "block" },
+            bgcolor: "#fff",
+            py: 4,
+            px: 6,
+            borderRadius: 3,
+          }}
         >
-          <Typography
-            sx={{ fontSize: 28, fontWeight: 600, mb: 4, color: "#000" }}
-          >
-            {product.title}
-          </Typography>
-
           <Box
             sx={{
               display: "flex",
               gap: 6,
-              flexDirection: { xs: "column", lg: "row" },
+              flexDirection: "row",
               justifyContent: "space-between",
             }}
           >
-            {/* LEFT GALLERY */}
-            <Box
-              sx={{
-                display: "flex",
-                gap: 2,
-                width: "100%",
-                maxWidth: 600,
-                flexDirection: { xs: "column-reverse", sm: "row" },
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: { xs: "row", sm: "column" },
-                  gap: 1,
-                  overflowX: "auto",
-                }}
-              >
-                {images.map((img, i) => (
-                  <Box
-                    key={img.id}
-                    onClick={() => setActiveImage(i)}
-                    sx={{
-                      width: 70,
-                      height: 70,
-                      borderRadius: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      p: 1,
-                      border:
-                        i === activeImage
-                          ? "2px solid #249FFC"
-                          : "1px solid #ddd",
-                    }}
-                  >
-                    <Image
-                      src={img.url}
-                      alt="thumb"
-                      width={60}
-                      height={60}
-                      style={{ objectFit: "contain" }}
-                    />
-                  </Box>
-                ))}
-              </Box>
-              <Box
-                sx={{
-                  flex: 1,
-                  height: 420,
-                  position: "relative",
-                  display: "flex",
-                  borderRadius: 3,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  border: "1px solid #eee",
-                }}
-              >
-                <Image
-                  src={images[activeImage]?.url}
-                  width={290}
-                  height={290}
-                  style={{ objectFit: "contain", position: "unset" }}
-                  alt={product.title}
-                />
-              </Box>
-            </Box>
+            {/* Gallery */}
+            <ProductGallery
+              images={images}
+              activeImage={activeImage}
+              title={title}
+              onImageSelect={setActiveImage}
+            />
 
-            {/* DESCRIPTION */}
-            <Box sx={{ flex: 1, maxWidth: { lg: 400 } }}>
+            {/* Features + Description */}
+            <Box sx={{ flex: 1, maxWidth: 520 }}>
+              <Typography
+                sx={{
+                  fontSize: 28,
+                  fontWeight: 600,
+                  mb: 4,
+                  color: "#000",
+                }}
+              >
+                {title}
+              </Typography>
+              {characteristics.length > 0 && (
+                <>
+                  <Typography
+                    sx={{ fontSize: 18, fontWeight: 700, mb: 2, color: "#000" }}
+                  >
+                    {t("characteristics") ?? "Характеристики"}:
+                  </Typography>
+                  <Box
+                    sx={{ display: "flex", flexDirection: "column", gap: 1 }}
+                  >
+                    {characteristics.map((f) => (
+                      <SpecRow key={f.id} label={f.key} value={f.value} />
+                    ))}
+                  </Box>
+                  <Box sx={{ height: 18 }} />
+                </>
+              )}
               <Typography
                 sx={{ fontSize: 18, fontWeight: 600, mb: 2, color: "#000" }}
               >
-                {t("description")}{" "}
+                {t("description")}
               </Typography>
               <Typography
                 sx={{
-                  textAlign: "left",
                   color: "#555",
                   fontSize: 14,
                   lineHeight: 1.8,
@@ -276,10 +306,9 @@ export default function ProductDetailPage() {
                   transition: "all 0.3s ease",
                 }}
               >
-                {product.description}
+                {product.shortText}
               </Typography>
-
-              {product.description && product.description.length > 150 && (
+              {product.shortText && product.shortText.length > 150 && (
                 <Button
                   onClick={() => setIsExpanded(!isExpanded)}
                   endIcon={
@@ -306,217 +335,178 @@ export default function ProductDetailPage() {
               )}
             </Box>
 
-            {/* RIGHT BUY CARD */}
-            <Box
-              sx={{
-                bgcolor: "#FAFAFA",
-                p: 3,
-                borderRadius: 3,
-                maxWidth: { xs: "100%", lg: 380 },
-                width: "100%",
-              }}
-            >
-              <Typography
-                sx={{
-                  mb: 2,
-                  color: product.is_in_stock ? "#3BB351" : "#FF5F5F",
-                  fontWeight: 600,
-                }}
-              >
-                {product.is_in_stock
-                  ? `• ${t("inStock")}`
-                  : `• ${t("notAvailable")}`}
-              </Typography>
-
-              <Typography
-                sx={{ fontSize: 32, fontWeight: 700, mb: 2, color: "#000" }}
-              >
-                {formatPrice(product.price)} {t("currency")}
-              </Typography>
-
-              <Box sx={{ display: "flex", gap: 1, mb: 3 }}>
-                <Button variant="outlined" fullWidth sx={actionBtnStyle}>
-                  <Image src="/scale.svg" width={24} height={24} alt="scale" />{" "}
-                  {t("actions.compare")}{" "}
-                </Button>
-                <Button
-                  variant="outlined"
-                  fullWidth
-                  sx={actionBtnStyle}
-                  onClick={(e) => onFavoriteClick(e, product)}
-                >
-                  {isFavorite ? (
-                    <FavoriteIcon sx={{ color: "#FF5F5F" }} />
-                  ) : (
-                    <FavoriteBorderOutlinedIcon sx={{ color: "#FF5F5F" }} />
-                  )}
-                  {isFavorite
-                    ? t("actions.inFavorites")
-                    : t("actions.addToFavorites")}
-                </Button>
-              </Box>
-
-              {/* ADD TO CART */}
-              <Button
-                fullWidth
-                onClick={onBasketClick}
-                sx={{
-                  bgcolor: inBasket ? "#3BB351" : "#249FFC",
-                  color: "#fff",
-                  py: 1.5,
-                  borderRadius: 3,
-                  fontSize: 16,
-                  mb: 2,
-                  display: "flex",
-                  gap: 1,
-                  textTransform: "none",
-                  "&:hover": { bgcolor: inBasket ? "#2e8b40" : "#1E8BD8" },
-                }}
-              >
-                {inBasket ? (
-                  <DoneIcon />
-                ) : (
-                  <Image
-                    src="/basketIcon.svg"
-                    width={24}
-                    height={24}
-                    alt="cart"
-                  />
-                )}
-                {inBasket ? t("actions.added") : t("actions.addToCart")}
-              </Button>
-
-              {/* CHECKOUT — adds product & goes to checkout page */}
-              <Button
-                fullWidth
-                onClick={onCheckoutClick}
-                disabled={!product.is_in_stock}
-                sx={{
-                  bgcolor: "#FF8C00",
-                  color: "#fff",
-                  py: 1.5,
-                  borderRadius: 3,
-                  fontSize: 16,
-                  mb: 2,
-                  display: "flex",
-                  gap: 1,
-                  textTransform: "none",
-                  "&:hover": { bgcolor: "#e07b00" },
-                  "&.Mui-disabled": { bgcolor: "#f5c07a", color: "#fff" },
-                }}
-              >
-                <ShoppingCartCheckoutIcon />
-                {t("buyNow") ?? "Купить сейчас"}
-              </Button>
-
-              <Button
-                fullWidth
-                onClick={() => router.push(`/${locale}/legalentity/`)}
-                sx={{
-                  bgcolor: "#25C261",
-                  color: "#fff",
-                  py: 1.5,
-                  borderRadius: 3,
-                  textTransform: "none",
-                  "&:hover": { bgcolor: "#1FA754" },
-                }}
-              >
-                <DescriptionOutlinedIcon sx={{ mr: 1 }} />{" "}
-                {t("actions.buyAsLegal")}
-              </Button>
-
-              <Button
-                fullWidth
-                component="a"
-                href="tel:+998977782347"
-                sx={{
-                  bgcolor: "#249FFC",
-                  color: "#fff",
-                  py: 1.5,
-                  borderRadius: 3,
-                  mt: 2,
-                  fontSize: 16,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  textTransform: "none",
-                  "&:hover": { bgcolor: "#1d93d7" },
-                }}
-              >
-                <CallIcon /> {t("actions.call")}
-              </Button>
-            </Box>
+            {/* Buy Card */}
+            <ProductBuyBlock
+              finalPrice={finalPrice}
+              currency={product.currency}
+              hasDiscount={hasDiscount}
+              oldPrice={oldPrice}
+              discountPercentage={product.discountPercentage}
+              inStock={isProductInStock(product)}
+              inBasket={inBasket}
+              isFavorite={isFavorite}
+              isDistributor={isDistributor}
+              dealerPriceLabel={t("dealerPrice") ?? "Дилерская цена"}
+              inStockLabel={t("inStock")}
+              notAvailableLabel={t("notAvailable")}
+              currencyLabel={t("currency")}
+              addToCartLabel={t("actions.addToCart")}
+              addedLabel={t("actions.added")}
+              buyAsLegalLabel={t("actions.buyAsLegal")}
+              deliveryTitle={t("pickup.delivery.title")}
+              deliveryDesc={t("pickup.delivery.description")}
+              pickupTitle={t("pickup.pickup.title")}
+              pickupAddress={t("pickup.pickup.address")}
+              questionsTitle={t("pickup.questions.title")}
+              onBasketClick={onBasketClick}
+              onFavoriteClick={(e) => onFavoriteClick(e, product)}
+              onCheckoutClick={onCheckoutClick}
+            />
           </Box>
 
-          {/* INFO BLOCKS */}
-          <Box
-            sx={{
-              width: "100%",
-              bgcolor: "#f4f4f4",
-              borderRadius: 3,
-              display: "flex",
-              mt: 4,
-              justifyContent: "space-between",
-              alignItems: "center",
-              color: "#000",
-              overflowX: { xs: "auto", lg: "hidden" },
-            }}
+          {/* Info blocks — desktop */}
+        </Box>
+
+        {/* About product — desktop */}
+        <Box
+          sx={{
+            mt: { xs: 2, md: 4 },
+            bgcolor: "#fff",
+            borderRadius: 3,
+            p: { xs: 2, md: 3 },
+            display: { xs: "none", md: "block" },
+          }}
+        >
+          <Typography
+            sx={{ fontSize: 18, fontWeight: 700, color: "#000", mb: 1 }}
           >
-            <InfoItem
-              icon="/Pickup.svg"
-              title={t("pickup.pickup.title")}
-              desc={t("pickup.pickup.address")}
-            />
-            <Divider
-              orientation="vertical"
-              flexItem
-              sx={{ my: 4, display: { xs: "none", lg: "block" } }}
-            />
-            <InfoItem
-              icon="/Delivery.svg"
-              title={t("pickup.delivery.title")}
-              desc={t("pickup.delivery.description")}
-            />
-            <Divider
-              orientation="vertical"
-              flexItem
-              sx={{ my: 4, display: { xs: "none", lg: "block" } }}
-            />
-            <Box
+            {"О товаре"}
+          </Typography>
+          <Typography sx={{ color: "#555", fontSize: 14, lineHeight: 1.9 }}>
+            {product.description || product.shortText || ""}
+          </Typography>
+        </Box>
+
+        {/* ─── MOBILE LAYOUT ──────────────────────────────────────────── */}
+        <Box sx={{ display: { xs: "block", md: "none" } }}>
+          {/* Product title */}
+          <Typography
+            sx={{ fontSize: 18, fontWeight: 700, color: "#000", mb: 2, px: 1 }}
+          >
+            {title}
+          </Typography>
+
+          {/* Product gallery */}
+          <ProductGallery
+            images={images}
+            activeImage={activeImage}
+            title={title}
+            onImageSelect={setActiveImage}
+          />
+
+          {/* Description */}
+          <Box sx={{ bgcolor: "#fff", borderRadius: 3, p: 2, mb: 2 }}>
+            <Typography
+              sx={{ fontSize: 16, fontWeight: 700, mb: 1.5, color: "#000" }}
+            >
+              {t("description")}
+            </Typography>
+            <Typography
               sx={{
-                textAlign: "center",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 1,
-                flex: 1,
-                minWidth: 280,
+                color: "#555",
+                fontSize: 13,
+                lineHeight: 1.75,
+                display: "-webkit-box",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: isExpanded ? "unset" : 6,
+                overflow: "hidden",
               }}
             >
-              <Typography>{t("pickup.questions.title")}</Typography>{" "}
+              {product.shortText}
+            </Typography>
+            {product.shortText && product.shortText.length > 200 && (
               <Button
-                variant="contained"
-                component="a"
-                href="https://t.me/ProtouchMarket"
-                target="_blank"
-                rel="noopener noreferrer"
-                startIcon={<TelegramIcon />}
+                onClick={() => setIsExpanded(!isExpanded)}
+                endIcon={
+                  isExpanded ? (
+                    <KeyboardArrowUpIcon />
+                  ) : (
+                    <KeyboardArrowDownIcon />
+                  )
+                }
                 sx={{
-                  bgcolor: "#249FFC",
-                  borderRadius: 4,
-                  px: 4,
-                  color: "#fff",
+                  mt: 1,
+                  color: "#249FFC",
+                  fontWeight: 600,
                   textTransform: "none",
-                  "&:hover": { bgcolor: "#1E8BD8" },
+                  p: 0,
+                  fontSize: 13,
                 }}
               >
-                Telegram
+                {isExpanded ? t("collapse") : t("readMore")}
               </Button>
+            )}
+          </Box>
+
+          {/* Features / Characteristics */}
+          {characteristics.length > 0 && (
+            <Box sx={{ bgcolor: "#fff", borderRadius: 3, p: 2, mb: 2 }}>
+              <Typography
+                sx={{ fontSize: 16, fontWeight: 700, mb: 1.5, color: "#000" }}
+              >
+                {t("characteristics") ?? "Характеристики"}:
+              </Typography>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                {characteristics.map((f) => (
+                  <SpecRow key={f.id} label={f.key} value={f.value} />
+                ))}
+              </Box>
             </Box>
+          )}
+
+          {/* Buy block */}
+          <ProductBuyBlock
+            finalPrice={finalPrice}
+            currency={product.currency}
+            hasDiscount={hasDiscount}
+            oldPrice={oldPrice}
+            discountPercentage={product.discountPercentage}
+            inStock={isProductInStock(product)}
+            inBasket={inBasket}
+            isFavorite={isFavorite}
+            isDistributor={isDistributor}
+            dealerPriceLabel={t("dealerPrice") ?? "Дилерская цена"}
+            inStockLabel={t("inStock")}
+            notAvailableLabel={t("notAvailable")}
+            currencyLabel={t("currency")}
+            addToCartLabel={t("actions.addToCart")}
+            addedLabel={t("actions.added")}
+            buyAsLegalLabel={t("actions.buyAsLegal")}
+            deliveryTitle={t("pickup.delivery.title")}
+            deliveryDesc={t("pickup.delivery.description")}
+            pickupTitle={t("pickup.pickup.title")}
+            pickupAddress={t("pickup.pickup.address")}
+            questionsTitle={t("pickup.questions.title")}
+            onBasketClick={onBasketClick}
+            onFavoriteClick={(e) => onFavoriteClick(e, product)}
+            onCheckoutClick={onCheckoutClick}
+          />
+
+          <Box sx={{ bgcolor: "#fff", borderRadius: 3, p: 2 }}>
+            <Typography
+              sx={{ fontSize: 16, fontWeight: 700, color: "#000", mb: 1 }}
+            >
+              {"О товаре"}
+            </Typography>
+            <Typography sx={{ color: "#555", fontSize: 14, lineHeight: 1.8 }}>
+              {product.description || product.shortText || ""}
+            </Typography>
           </Box>
         </Box>
 
-        <Accessories />
+        <Box sx={{ mt: { xs: 2, md: 4 } }}>
+          <Accessories />
+        </Box>
       </Container>
 
       {/* TOASTS */}
@@ -534,7 +524,6 @@ export default function ProductDetailPage() {
           {t("toasts.addedToCart")}
         </Alert>
       </Snackbar>
-
       <Snackbar
         open={favoriteToast}
         autoHideDuration={2000}
@@ -554,38 +543,3 @@ export default function ProductDetailPage() {
     </Box>
   );
 }
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const InfoItem = ({ icon, title, desc }: any) => (
-  <Box
-    sx={{
-      py: 4,
-      display: "flex",
-      gap: 1,
-      flexDirection: "column",
-      alignItems: "center",
-      textAlign: "center",
-      flex: 1,
-      minWidth: 280,
-    }}
-  >
-    <Image src={icon} alt={title} width={40} height={40} />
-    <Typography fontWeight={600}>{title}</Typography>
-    <Typography fontSize={13} color="#555">
-      {desc}
-    </Typography>
-  </Box>
-);
-
-const actionBtnStyle = {
-  borderRadius: 3,
-  bgcolor: "#fff",
-  color: "#000",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  fontSize: 12,
-  py: 1,
-  border: "1px solid #ddd",
-  textTransform: "none",
-};

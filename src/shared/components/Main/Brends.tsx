@@ -3,47 +3,52 @@
 import { Box, IconButton, Typography } from "@mui/material";
 import Image from "next/image";
 import React, { useRef, useState, useEffect } from "react";
-import { useTranslations } from "next-intl"; // Tarjima uchun hook
+import { useTranslations } from "next-intl";
+import axios from "axios";
+
+import { API_URL } from "../../../entities/config/base";
+import { ensureHttps } from "@/shared/lib/media-url";
+
+type BrandApi = {
+  id: number;
+  name: string;
+  slug: string;
+  imageId?: number | null;
+  image?: { url?: string | null; secureUrl?: string | null } | null;
+};
 
 const Brends = () => {
-  const t = useTranslations("main"); // "main" bo'limidan foydalanamiz
+  const t = useTranslations("main");
+  const [brands, setBrands] = useState<BrandApi[]>([]);
 
-  const brends = [
-    { img: "/dahua.svg" },
-    { img: "/galaxyhub.svg" },
-    { img: "/huawei.svg" },
-    { img: "/minrray.svg" },
-    { img: "/porurobotics.svg" },
-    { img: "/vlinka.svg" },
-    { img: "/iqonex.png" },
-    { img: "/HPBrand.svg" },
-    { img: "/Tenveo.jpg" },
-    { img: "/minew.png" },
-    { img: "/DellBrand.jpg" },
-    { img: "/OKVBrand.jpg" },
-    { img: "/LenovoBrand.jpg" },
-    { img: "/HewlettBrand.jpg" },
-    { img: "/ShileBrand.jpg" },
-    { img: "/yealinkBrend.png" },
-    { img: "/unitreeBrend.png" },
-    { img: "/absenBrend.png" },
-    { img: "/ugreenBrend.png" },
-    { img: "/averBrend.png" },
-    { img: "/yamahaBrend.png" },
-    { img: "/boschBrend.png" },
-  ];
+  useEffect(() => {
+    const controller = new AbortController();
+    const load = async () => {
+      if (!API_URL) return;
+      try {
+        const { data } = await axios.get(`${API_URL}/api/brands`, {
+          signal: controller.signal,
+        });
+        const list = Array.isArray(data) ? (data as BrandApi[]) : [];
+        setBrands(list);
+      } catch {
+        setBrands([]);
+      }
+    };
+    load();
+    return () => controller.abort();
+  }, []);
 
-  const scrollRef = useRef<any>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  // --- 1. AVTOMATIK SCROLL MANTIQI ---
   useEffect(() => {
     const slider = scrollRef.current;
-    let scrollInterval: any;
+    let scrollInterval: ReturnType<typeof setInterval>;
 
     const startAutoScroll = () => {
       scrollInterval = setInterval(() => {
-        if (slider && !slider.isDown) {
+        if (slider && !dragInfo.current.isDown) {
           slider.scrollLeft += 1;
           if (
             slider.scrollLeft >=
@@ -62,31 +67,36 @@ const Brends = () => {
     return () => clearInterval(scrollInterval);
   }, [isHovered]);
 
-  // --- 2. SICHQONCHA BILAN SURISH (DRAG) MANTIQI ---
+  const dragInfo = useRef({ isDown: false, startX: 0, scrollLeftStart: 0 });
+
   const handleMouseDown = (e: React.MouseEvent) => {
     const slider = scrollRef.current;
     if (!slider) return;
-    slider.isDown = true;
-    slider.startX = e.pageX - slider.offsetLeft;
-    slider.scrollLeftStart = slider.scrollLeft;
+    // eslint-disable-next-line react-hooks/immutability
+    dragInfo.current = {
+      isDown: true,
+      startX: e.pageX - slider.offsetLeft,
+      scrollLeftStart: slider.scrollLeft,
+    };
     slider.style.cursor = "grabbing";
   };
 
   const handleMouseLeaveOrUp = () => {
     const slider = scrollRef.current;
     if (!slider) return;
-    slider.isDown = false;
+    // eslint-disable-next-line react-hooks/immutability
+    dragInfo.current.isDown = false;
     slider.style.cursor = "grab";
     setIsHovered(false);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const slider = scrollRef.current;
-    if (!slider || !slider.isDown) return;
+    if (!slider || !dragInfo.current.isDown) return;
     e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
-    const walk = (x - slider.startX) * 1.5;
-    slider.scrollLeft = slider.scrollLeftStart - walk;
+    const walk = (x - dragInfo.current.startX) * 1.5;
+    slider.scrollLeft = dragInfo.current.scrollLeftStart - walk;
   };
 
   const scrollBtn = (dir: "left" | "right") => {
@@ -97,13 +107,16 @@ const Brends = () => {
     });
   };
 
+  if (!brands.length) return null;
+
   return (
-    <Box sx={{ mt: "44px" }}>
+    <Box sx={{ mt: "64px" }}>
       <Typography
         sx={{
           fontSize: "32px",
           fontWeight: 600,
           color: "#000",
+          textAlign: "center",
           "@media (max-width:900px)": {
             fontSize: "26px",
           },
@@ -177,32 +190,54 @@ const Brends = () => {
             WebkitOverflowScrolling: "touch",
           }}
         >
-          {brends.map((item, i) => (
-            <Box
-              key={i}
-              sx={{
-                minWidth: "240px",
-                width: "240px",
-                height: "100px",
-                borderRadius: "18px",
-                border: "1px solid #DDDDDD",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                flexShrink: 0,
-                transition: "transform 0.15s ease",
-                "&:hover": { transform: "scale(1.02)" },
-              }}
-            >
-              <Image
-                src={item.img}
-                alt="brand"
-                width={150}
-                height={60}
-                style={{ objectFit: "contain", pointerEvents: "none" }}
-              />
-            </Box>
-          ))}
+          {brands.map((brand) => {
+            const imageUrl = ensureHttps(brand.image?.url);
+            return (
+              <Box
+                key={brand.id}
+                sx={{
+                  minWidth: "240px",
+                  width: "240px",
+                  height: "100px",
+                  borderRadius: "18px",
+                  border: "1px solid #DDDDDD",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexShrink: 0,
+                  transition: "transform 0.15s ease",
+                  "&:hover": { transform: "scale(1.02)" },
+                }}
+              >
+                {imageUrl ? (
+                  <Box
+                    component="img"
+                    src={imageUrl}
+                    alt={brand.name}
+                    loading="lazy"
+                    sx={{
+                      maxWidth: "150px",
+                      maxHeight: "60px",
+                      objectFit: "contain",
+                      pointerEvents: "none",
+                    }}
+                  />
+                ) : (
+                  <Typography
+                    sx={{
+                      fontSize: 16,
+                      fontWeight: 600,
+                      color: "#1C1C1C",
+                      textAlign: "center",
+                      px: 2,
+                    }}
+                  >
+                    {brand.name}
+                  </Typography>
+                )}
+              </Box>
+            );
+          })}
         </Box>
       </Box>
     </Box>

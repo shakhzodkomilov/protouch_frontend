@@ -1,4 +1,5 @@
 import { createStore, createEvent, sample } from "effector";
+import { normalizeError } from "@/shared/lib/error";
 import {
   getCategoriesFx,
   getProductsFx,
@@ -8,12 +9,9 @@ import {
   searchProductsFx,
   getNewArrivalsFx,
   getRecommendsFx,
-  getStearmAndPodcast,
+  getStreamAndPodcast,
 } from "./effects";
 import { CategoryType, PaginationType, ProductDetailType } from "./types";
-
-// ✅ Error turlari
-type ErrorType = string | { message?: string };
 
 // --- Events ---
 export const loadCategories = createEvent<{
@@ -62,7 +60,7 @@ export const $searchProducts = createStore<PaginationType | null>(null).on(
 );
 
 export const $steamAndPodcast = createStore<PaginationType | null>(null).on(
-  getStearmAndPodcast.doneData,
+  getStreamAndPodcast.doneData,
   (_, data) => data,
 );
 export const $searchLoading = searchProductsFx.pending;
@@ -91,12 +89,12 @@ export const $bestSellers = createStore<PaginationType | null>(null).on(
   getBestSellersFx.doneData,
   (_, data) => data,
 );
-export const $loadingSteamAndPodcast = getStearmAndPodcast.pending;
+export const $loadingSteamAndPodcast = getStreamAndPodcast.pending;
 export const $newArrivals = createStore<PaginationType | null>(null).on(
   getNewArrivalsFx.doneData,
   (_, data) => data,
 );
-export const $Recommends = createStore<PaginationType | null>(null).on(
+export const $recommends = createStore<PaginationType | null>(null).on(
   getRecommendsFx.doneData,
   (_, data) => data,
 );
@@ -116,27 +114,37 @@ export const $loadingRecommend = getRecommendsFx.pending;
 export const $loadingProductDetail = getProductDetailFx.pending;
 
 // --- Error Stores ---
-const getErrorMessage = (e: ErrorType, defaultMsg: string) =>
-  (e && typeof e === "object" && "message" in e
-    ? e.message
-    : defaultMsg) as string;
-
 export const $errorCategories = createStore<string | null>(null).on(
   getCategoriesFx.failData,
-  (_, e) => getErrorMessage(e, "Error loading categories"),
+  (_, e) => normalizeError(e, "Error loading categories"),
 );
 
 export const $errorProducts = createStore<string | null>(null)
   .on(getProductsFx.failData, (_, e) =>
-    getErrorMessage(e, "Error loading products"),
+    normalizeError(e, "Error loading products"),
   )
   .on(getProductsByCategoryFx.failData, (_, e) =>
-    getErrorMessage(e, "Error loading products"),
+    normalizeError(e, "Error loading products"),
   );
 
 export const $errorProductDetail = createStore<string | null>(null).on(
   getProductDetailFx.failData,
-  (_, e) => getErrorMessage(e, "Error loading product"),
+  (_, e) => normalizeError(e, "Error loading product"),
+);
+
+export const $errorSellers = createStore<string | null>(null).on(
+  getBestSellersFx.failData,
+  (_, e) => normalizeError(e, "Failed to load best sellers"),
+);
+
+export const $errorArrivals = createStore<string | null>(null).on(
+  getNewArrivalsFx.failData,
+  (_, e) => normalizeError(e, "Failed to load arrivals"),
+);
+
+export const $errorRecommends = createStore<string | null>(null).on(
+  getRecommendsFx.failData,
+  (_, e) => normalizeError(e, "Failed to load recommends"),
 );
 
 // --- Triggers (Samples) ---
@@ -150,5 +158,5 @@ sample({ clock: loadRecommends, target: getRecommendsFx });
 sample({ clock: searchProducts, target: searchProductsFx });
 sample({
   clock: loadSteamAndPodcast,
-  target: getStearmAndPodcast,
+  target: getStreamAndPodcast,
 });

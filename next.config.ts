@@ -41,7 +41,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "cdn.raumkraft.uz",
-        pathname: "/uploads/**",
+        pathname: "/**",
       },
     ],
   },

@@ -9,6 +9,9 @@
     "comparison": "Taqqoslash",
     "cart": "Savatcha",
     "favorites": "Sevimlilar",
+    "profile": "Profil",
+    "login": "Kirish",
+    "logout": "Chiqish",
     "language": "O'zbekcha",
     "actions": "Aksiyalar",
     "delivery": "Yetkazib berish",
@@ -19,14 +22,22 @@
   },
   "main": {
     "summary": "So'm",
+    "productCategoriesTitle": "Mahsulot kategoriyalari",
     "personalAccount": "Shaxsiy kabinet",
     "accountText": "Bonuslarga ega bo'ling, buyurtmalarni kuzating va fikringiz bilan bo'lishing",
     "login": "Kirish",
     "orders": "Buyurtmalar",
-    "brands": "Brendlar",
+    "brands": "Brend bo'yicha qidiruv",
     "close": "Yopish",
     "bestSellers": "Eng ko'p sotuvda",
     "newsTitle": "Maqolalar yangiliklar",
+    "dealOfTheDay": "Kun tovari",
+    "days": "kun",
+    "hours": "soat",
+    "discount": "Chegirma",
+    "currency": "so'm",
+    "addToCart": "Savatchaga",
+    "noActiveSales": "Faol aksiyalar yo'q",
     "categories": {
       "interactive_panels": "Interaktiv panellar",
       "infokiosks": "Infokioskalar",
@@ -43,7 +54,6 @@
       "switches": "Kommutatorlar"
     }
   },
-
   "ObjectDetail": {
     "description": "Tavsif",
     "readMore": "Batafsil",
@@ -54,7 +64,6 @@
     "breadcrumbs": {
       "home": "Bosh sahifa"
     },
-
     "actions": {
       "compare": "Taqqoslash",
       "inFavorites": "Sevimlilarda",
@@ -64,19 +73,16 @@
       "buyAsLegal": "Yuridik shaxs sifatida sotib olish",
       "call": "Qo‘ng‘iroq qilish"
     },
-
     "currency": "so‘m",
-
+    "dealerPrice": "Diler narxi",
     "toasts": {
       "addedToCart": "Mahsulot savatchaga qo‘shildi!",
       "addedToFavorites": "Sevimlilarga qo‘shildi",
       "removedFromFavorites": "Sevimlilardan olib tashlandi"
     },
-
     "fallback": {
       "product": "Mahsulot"
     },
-
     "pickup": {
       "pickup": {
         "title": "O‘zi olib ketish",
@@ -97,37 +103,31 @@
       "title": "Aksiya va chegirmalardan xabardor bo‘lishni xohlaysizmi?",
       "subtitle": "Bizning kanalga obuna bo‘ling:"
     },
-
     "resources": {
       "title": "Resurslar",
       "personalData": "Shaxsiy ma’lumotlarni qayta ishlash",
       "privacy": "Maxfiylik siyosati",
       "serviceCenters": "Servis markazlari"
     },
-
     "contacts": {
       "title": "Aloqa",
       "address": "Mirabod tumani, Fuqarolar Tong Yulduzi"
     },
-
     "buttons": {
       "telegram": "Telegram"
     }
   },
   "Discount": {
     "title": "@ProtouchMarket",
-
     "intro": {
       "line1": "Elektronika bo‘yicha yangiliklar, aksiyalar va foydali tanlovlar.",
       "line2": "Tanlash bo‘yicha maslahatlar, sharhlar va ulash bo‘yicha yo‘riqnomalar bilan bo‘lishamiz.",
       "line3": "Yangi kelgan mahsulotlar va foydali takliflardan xabardor bo‘ling."
     },
-
     "about": {
       "title": "@ProtouchMarket — Protouch Market’ning rasmiy Telegram kanali",
       "description": "Biz elektronika yo‘nalishlarini kengaytiryapmiz va eng muhim hamda foydali ma’lumotlarni ulashamiz."
     },
-
     "features": [
       "Yangi mahsulotlar va kelib tushgan tovarlar (nimalar keldi, nimalar mavjud)",
       "Aksiyalar va maxsus takliflar",
@@ -137,14 +137,11 @@
       "Ko‘p beriladigan savollarga javoblar va mutaxassislar tavsiyalari",
       "O‘rnatish bo‘yicha кейсlar (tarmoqlar, Wi-Fi, videokuzatuv, digital signage)"
     ],
-
     "subscribe": "Obuna bo‘ling:"
   },
   "Delivery": {
     "pageTitle": "PROTOUCH UZ",
-
     "intro": "Toshkent bo‘ylab yetkazib berish bepul, hududlarga esa pullik. Oldindan kelishilgan holda ofis/ombordan o‘zi olib ketish mumkin. To‘lov: karta, naqd yoki bank o‘tkazmasi.",
-
     "sections": {
       "delivery": {
         "title": "Yetkazib berish",
@@ -156,7 +153,6 @@
           "Yetkazib berish xizmati orqali yuborilganda trek-raqam taqdim etiladi."
         ]
       },
-
       "pickup": {
         "title": "O‘zi olib ketish",
         "items": [
@@ -165,7 +161,6 @@
           "Olish vaqtida mahsulot va to‘liqligini joyida tekshirish mumkin."
         ]
       },
-
       "payment": {
         "title": "To‘lov",
         "items": [
@@ -174,7 +169,6 @@
           "Bank o‘tkazmasi (tashkilotlar uchun)"
         ]
       },
-
       "documents": {
         "title": "Hujjatlar",
         "items": [
@@ -190,6 +184,7 @@
     "outOfStock": "Talab bo'yicha",
     "currency": "so'm",
     "loading": "Yuklanmoqda...",
+    "noProducts": "Ko'rsatish uchun mahsulotlar yo'q",
     "addedToBasket": "Savatchaga qo'shildi!",
     "favoriteAdded": "Sevimlilarga qo'shildi",
     "favoriteRemoved": "Sevimlilardan o'chirildi",
@@ -197,31 +192,25 @@
   },
   "Recommend": {
     "weRecommend": "Biz tavsiya etamiz",
-    "noProducts": "Ko'rsatish uchun mahsulotlar mavjud emas",
-    "steamAndPodcast": "Strim va podkastlar",
-    "newArrivals": "Yangi mahsulotlar",
-    "bestSellers": "Eng ko'p sotilganlar",
-    "inStock": "Mavjud",
-    "outOfStock": "Talab bo'yicha",
-    "currency": "so'm",
+    "noProducts": "Ko'rsatish uchun mahsulotlar yo'q",
+    "steamAndPodcast": "Streaming va podkastlar",
+    "newArrivals": "Yangi kelganlar",
+    "bestSellers": "Bestsellerlar",
+    "inStock": "Sotuvda",
+    "outOfStock": "Talabga ko'ra",
+    "currency": "sum",
     "loading": "Yuklanmoqda...",
-    "addedToBasket": "Savatchaga qo'shildi!",
-    "favoriteAdded": "Sevimlilarga qo'shildi",
-    "favoriteRemoved": "Sevimlilardan o'chirildi"
+    "addedToBasket": "Savatga qo'shildi!",
+    "favoriteAdded": "Sevimlilar ro'yxatiga qo'shildi",
+    "favoriteRemoved": "Sevimlilar ro'yxatidan o'chirildi"
   },
   "About": {
     "heroTitle": "PROTOUCH — davlat va korporativ sektor uchun loyihalarni amalga oshirish tajribasiga ega kompaniya.",
-
     "heroText": "PROTOUCH — davlat va korporativ sektor uchun loyihalarni amalga oshirish tajribasiga ega kompaniya. Ko‘p yillar davomida davlat tashkilotlari va yirik buyurtmachilar bilan ishlaganmiz, shuning uchun sifat, muddat, hujjatlar va mas’uliyat talablarini yaxshi tushunamiz. 2026 yilda biz loyihani kengaytirib, PMarket B2B internet-do‘konini ishga tushirdik — biznes uchun elektronika va IT-yechimlarni xarid qilishni yanada oson, tez va qulay qilish uchun. Bizning maqsadimiz — sifatli va hamyonbop mahsulotlarga qulay kirish imkonini yaratish va eng yaxshi servisni taqdim etish.",
-
     "directionsTitle": "Bizning yo‘nalishlarimiz",
-
     "directionsText": "Yillar davomida biz yo‘nalishlarni kengaytirib, kuchli muhandis va mutaxassislar jamoasini shakllantirdik. Bugun biz vazifalarni kompleks tarzda hal qilamiz — uskunani tanlashdan tortib loyihalash, yetkazib berish, o‘rnatish, sozlash va qo‘llab-quvvatlashgacha. Asosiy yo‘nalishlarimiz: elektronika va IT-uskunalar, server va infratuzilma, tarmoq yechimlari, IP-telefoniyа, konferensiya va VKS tizimlari, digital signage va ekranlar, dasturiy ta’minot va litsenziyalar, interaktiv panellar va xonalarni jihozlash, shuningdek, aniq vazifalar uchun “noldan tayyor holatgacha” yechimlar.",
-
     "trustTitle": "Bizga ishonishadi",
-
     "trustText": "Wyndham Charvak, Hilton, CAEx Uzbekistan, UzExpo Center, NBU Bank, Kapital Bank, Orient Finans Bank, Ucell, Beeline Uzbekistan, IT Park, Turonbank, SQB, Xalq Bank va boshqa yirik tashkilotlar. O‘zbekiston bo‘ylab 300 dan ortiq muvaffaqiyatli amalga oshirilgan loyihalar.",
-
     "timeline": [
       {
         "year": "2019-yil",
@@ -325,7 +314,6 @@
       "description": "Ushbu bo‘lim kompaniyalar va korporativ mijozlar uchun mo‘ljallangan bo‘lib, uskunalarni qulay va shaffof shartlarda xarid qilish imkonini beradi.",
       "subDescription": "Biz uzoq muddatli hamkorlikka ochiqmiz va biznes hamda davlat tashkilotlari uchun samarali yechimlarni taklif qilamiz."
     },
-
     "partners": {
       "title": "Hamkorlar va dilerlar uchun",
       "description": "Biz yuridik shaxslar bilan hamkorlikdan mamnunmiz va kompaniyalarni rasmiy diler bo‘lishga taklif qilamiz.",
@@ -339,7 +327,6 @@
       ],
       "cta": "Agar hamkorlikka qiziqsangiz — biz bilan bog‘laning, sizga individual shartlarni taklif qilamiz."
     },
-
     "projects": {
       "title": "Loyihaviy yetkazib berish va individual buyurtmalar",
       "description": "Biz har qanday murakkablikdagi loyihalarni amalga oshiramiz — ofislar, konferensiya zallari, o‘quv va tibbiyot muassasalari uchun.",
@@ -350,7 +337,6 @@
         "O‘rnatish va servis xizmati"
       ]
     },
-
     "brands": {
       "title": "Rasmiy dilerlik va brendlar",
       "list": [
@@ -366,7 +352,6 @@
       ],
       "description": "Mahsulotlar original bo‘lib, rasmiy kafolat va texnik qo‘llab-quvvatlash bilan ta’minlanadi."
     },
-
     "howToOrder": {
       "title": "Yuridik shaxs sifatida buyurtma berish tartibi",
       "steps": [
@@ -378,7 +363,6 @@
         "Shaxsiy menejer siz bilan bog‘lanadi"
       ]
     },
-
     "documents": {
       "title": "Taqdim etiladigan hujjatlar",
       "list": [
@@ -390,7 +374,6 @@
         "Kafolat va servis hujjatlari"
       ]
     },
-
     "advantages": {
       "title": "Nega bizni tanlashadi",
       "list": [
@@ -402,10 +385,8 @@
         "Hujjatlar avtomatlashtirilgan"
       ]
     },
-
     "footerCta": "Maslahat olish, individual taklif yoki hamkorlik uchun biz bilan bog‘laning. Uzoq muddatli hamkorlikdan mamnun bo‘lamiz."
   },
-
   "basket": {
     "title": "Savatcha",
     "breadcrumbs": {
@@ -427,6 +408,10 @@
       "items": "mahsulot",
       "currency": "so'm",
       "checkout": "Rasmiylashtirish"
+    },
+    "orderForm": {
+      "back": "Orqaga",
+      "toCatalog": "Katalogga o'tish"
     }
   },
   "favorites": {
@@ -750,12 +735,34 @@
   },
   "checkout": {
     "title": "Xaridor ma'lumotlari",
+    "loginBtn": "Kirish",
+    "registerBtn": "Ro'yxatdan o'tish",
+    "loginSubtitle": "Akkauntingizga kiring va ma'lumotlaringiz avtomatik to'ldiriladi",
+    "password": "Parol",
+    "loggedInAs": "Siz tizimga kirdingiz:",
+    "individual": "Jismoniy shaxs",
+    "legal": "Yuridik shaxs",
     "name": "Ism",
+    "surname": "Familiya",
     "phone": "Telefon raqami:",
     "address": "Manzil",
+    "region": "Hudud",
+    "selectRegion": "Hududni tanlang",
+    "companyName": "Tashkilot nomi",
+    "inn": "INN",
     "confirm": "Tasdiqlash",
+    "submitLegal": "Buyurtmani yuborish",
+    "submitLead": "Ariza yuborish",
+    "orderComposition": "Buyurtma tarkibi",
+    "total": "Jami",
     "errorPhone": "Iltimos, telefon raqamingizni to'liq kiriting (+998XXXXXXXXX)",
     "errorGeneral": "Xatolik yuz berdi",
-    "success": "Ma'lumotlar qabul qilindi"
+    "success": "Ma'lumotlar qabul qilindi",
+    "successTitle": "Buyurtma qabul qilindi!",
+    "successMessage": "Ma'lumotlaringiz muvaffaqiyatli yuborildi. Tez orada siz bilan bog'lanamiz."
+  },
+  "profile": {
+    "basket": "Savatcha",
+    "favorites": "Sevimlilar"
   }
 }

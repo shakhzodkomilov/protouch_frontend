@@ -1,64 +1,93 @@
 import axios from "axios";
 import { createEffect } from "effector";
 import { API_URL } from "../../config/base";
+import { ensureHttps } from "@/shared/lib/media-url";
 import {
   CategoryType,
-  Image,
   PaginationType,
   Product,
   ProductDetailType,
+  ProductImageLegacy,
+  ProductMedia,
 } from "./types";
 
-const ensureHttps = (url?: string) => {
-  if (!url) {
-    return url;
-  }
-
-  // Media server at 46.62.220.230:9000 does not serve HTTPS (no valid TLS),
-  // so always use plain HTTP for that origin.
-  if (
-    url.startsWith("https://46.62.220.230:9000/") ||
-    url.startsWith("http://46.62.220.230:9000/")
-  ) {
-    return `http://${url.slice(url.indexOf("46.62.220.230:9000/"))}`;
-  }
-
-  if (url.startsWith("http://")) {
-    return `https://${url.slice("http://".length)}`;
-  }
-
-  return url;
+const getAuthHeaders = (): Record<string, string> => {
+  if (typeof window === "undefined") return {};
+  const token = localStorage.getItem("accessToken");
+  return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-const normalizeImage = (image?: Image) =>
+const normalizeLegacyImage = (image?: ProductImageLegacy) =>
   image ? { ...image, url: ensureHttps(image.url) } : image;
 
-const normalizeProduct = (product: Product): Product => ({
-  ...product,
-  image: ensureHttps(product.image),
-});
+const pickCoverImage = (media?: ProductMedia[]) => {
+  if (!media?.length) return undefined;
+  const cover =
+    media.find((m) => m.isCover) ??
+    [...media].sort(
+      (a, b) =>
+        (a.position ?? Number.MAX_SAFE_INTEGER) -
+        (b.position ?? Number.MAX_SAFE_INTEGER),
+    )[0];
+  return ensureHttps(cover?.url);
+};
 
-const normalizePagination = (pagination: PaginationType): PaginationType => ({
-  ...pagination,
-  results: pagination.results.map(normalizeProduct),
-});
+const normalizeProduct = (product: Product): Product => {
+  const image = pickCoverImage(product.media) ?? ensureHttps(product.image);
+  const title = product.name ?? product.title ?? "";
+  const short_description = product.shortText ?? product.short_description;
+  const is_in_stock =
+    product.is_in_stock ??
+    (product.availability === "IN_STOCK" && (product.quantityInStock ?? 0) > 0);
+  const is_pre_order = product.is_pre_order ?? Boolean(product.underOrder);
+
+  return {
+    ...product,
+    image,
+    title,
+    short_description,
+    is_in_stock,
+    is_pre_order,
+    price: Number(product.price),
+    dealerPrice: product.dealerPrice != null ? Number(product.dealerPrice) : null,
+    partnerPrice: product.partnerPrice != null ? Number(product.partnerPrice) : null,
+    displayPrice: product.displayPrice != null ? Number(product.displayPrice) : undefined,
+    media: product.media?.map((m) => ({
+      ...m,
+      url: ensureHttps(m.url) ?? m.url,
+    })),
+  };
+};
+
+const normalizePagination = (
+  pagination: PaginationType | null | undefined,
+): PaginationType => {
+  const results = pagination?.results;
+  return {
+    count: pagination?.count ?? 0,
+    next: pagination?.next ?? null,
+    previous: pagination?.previous ?? null,
+    results: Array.isArray(results) ? results.map(normalizeProduct) : [],
+  };
+};
 
 export const getCategoriesFx = createEffect<
   { is_carousel?: string; lang?: string },
   CategoryType[]
 >(async (params) => {
   const { data } = await axios.get(
-    `${API_URL}/api/v1/products/categories/?is_carousel=true`,
+    `${API_URL}/api/products/categories/?is_carousel=true`,
     {
       params: {
         is_carousel: params.is_carousel,
         lang: params.lang || "ru",
       },
+      headers: getAuthHeaders(),
     },
   );
   return data.map((category: CategoryType) => ({
     ...category,
-    image: normalizeImage(category.image),
+    image: normalizeLegacyImage(category.image),
   }));
 });
 
@@ -72,11 +101,12 @@ export const getProductsFx = createEffect<
   },
   PaginationType
 >(async (params) => {
-  const { data } = await axios.get(`${API_URL}/api/v1/products/`, {
+  const { data } = await axios.get(`${API_URL}/api/products/`, {
     params: {
       ...params,
       lang: params.lang || "ru",
     },
+    headers: getAuthHeaders(),
   });
   return normalizePagination(data);
 });
@@ -85,81 +115,96 @@ export const getProductDetailFx = createEffect<
   { product_id: string; lang?: string },
   ProductDetailType
 >(async ({ product_id, lang }) => {
-  const { data } = await axios.get(
-    `${API_URL}/api/v1/products/product/${product_id}/`,
-    { params: { lang: lang || "ru" } },
-  );
+  const { data } = await axios.get(`${API_URL}/api/products/${product_id}`, {
+    params: { lang: lang || "ru" },
+    headers: getAuthHeaders(),
+  });
+
+  const normalized = normalizeProduct(data as Product);
+  const images =
+    (data.images as ProductImageLegacy[] | undefined)?.map(
+      normalizeLegacyImage,
+    ) ??
+    (data.media as ProductMedia[] | undefined)?.map((m) => ({
+      id: String(m.id),
+      url: ensureHttps(m.url) ?? m.url,
+    })) ??
+    [];
 
   return {
-    ...data,
-    price: Number(data.price),
-    image: ensureHttps(data.image),
-    images: data.images?.map((image) => normalizeImage(image)) ?? [],
+    ...(data as ProductDetailType),
+    ...normalized,
+    images,
+    image: normalized.image,
   };
 });
 
 export const getBestSellersFx = createEffect<{ lang?: string }, PaginationType>(
   async ({ lang }) => {
-    const { data } = await axios.get(
-      `${API_URL}/api/v1/products/?slug=sales-hits`,
-      {
-        params: { is_bestseller: true, lang: lang || "ru" },
+    const { data } = await axios.get(`${API_URL}/api/products`, {
+      params: {
+        categorySlug: "best-seller",
+        lang: lang || "ru",
       },
-    );
-    return normalizePagination(data);
+      headers: getAuthHeaders(),
+    });
+
+    const paginated = Array.isArray(data)
+      ? { count: data.length, next: null, previous: null, results: data }
+      : data;
+
+    return normalizePagination(paginated);
   },
 );
 
-// export const getSelesHItsFx = createEffect<
-//   { lang?: string; page?: number },
-//   PaginationType
-// >(async ({ lang, page = 1 }) => {
-//   const { data } = await axios.get(`${API_URL}/apiv1/products/`, {
-//     params: {
-//       page,
-//       slug: "sales-hits",
-//       lang: lang || "ru",
-//     },
-//   });
-//   return data;
-// });
-//BestSellers
 export const getNewArrivalsFx = createEffect<{ lang?: string }, PaginationType>(
   async ({ lang }) => {
-    const { data } = await axios.get(
-      `${API_URL}/api/v1/products/?slug=new-arrivals`,
-      {
-        params: { is_new: true, lang: lang || "ru" },
+    const { data } = await axios.get(`${API_URL}/api/products`, {
+      params: {
+        categorySlug: "new-collection",
+        lang: lang || "ru",
       },
-    );
-    return normalizePagination(data);
+      headers: getAuthHeaders(),
+    });
+
+    const paginated = Array.isArray(data)
+      ? { count: data.length, next: null, previous: null, results: data }
+      : data;
+
+    return normalizePagination(paginated);
   },
 );
 
 //Reccomend
 export const getRecommendsFx = createEffect<{ lang?: string }, PaginationType>(
   async ({ lang }) => {
-    const { data } = await axios.get(
-      `${API_URL}/api/v1/products/?slug=we-recommend`,
-      {
-        params: { is_new: true, lang: lang || "ru" },
+    const { data } = await axios.get(`${API_URL}/api/products`, {
+      params: {
+        categorySlug: "recommend",
+        lang: lang || "ru",
       },
-    );
-    return normalizePagination(data);
+      headers: getAuthHeaders(),
+    });
+    const paginated = Array.isArray(data)
+      ? { count: data.length, next: null, previous: null, results: data }
+      : data;
+
+    return normalizePagination(paginated);
   },
 );
-
-//Steam and podcast
-export const getStearmAndPodcast = createEffect<
+// Stream and podcast
+export const getStreamAndPodcast = createEffect<
   { lang?: string },
   PaginationType
 >(async ({ lang }) => {
-  const { data } = await axios.get(
-    `${API_URL}/api/v1/products/?slug=studio-audio-equipment/stream-and-podcast`,
-    {
-      params: { is_new: true, lang: lang || "ru" },
+  const { data } = await axios.get(`${API_URL}/api/products/`, {
+    params: {
+      slug: "studio-audio-equipment/stream-and-podcast",
+      is_new: true,
+      lang: lang || "ru",
     },
-  );
+    headers: getAuthHeaders(),
+  });
   return normalizePagination(data);
 });
 
@@ -167,13 +212,14 @@ export const getProductsByCategoryFx = createEffect<
   { slugs?: string; page: number; lang?: string },
   PaginationType
 >(async ({ slugs, page, lang }) => {
-  const { data } = await axios.get(`${API_URL}/api/v1/products/`, {
+  const { data } = await axios.get(`${API_URL}/api/products/`, {
     params: {
       page,
       ...(slugs && { slug: slugs }),
       brand: "",
       lang: lang || "ru",
     },
+    headers: getAuthHeaders(),
   });
   return normalizePagination(data);
 });
@@ -182,12 +228,13 @@ export const searchProductsFx = createEffect<
   { lang?: string; search: string; page?: number },
   PaginationType
 >(async ({ lang, search, page = 1 }) => {
-  const { data } = await axios.get(`${API_URL}/api/v1/products/`, {
+  const { data } = await axios.get(`${API_URL}/api/products/`, {
     params: {
       page,
       title: search || undefined,
       lang: lang || "ru",
     },
+    headers: getAuthHeaders(),
   });
   return normalizePagination(data);
 });

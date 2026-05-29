@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     title: "Protouch | Интерактивные технологии в Ташкенте",
     description:
       "Сенсорные панели, инфокиоски и роботы — современные решения от Protouch.",
-    images: ["faviconn.png"],
+    images: ["/favicon.png"],
   },
   alternates: {
     canonical: "https://protouch.uz/ru",

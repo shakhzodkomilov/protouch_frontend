@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import Image from "next/image";
 import { $categories } from "../../../entities/product/model";
-import { CategoryType as ProductServiceCategoryType } from "../../../entities/types/productService.types";
+import type { CategoryType } from "../../../entities/product/model/types";
 
 // ✅ FIXED: Create compatible type from model store
 type ModelCategoryType = {
@@ -38,10 +38,8 @@ type ModelCategoryType = {
 
 interface CatalogDropdownProps {
   isOpen: boolean;
-  activeCategory: ProductServiceCategoryType | ModelCategoryType | null;
-  onCategoryHover: (
-    category: ProductServiceCategoryType | ModelCategoryType,
-  ) => void;
+  activeCategory: CategoryType | ModelCategoryType | null;
+  onCategoryHover: (category: CategoryType | ModelCategoryType) => void;
   onClose: () => void;
 }
 

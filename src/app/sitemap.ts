@@ -32,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     while (hasNextPage) {
-      const res = await axios.get(`${API_URL}/api/v1/products/`, {
+      const res = await axios.get(`${API_URL}/api/products/`, {
         params: { page: currentPage, lang: "ru" },
       });
 
@@ -49,7 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 
     const categoriesRes = await axios.get(
-      `${API_URL}/api/v1/products/categories/`,
+      `${API_URL}/api/products/categories/`,
     );
     const categories = categoriesRes.data ?? [];
 

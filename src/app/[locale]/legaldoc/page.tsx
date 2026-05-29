@@ -3,14 +3,13 @@ import React from "react";
 import {
   Box,
   Typography,
-  Link,
+  Link as MuiLink,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
   Paper,
   Stack,
-  Link as MuiLink,
 } from "@mui/material";
 import {
   Gavel,
@@ -20,7 +19,6 @@ import {
   CheckCircle,
 } from "@mui/icons-material";
 import { useTranslations } from "next-intl";
-import { color } from "framer-motion";
 
 const ProcurementPage = () => {
   const t = useTranslations("procurement");
@@ -272,7 +270,7 @@ const ProcurementPage = () => {
                   >
                     {t(`platforms.items.${p.id}`)}
                   </Typography>
-                  <Link
+                  <MuiLink
                     href={p.url}
                     target="_blank"
                     sx={{
@@ -282,7 +280,7 @@ const ProcurementPage = () => {
                     }}
                   >
                     {p.url}
-                  </Link>
+                  </MuiLink>
                 </Box>
               ))}
             </Box>

@@ -29,11 +29,18 @@ const CustomerDataForm = () => {
 
   const handleSendToTelegram = async () => {
     try {
-      const { docx, pdf, filesName } = await sendToTelegramGroup(formData, {
+      const result = await sendToTelegramGroup(formData, {
         items,
         totalCount,
         totalPrice,
       });
+
+      if ("error" in result) {
+        alert(result.error);
+        return;
+      }
+
+      const { docx, pdf, filesName } = result;
 
       const docxBlob = new Blob(
         [Uint8Array.from(atob(docx), (c) => c.charCodeAt(0))],

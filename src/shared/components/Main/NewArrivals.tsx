@@ -1,21 +1,10 @@
 "use client";
 
-import {
-  Box,
-  IconButton,
-  Typography,
-  Snackbar,
-  Alert,
-  Button,
-} from "@mui/material";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { Box, IconButton, Typography, Snackbar, Alert } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import { useUnit } from "effector-react";
 import { useParams } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
-import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import DoneIcon from "@mui/icons-material/Done";
 import { useTranslations } from "next-intl";
 
 import {
@@ -23,20 +12,9 @@ import {
   $loadingArrivals,
   loadArrivals,
 } from "../../../entities/product/model";
-import { addToBasket, $basket } from "../../../entities/basket/model/store";
-import {
-  toggleFavorite,
-  loadFavorites,
-  $favorites,
-} from "../../../entities/favourite/model/store";
-
-interface ProductItem {
-  id: string | number;
-  image: string;
-  short_description: string;
-  price: number;
-  is_in_stock: boolean;
-}
+import { loadFavorites } from "../../../entities/favourite/model/store";
+import ProductCard from "../../Product/ProductCard";
+import { Product } from "../../../entities/product/model/types";
 
 const NewArrivals = () => {
   const { locale } = useParams();
@@ -47,12 +25,7 @@ const NewArrivals = () => {
     $loadingArrivals,
     loadArrivals,
   ]);
-  const { items: basketItems } = useUnit($basket);
-  const favorites = useUnit($favorites);
-  const handleAddToBasket = useUnit(addToBasket);
-  const handleToggleFavorite = useUnit(toggleFavorite);
   const loadFavoritesEv = useUnit(loadFavorites);
-
   const [openBasketToast, setOpenBasketToast] = useState(false);
   const [openFavoriteToast, setOpenFavoriteToast] = useState(false);
   const [lastActionType, setLastActionType] = useState<"add" | "remove" | null>(
@@ -71,18 +44,6 @@ const NewArrivals = () => {
     loadArrivalsEv({ lang: (locale as string) || "ru" });
     loadFavoritesEv();
   }, [loadArrivalsEv, loadFavoritesEv, locale]);
-
-  const isItemInBasket = useCallback(
-    (productId: string | number) =>
-      basketItems.some((item) => String(item.productId) === String(productId)),
-    [basketItems],
-  );
-
-  const isItemFavorite = useCallback(
-    (productId: string | number) =>
-      favorites.some((item) => String(item.productId) === String(productId)),
-    [favorites],
-  );
 
   // --- DRAG HANDLERS ---
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -121,52 +82,6 @@ const NewArrivals = () => {
     }
   };
 
-  const onFavoriteClick = useCallback(
-    (e: React.MouseEvent, item: ProductItem) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (dragInfo.current.hasMoved) return;
-
-      const wasFavorite = isItemFavorite(item.id);
-      handleToggleFavorite({
-        id: Number(new Date()),
-        productId: item.id,
-        title: item.short_description || "Product",
-        image: item.image,
-        price: item.price,
-      });
-      setLastActionType(wasFavorite ? "remove" : "add");
-      setOpenFavoriteToast(true);
-    },
-    [handleToggleFavorite, isItemFavorite],
-  );
-
-  const onBasketClick = useCallback(
-    (e: React.MouseEvent, item: ProductItem) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (dragInfo.current.hasMoved) return;
-
-      if (item.is_in_stock) {
-        const numericId =
-          typeof item.id === "string" ? parseInt(item.id, 10) : item.id;
-        handleAddToBasket({
-          id: numericId,
-          productId: numericId,
-          title: item.short_description || "Product",
-          price: item.price,
-          image: item.image,
-          quantity: 1,
-          isInStock: true,
-        });
-        setOpenBasketToast(true);
-      } else {
-        window.location.href = `tel:+998000000000`;
-      }
-    },
-    [handleAddToBasket],
-  );
-
   const scrollBtn = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollBy({
@@ -182,6 +97,7 @@ const NewArrivals = () => {
           fontSize: "32px",
           fontWeight: 600,
           color: "#000",
+          textAlign: "center",
           "@media (max-width:900px)": { fontSize: "26px" },
         }}
       >
@@ -239,129 +155,28 @@ const NewArrivals = () => {
         >
           {loading ? (
             <Typography sx={{ p: 4 }}>{t("loading")}</Typography>
+          ) : !arrivals?.results?.length ? (
+            <Typography sx={{ p: 4, color: "#999" }}>
+              {t("noProducts")}
+            </Typography>
           ) : (
-            arrivals?.results?.map((item: ProductItem) => {
-              const inBasket = isItemInBasket(item.id);
-              const isFavorite = isItemFavorite(item.id);
-              return (
-                <Link
-                  key={item.id}
-                  href={`/${locale}/product/${item.id}`}
-                  style={{ textDecoration: "none" }}
-                  onClickCapture={preventClickIfDragged}
-                  onDragStart={(e) => e.preventDefault()}
-                >
-                  <Box sx={cardStyle}>
-                    <Box
-                      sx={{ display: "flex", justifyContent: "space-between" }}
-                    >
-                      <Typography sx={statusBadgeStyle(item.is_in_stock)}>
-                        {item.is_in_stock ? t("inStock") : t("outOfStock")}
-                      </Typography>
-                      <Box
-                        sx={{ display: "flex", gap: 1, alignItems: "center" }}
-                      >
-                        <Image
-                          src="/scale.svg"
-                          height={24}
-                          width={24}
-                          alt="compare"
-                        />
-                        <IconButton
-                          size="small"
-                          onClick={(e) => onFavoriteClick(e, item)}
-                          sx={{
-                            p: 0.25,
-                            color: isFavorite ? "#ff4444" : "#4E4E4E",
-                          }}
-                        >
-                          {isFavorite ? (
-                            <FavoriteIcon />
-                          ) : (
-                            <FavoriteBorderOutlinedIcon />
-                          )}
-                        </IconButton>
-                      </Box>
-                    </Box>
-
-                    <Box
-                      sx={{
-                        position: "relative",
-                        width: "100%",
-                        height: "180px",
-                        my: 2,
-                        pointerEvents: "none",
-                        "@media (max-width:900px)": {
-                          height: "140px",
-                          width: "120px",
-                          margin: "0 auto",
-                        },
-                      }}
-                    >
-                      <Image
-                        src={item.image}
-                        alt="product"
-                        fill
-                        style={{ objectFit: "contain" }}
-                      />
-                    </Box>
-
-                    <Box sx={{ flexGrow: 1 }}>
-                      <Typography sx={descriptionStyle}>
-                        {item.short_description}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          color: "#000",
-                          fontWeight: 700,
-                          fontSize: "18px",
-                          "@media (max-width:1000px)": { fontSize: "16px" },
-                        }}
-                      >
-                        {new Intl.NumberFormat("ru-RU").format(item.price)}{" "}
-                        {t("currency")}
-                      </Typography>
-                    </Box>
-
-                    <Button
-                      onClick={(e) => onBasketClick(e, item)}
-                      sx={{
-                        ...actionBtnStyle,
-                        bgcolor: inBasket ? "#3BB351" : "#249FFC",
-                        width: { xs: "40px", md: "50px" },
-                        height: { xs: "44px", md: "50px" },
-                        minWidth: { xs: "44px", md: "54px" },
-                        "&:hover": {
-                          bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
-                        },
-                        "& img": {
-                          width: { xs: "22px", md: "26px" },
-                          height: { xs: "22px", md: "26px" },
-                        },
-                      }}
-                    >
-                      {inBasket ? (
-                        <DoneIcon
-                          sx={{ color: "#fff", fontSize: { xs: 24, md: 30 } }}
-                        />
-                      ) : (
-                        <Image
-                          src={
-                            item.is_in_stock
-                              ? "/basketIcon.svg"
-                              : "/call-outline_white.svg"
-                          }
-                          alt="icon"
-                          width={24}
-                          height={24}
-                          style={{ objectFit: "contain" }}
-                        />
-                      )}
-                    </Button>
-                  </Box>
-                </Link>
-              );
-            })
+            arrivals.results.map((item: Product) => (
+              <Box
+                key={item.id}
+                onClickCapture={preventClickIfDragged}
+                onDragStart={(e) => e.preventDefault()}
+                sx={{ flexShrink: 0, scrollSnapAlign: "start" }}
+              >
+                <ProductCard
+                  product={item}
+                  onAddedToBasket={() => setOpenBasketToast(true)}
+                  onToggledFavorite={(added) => {
+                    setLastActionType(added ? "add" : "remove");
+                    setOpenFavoriteToast(true);
+                  }}
+                />
+              </Box>
+            ))
           )}
         </Box>
       </Box>
@@ -412,63 +227,6 @@ const navBtnStyle = {
   boxShadow: 3,
   borderRadius: "50%",
   "&:hover": { bgcolor: "#f0f0f0" },
-};
-
-const cardStyle = {
-  width: 300,
-  minHeight: "420px",
-  borderRadius: 3,
-  p: 2,
-  boxShadow: "0px 4px 20px rgba(0,0,0,0.08)",
-  bgcolor: "#fff",
-  flexShrink: 0,
-  display: "flex",
-  position: "relative",
-  flexDirection: "column",
-  "@media (max-width:900px)": {
-    minHeight: "320px",
-    width: "240px",
-  },
-};
-
-const statusBadgeStyle = (isInStock: boolean) => ({
-  padding: "4px 12px",
-  borderRadius: "8px",
-  fontSize: "14px",
-  fontWeight: 500,
-  color: isInStock ? "#3BB351" : "#FF5F5F",
-  bgcolor: isInStock ? "#D6F2DB" : "#FFE4E4",
-});
-
-const descriptionStyle = {
-  fontWeight: 600,
-  fontSize: "16px",
-  mb: 1,
-  display: "-webkit-box",
-  WebkitBoxOrient: "vertical",
-  WebkitLineClamp: 2,
-  color: "rgb(78, 78, 78)",
-  overflow: "hidden",
-  "@media (max-width:1000px)": {
-    fontSize: "14px",
-  },
-};
-
-const actionBtnStyle = {
-  minWidth: "54px",
-  height: "54px",
-  borderRadius: "50%",
-  position: "absolute",
-  right: "15px",
-  bottom: "15px",
-  "@media (max-width:1000px)": {
-    minWidth: "44px",
-    height: "44px",
-    borderRadius: "50%",
-    position: "absolute",
-    right: "15px",
-    bottom: "15px",
-  },
 };
 
 export default NewArrivals;
