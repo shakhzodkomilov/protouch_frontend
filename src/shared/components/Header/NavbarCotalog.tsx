@@ -171,11 +171,12 @@ const NavbarCatalog = () => {
         });
         const list = Array.isArray(data) ? (data as CategoryApi[]) : [];
         setInsideCategories(
-          list.filter(
-            (c) =>
-              (c.status || "").toUpperCase() === "ACTIVE" &&
-              (c.placements || []).includes("HEADER"),
-          ),
+          list.filter((c) => {
+            const statusMatch = (c.status || "").toUpperCase() === "ACTIVE";
+            const placements = c.placements || [];
+            if (placements.length === 0) return statusMatch;
+            return statusMatch && placements.includes("HEADER");
+          }),
         );
       } catch {
         setInsideCategories([]);

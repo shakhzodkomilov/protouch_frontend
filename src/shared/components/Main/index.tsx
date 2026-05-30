@@ -67,9 +67,9 @@ export default function HomeCategories() {
     () =>
       categories.filter((c) => {
         const statusMatch = (c.status || "").toUpperCase() === "ACTIVE";
-        const hasExplicitPlacements =
-          Array.isArray(c.placements) && c.placements.length > 0;
-        return statusMatch && !hasExplicitPlacements;
+        const placements = c.placements || [];
+        if (placements.length === 0) return statusMatch;
+        return statusMatch && placements.includes("FOOTER");
       }),
     [categories],
   );
