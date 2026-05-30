@@ -139,7 +139,7 @@ export default function DillerDialog({ open, onClose }: DillerDialogProps) {
       PaperProps={{ sx: { borderRadius: "16px", p: 2 } }}
     >
       <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pb: 1 }}>
-        <Typography variant="h6" fontWeight={700}>
+        <Typography variant="h6" component="span" fontWeight={700}>
           {locale === "ru" ? "Заявка на дилерство" : "Diller bo'lish uchun so'rov"}
         </Typography>
         <IconButton onClick={handleClose} size="small">

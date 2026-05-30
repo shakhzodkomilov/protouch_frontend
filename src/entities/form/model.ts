@@ -96,13 +96,26 @@ export const clientRegisterFx = createEffect(
     lastName: string;
     password: string;
   }) => {
-    const response = await $api.post("/api/admin/clients", {
-      phone: payload.phone.replace(/^\+/, ""),
+    const phoneClean = payload.phone.replace(/^\+/, "");
+    const response = await $api.post("/api/auth/client/register", {
+      phone: phoneClean,
       firstName: payload.firstName,
       lastName: payload.lastName,
       password: payload.password,
     });
-    return response.data;
+    if (response.data.access_token) {
+      persistAuth(response.data.access_token, response.data.user);
+      return response.data;
+    }
+
+    const loginResponse = await $api.post("/api/auth/client/login", {
+      phone: phoneClean,
+      password: payload.password,
+    });
+    if (loginResponse.data.access_token) {
+      persistAuth(loginResponse.data.access_token, loginResponse.data.user);
+    }
+    return loginResponse.data;
   },
 );
 
@@ -116,8 +129,9 @@ export const partnerRegisterFx = createEffect(
     inn: string;
     region: string;
   }) => {
-    const response = await $api.post("/api/admin/partners", {
-      phone: payload.phone.replace(/^\+/, ""),
+    const phoneClean = payload.phone.replace(/^\+/, "");
+    const response = await $api.post("/api/auth/partner/register", {
+      phone: phoneClean,
       firstName: payload.firstName,
       lastName: payload.lastName,
       password: payload.password,
@@ -125,7 +139,19 @@ export const partnerRegisterFx = createEffect(
       inn: payload.inn,
       region: payload.region,
     });
-    return response.data;
+    if (response.data.access_token) {
+      persistAuth(response.data.access_token, response.data.user);
+      return response.data;
+    }
+
+    const loginResponse = await $api.post("/api/auth/partner/login", {
+      phone: phoneClean,
+      password: payload.password,
+    });
+    if (loginResponse.data.access_token) {
+      persistAuth(loginResponse.data.access_token, loginResponse.data.user);
+    }
+    return loginResponse.data;
   },
 );
 
@@ -139,7 +165,7 @@ export const distributorRegisterFx = createEffect(
     inn: string;
     region: string;
   }) => {
-    const response = await $api.post("/auth/distributor/register", {
+    const response = await $api.post("/api/auth/distributor/register", {
       phone: payload.phone.replace(/^\+/, ""),
       firstName: payload.firstName,
       lastName: payload.lastName,
@@ -148,6 +174,9 @@ export const distributorRegisterFx = createEffect(
       inn: payload.inn,
       region: payload.region,
     });
+    if (response.data.access_token) {
+      persistAuth(response.data.access_token, response.data.user);
+    }
     return response.data;
   },
 );
@@ -203,6 +232,8 @@ export const $isAuthPending = combine(
   (a, b, c, d, e, f, g) => a || b || c || d || e || f || g,
 );
 
+
+
 export const $authError = createStore<string | null>(null)
   .on(loginFx.failData, (_, error: any) => {
     return error.response?.data?.detail || "Login yoki parol xato!";
@@ -232,6 +263,8 @@ export const $loginSuccess = createStore(false)
   .on(clientLoginFx.done, () => true)
   .on(partnerLoginFx.done, () => true)
   .on(distributorLoginFx.done, () => true)
+  .on(clientRegisterFx.done, () => true)
+  .on(partnerRegisterFx.done, () => true)
   .reset(resetAuthStatus);
 
 export const $user = createStore<any | null>(getStoredUser())
@@ -239,6 +272,8 @@ export const $user = createStore<any | null>(getStoredUser())
   .on(partnerLoginFx.doneData, (_, res) => res.user || res)
   .on(distributorLoginFx.doneData, (_, res) => res.user || res)
   .on(loginFx.doneData, (_, res) => res.admin || res)
+  .on(clientRegisterFx.doneData, (_, res) => res.user || res)
+  .on(partnerRegisterFx.doneData, (_, res) => res.user || res)
   .on(fetchCurrentUserFx.doneData, (_, res) => res)
   .reset(logout);
 
@@ -249,6 +284,8 @@ export const $isAuth = createStore<boolean>(
   .on(clientLoginFx.doneData, () => true)
   .on(partnerLoginFx.doneData, () => true)
   .on(distributorLoginFx.doneData, () => true)
+  .on(clientRegisterFx.doneData, () => true)
+  .on(partnerRegisterFx.doneData, () => true)
   .on(logout, () => false);
 
 export const $isDistributor = $user.map(
@@ -263,14 +300,6 @@ logout.watch(() => {
   }
 });
 
-sample({
-  clock: $loginSuccess,
-  source: $loginSuccess,
-  filter: (s) => s,
-  fn: () => null,
-  target: resetAuthStatus,
-});
-
 $loginSuccess.reset(logout);
 $loginSuccess.reset(resetAuthStatus);
 
@@ -279,6 +308,8 @@ sample({
     clientLoginFx.done,
     partnerLoginFx.done,
     distributorLoginFx.done,
+    clientRegisterFx.done,
+    partnerRegisterFx.done,
   ],
   target: [loadFavorites, loadBasket, loadApplications],
 });

@@ -11,6 +11,7 @@ import {
   Button,
   Paper,
   Breadcrumbs,
+  CircularProgress,
 } from "@mui/material";
 import { useTranslations } from "next-intl";
 
@@ -101,6 +102,14 @@ export default function BasketPage() {
   };
 
   if (!mounted) return null;
+
+  if (loading) {
+    return (
+      <Box sx={{ py: 12, textAlign: "center", bgcolor: "#fff", minHeight: "100vh" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box

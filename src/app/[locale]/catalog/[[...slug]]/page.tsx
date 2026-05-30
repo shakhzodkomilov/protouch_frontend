@@ -9,6 +9,7 @@ import {
   Typography,
   CircularProgress,
 } from "@mui/material";
+import { useTranslations } from "next-intl";
 
 import {
   $loadingProducts,
@@ -38,6 +39,7 @@ export default function CatalogPage(props: {
 }) {
   const resolvedParams = use(props.params);
   const { locale, slug } = resolvedParams;
+  const t = useTranslations("catalog");
 
   const slugArray = slug ? (Array.isArray(slug) ? slug : [slug]) : [];
   const joinedSlug = slugArray.join("/");
@@ -52,7 +54,7 @@ export default function CatalogPage(props: {
   }, [allCategories, joinedSlug]);
 
   // Agar kategoriya topilsa uni title'ini, topilmasa slug'ni ishlatamiz
-  const displayTitle = categoryData?.title || lastSlug?.replaceAll("-", " ") || "All Products";
+  const displayTitle = categoryData?.title || lastSlug?.replaceAll("-", " ") || t("allProducts");
 
   const [currentPage, setCurrentPage] = useState(1);
   const { ref, inView } = useInView({ threshold: 0.1 });
@@ -93,6 +95,8 @@ export default function CatalogPage(props: {
     );
   }
 
+  const hasProducts = products?.results && products.results.length > 0;
+
   return (
     <Box sx={{ bgcolor: "#FAFAFA", minHeight: "100vh", width: "100%", py: 4 }}>
       <Container maxWidth={false} sx={{ py: 4, maxWidth: "1800px" }}>
@@ -105,7 +109,6 @@ export default function CatalogPage(props: {
             color: "#000",
             textTransform: "capitalize",
             fontSize: "34px",
-            display: allCategories?.length ? "flex" : "none",
           }}
         >
           {displayTitle}
@@ -130,9 +133,17 @@ export default function CatalogPage(props: {
               width: "100%",
             }}
           >
-            {products?.results?.map((item: Product) => (
-              <ProductCard key={item.id} product={item} />
-            ))}
+            {hasProducts ? (
+              products.results.map((item: Product) => (
+                <ProductCard key={item.id} product={item} />
+              ))
+            ) : !loading ? (
+              <Box sx={{ gridColumn: "1 / -1", textAlign: "center", py: 8 }}>
+                <Typography sx={{ fontSize: 18, color: "#666" }}>
+                  {t("noProducts")}
+                </Typography>
+              </Box>
+            ) : null}
           </Box>
         </Box>
         <Box

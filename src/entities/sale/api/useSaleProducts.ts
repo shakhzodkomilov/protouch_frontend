@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { API_URL } from "../../config/base";
+import { API_URL, getLangHeader } from "../../config/base";
 import { ensureHttps, DEFAULT_PRODUCT_IMAGE } from "@/shared/lib/media-url";
 
 // ── New API shape: products come back directly with discount fields ──
@@ -91,7 +91,8 @@ export function useSaleProducts(lang: string): SaleProductsState {
 
     axios
       .get<unknown>(`${API_URL}/api/products`, {
-        params: { hasSale: true, lang },
+        params: { hasSale: true },
+        headers: getLangHeader(lang),
       })
       .then((res) => {
         const data = res.data;

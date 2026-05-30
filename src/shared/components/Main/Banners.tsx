@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Box,
-  IconButton,
-  Typography,
-} from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
 import { useParams } from "next/navigation";
@@ -26,27 +22,6 @@ const Banners = () => {
     scrollLeft: 0,
     hasMoved: false,
   });
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    const slider = scrollRef.current;
-    if (!slider) return;
-    dragInfo.current.isDown = true;
-    dragInfo.current.hasMoved = false;
-    dragInfo.current.startX = e.pageX - slider.offsetLeft;
-    dragInfo.current.scrollLeft = slider.scrollLeft;
-    slider.style.cursor = "grabbing";
-    slider.style.scrollSnapType = "none";
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const slider = scrollRef.current;
-    if (!slider || !dragInfo.current.isDown) return;
-    e.preventDefault();
-    const x = e.pageX - slider.offsetLeft;
-    const distance = x - dragInfo.current.startX;
-    if (Math.abs(distance) > 5) dragInfo.current.hasMoved = true;
-    slider.scrollLeft = dragInfo.current.scrollLeft - distance * 1.5;
-  };
 
   const stopDragging = () => {
     if (scrollRef.current) {
@@ -82,8 +57,6 @@ const Banners = () => {
 
         <Box
           ref={scrollRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
           onMouseUp={stopDragging}
           onMouseLeave={stopDragging}
           onClickCapture={(e) =>
@@ -172,13 +145,6 @@ const Banners = () => {
           ))}
         </Box>
       </Box>
-
-      <NewsModal
-        item={openModal !== null ? banners[openModal] || null : null}
-        open={openModal !== null}
-        closeLabel={t("close")}
-        onClose={() => setOpenModal(null)}
-      />
     </Box>
   );
 };

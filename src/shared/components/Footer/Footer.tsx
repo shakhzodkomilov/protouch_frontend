@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Button, Link, Stack, Container } from "@mui/material";
 import Image from "next/image";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
@@ -9,11 +9,47 @@ import TelegramIcon from "@mui/icons-material/Telegram";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
+import axios from "axios";
+import { API_URL, getLangHeader } from "../../../entities/config/base";
+
+type CategoryApi = {
+  id: number;
+  name?: string;
+  title?: string;
+  slug?: string;
+  status?: string;
+  placements?: string[];
+};
 
 const Footer = () => {
   const { locale } = useParams();
 
   const t = useTranslations("Footer");
+  const [footerCategories, setFooterCategories] = useState<CategoryApi[]>([]);
+
+  useEffect(() => {
+    const currentLocale = (locale as string) || "ru";
+    const controller = new AbortController();
+
+    const load = async () => {
+      if (!API_URL) return;
+      try {
+        const { data } = await axios.get(`${API_URL}/api/categories`, {
+          headers: getLangHeader(currentLocale),
+          signal: controller.signal,
+        });
+        const list = Array.isArray(data) ? (data as CategoryApi[]) : [];
+        setFooterCategories(
+          list.filter((c) => (c.placements || []).includes("FOOTER")),
+        );
+      } catch {
+        setFooterCategories([]);
+      }
+    };
+
+    load();
+    return () => controller.abort();
+  }, [locale]);
   // Phone numbers array for easy management
   const phoneNumbers = [
     "+998 97 778 23 47",
@@ -111,6 +147,27 @@ const Footer = () => {
               </Link>
             </Stack>
           </Box>
+
+          {/* Categories Section */}
+          {footerCategories.length > 0 && (
+            <Box sx={{ color: "#000" }}>
+              <Typography variant="h6" mb={2}>
+                {t("categories.title")}
+              </Typography>
+              <Stack spacing={1} mt={2} gap={3}>
+                {footerCategories.map((cat) => (
+                  <Link
+                    key={cat.id}
+                    href={`/${locale}/catalog/${cat.slug}`}
+                    underline="hover"
+                    color="inherit"
+                  >
+                    {cat.title || cat.name || ""}
+                  </Link>
+                ))}
+              </Stack>
+            </Box>
+          )}
 
           {/* Right Section - Contacts */}
           <Box sx={{ color: "#000" }}>

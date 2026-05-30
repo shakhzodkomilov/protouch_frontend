@@ -168,7 +168,7 @@ export default function CheckoutModal({ open, onClose, onSuccess, totalPrice, pr
       PaperProps={{ sx: { borderRadius: "16px", p: 2 } }}
     >
       <DialogTitle sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", pb: 1 }}>
-        <Typography variant="h6" fontWeight={700}>{titleLabel}</Typography>
+        <Typography variant="h6" component="span" fontWeight={700}>{titleLabel}</Typography>
         <IconButton onClick={onClose} size="small"><CloseIcon /></IconButton>
       </DialogTitle>
       <DialogContent sx={{ pt: 2 }}>

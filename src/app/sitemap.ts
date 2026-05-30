@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import axios from "axios";
-import { API_URL } from "../entities/config/base";
+import { API_URL, getLangHeader } from "../entities/config/base";
 
 const SITE_URL = process.env.SITE_URL || "https://protouch.uz";
 const LOCALES = ["uz", "ru"] as const;
@@ -33,7 +33,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     while (hasNextPage) {
       const res = await axios.get(`${API_URL}/api/products/`, {
-        params: { page: currentPage, lang: "ru" },
+        params: { page: currentPage },
+        headers: getLangHeader("ru"),
       });
 
       const { results, next } = res.data;
@@ -50,6 +51,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const categoriesRes = await axios.get(
       `${API_URL}/api/products/categories/`,
+      { headers: getLangHeader("ru") },
     );
     const categories = categoriesRes.data ?? [];
 

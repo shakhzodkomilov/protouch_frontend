@@ -7,16 +7,16 @@ function isAuthenticated(): boolean {
 
 export const fetchFavoritesFx = createEffect(async () => {
   if (!isAuthenticated()) return [];
-  const res = await $api.get("/favorites");
+  const res = await $api.get("/api/favorites");
   return res.data ?? [];
 });
 
 export const addFavoriteFx = createEffect(async (productId: number) => {
   if (!isAuthenticated()) return;
-  await $api.post(`/favorites/${productId}`);
+  await $api.post(`/api/favorites/${productId}`);
 });
 
 export const removeFavoriteFx = createEffect(async (productId: number) => {
   if (!isAuthenticated()) return;
-  await $api.delete(`/favorites/${productId}`);
+  await $api.delete(`/api/favorites/${productId}`);
 });

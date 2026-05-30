@@ -108,6 +108,9 @@
       "privacy": "Конфиденциальность",
       "serviceCenters": "Сервисные центры"
     },
+    "categories": {
+      "title": "Категории"
+    },
     "contacts": {
       "title": "Контакты",
       "address": "Мирабадский район, граждан Тонг Юлдузи"
@@ -429,6 +432,10 @@
     "toast": {
       "updated": "Обновлено в избранном"
     }
+  },
+  "catalog": {
+    "allProducts": "Все товары",
+    "noProducts": "В этой категории пока нет товаров"
   },
   "MobileCatalog": {
     "breadcrumbs": {

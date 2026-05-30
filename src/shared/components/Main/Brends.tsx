@@ -4,6 +4,7 @@ import { Box, IconButton, Typography } from "@mui/material";
 import Image from "next/image";
 import React, { useRef, useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 
 import { API_URL } from "../../../entities/config/base";
@@ -19,6 +20,8 @@ type BrandApi = {
 
 const Brends = () => {
   const t = useTranslations("main");
+  const { locale } = useParams();
+  const router = useRouter();
   const [brands, setBrands] = useState<BrandApi[]>([]);
 
   useEffect(() => {
@@ -67,7 +70,12 @@ const Brends = () => {
     return () => clearInterval(scrollInterval);
   }, [isHovered]);
 
-  const dragInfo = useRef({ isDown: false, startX: 0, scrollLeftStart: 0 });
+  const dragInfo = useRef({
+    isDown: false,
+    startX: 0,
+    scrollLeftStart: 0,
+    hasMoved: false,
+  });
 
   const handleMouseDown = (e: React.MouseEvent) => {
     const slider = scrollRef.current;
@@ -77,6 +85,7 @@ const Brends = () => {
       isDown: true,
       startX: e.pageX - slider.offsetLeft,
       scrollLeftStart: slider.scrollLeft,
+      hasMoved: false,
     };
     slider.style.cursor = "grabbing";
   };
@@ -96,7 +105,13 @@ const Brends = () => {
     e.preventDefault();
     const x = e.pageX - slider.offsetLeft;
     const walk = (x - dragInfo.current.startX) * 1.5;
+    if (Math.abs(walk) > 5) dragInfo.current.hasMoved = true;
     slider.scrollLeft = dragInfo.current.scrollLeftStart - walk;
+  };
+
+  const handleBrandClick = (brandSlug?: string) => {
+    if (dragInfo.current.hasMoved || !brandSlug) return;
+    router.push(`/${locale}/brand/${brandSlug}`);
   };
 
   const scrollBtn = (dir: "left" | "right") => {
@@ -195,6 +210,7 @@ const Brends = () => {
             return (
               <Box
                 key={brand.id}
+                onClick={() => handleBrandClick(brand.slug)}
                 sx={{
                   minWidth: "240px",
                   width: "240px",
@@ -206,6 +222,7 @@ const Brends = () => {
                   alignItems: "center",
                   flexShrink: 0,
                   transition: "transform 0.15s ease",
+                  cursor: "pointer",
                   "&:hover": { transform: "scale(1.02)" },
                 }}
               >

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { createEffect } from "effector";
-import { API_URL } from "../../config/base";
+import { API_URL, getLangHeader } from "../../config/base";
 import { ensureHttps } from "@/shared/lib/media-url";
 import {
   CategoryType,
@@ -11,10 +11,15 @@ import {
   ProductMedia,
 } from "./types";
 
-const getAuthHeaders = (): Record<string, string> => {
-  if (typeof window === "undefined") return {};
-  const token = localStorage.getItem("accessToken");
-  return token ? { Authorization: `Bearer ${token}` } : {};
+const getAuthHeaders = (lang?: string): Record<string, string> => {
+  const headers: Record<string, string> = {};
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("accessToken");
+    if (token) headers.Authorization = `Bearer ${token}`;
+  }
+  const langHeader = getLangHeader(lang);
+  headers["x-lang"] = langHeader["x-lang"];
+  return headers;
 };
 
 const normalizeLegacyImage = (image?: ProductImageLegacy) =>
@@ -80,9 +85,8 @@ export const getCategoriesFx = createEffect<
     {
       params: {
         is_carousel: params.is_carousel,
-        lang: params.lang || "ru",
       },
-      headers: getAuthHeaders(),
+      headers: getAuthHeaders(params.lang),
     },
   );
   return data.map((category: CategoryType) => ({
@@ -101,12 +105,10 @@ export const getProductsFx = createEffect<
   },
   PaginationType
 >(async (params) => {
+  const { lang, ...rest } = params;
   const { data } = await axios.get(`${API_URL}/api/products/`, {
-    params: {
-      ...params,
-      lang: params.lang || "ru",
-    },
-    headers: getAuthHeaders(),
+    params: rest,
+    headers: getAuthHeaders(lang),
   });
   return normalizePagination(data);
 });
@@ -116,8 +118,7 @@ export const getProductDetailFx = createEffect<
   ProductDetailType
 >(async ({ product_id, lang }) => {
   const { data } = await axios.get(`${API_URL}/api/products/${product_id}`, {
-    params: { lang: lang || "ru" },
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(lang),
   });
 
   const normalized = normalizeProduct(data as Product);
@@ -144,9 +145,8 @@ export const getBestSellersFx = createEffect<{ lang?: string }, PaginationType>(
     const { data } = await axios.get(`${API_URL}/api/products`, {
       params: {
         categorySlug: "best-seller",
-        lang: lang || "ru",
       },
-      headers: getAuthHeaders(),
+      headers: getAuthHeaders(lang),
     });
 
     const paginated = Array.isArray(data)
@@ -162,9 +162,8 @@ export const getNewArrivalsFx = createEffect<{ lang?: string }, PaginationType>(
     const { data } = await axios.get(`${API_URL}/api/products`, {
       params: {
         categorySlug: "new-collection",
-        lang: lang || "ru",
       },
-      headers: getAuthHeaders(),
+      headers: getAuthHeaders(lang),
     });
 
     const paginated = Array.isArray(data)
@@ -181,9 +180,8 @@ export const getRecommendsFx = createEffect<{ lang?: string }, PaginationType>(
     const { data } = await axios.get(`${API_URL}/api/products`, {
       params: {
         categorySlug: "recommend",
-        lang: lang || "ru",
       },
-      headers: getAuthHeaders(),
+      headers: getAuthHeaders(lang),
     });
     const paginated = Array.isArray(data)
       ? { count: data.length, next: null, previous: null, results: data }
@@ -201,9 +199,8 @@ export const getStreamAndPodcast = createEffect<
     params: {
       slug: "studio-audio-equipment/stream-and-podcast",
       is_new: true,
-      lang: lang || "ru",
     },
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(lang),
   });
   return normalizePagination(data);
 });
@@ -215,13 +212,14 @@ export const getProductsByCategoryFx = createEffect<
   const { data } = await axios.get(`${API_URL}/api/products/`, {
     params: {
       page,
-      ...(slugs && { slug: slugs }),
-      brand: "",
-      lang: lang || "ru",
+      ...(slugs && { categorySlug: slugs }),
     },
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(lang),
   });
-  return normalizePagination(data);
+  const paginated = Array.isArray(data)
+    ? { count: data.length, next: null, previous: null, results: data }
+    : data;
+  return normalizePagination(paginated);
 });
 
 export const searchProductsFx = createEffect<
@@ -232,9 +230,8 @@ export const searchProductsFx = createEffect<
     params: {
       page,
       title: search || undefined,
-      lang: lang || "ru",
     },
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(lang),
   });
   return normalizePagination(data);
 });

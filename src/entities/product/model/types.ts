@@ -17,6 +17,7 @@ export interface ProductCategory {
   description?: string | null;
   link?: string | null;
   status?: string;
+  placements?: string[];
   imageId?: number | null;
   parentId?: number | null;
   createdAt?: string;
@@ -49,6 +50,8 @@ export interface CategoryType {
   title: string;
   slug: string;
   is_carousel?: boolean;
+  status?: string;
+  placements?: string[];
   image?: ProductImageLegacy;
   children?: ProductCategoryChild[];
 }

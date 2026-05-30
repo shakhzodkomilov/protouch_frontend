@@ -21,6 +21,8 @@ import type { CategoryType } from "../../../entities/product/model/types";
 type ModelCategoryType = {
   id: string;
   title: string;
+  status?: string;
+  placements?: string[];
   image?: {
     url: string;
   };
@@ -52,7 +54,17 @@ export const CatalogDropdown: React.FC<CatalogDropdownProps> = ({
   const router = useRouter();
   const { locale } = useParams();
   const categories = useUnit($categories) as ModelCategoryType[];
-  if (!isOpen || categories.length === 0) return null;
+  const headerCategories = categories.filter(
+    (cat) =>
+      (cat.status || "").toUpperCase() === "ACTIVE" &&
+      (cat.placements || []).includes("HEADER"),
+  );
+  if (!isOpen || headerCategories.length === 0) return null;
+
+  const resolvedActive =
+    headerCategories.find((c) => c.id === activeCategory?.id) ??
+    headerCategories[0] ??
+    null;
 
   const handleCategoryClick = (slug: string) => {
     router.push(`/${locale}/catalog/${slug}`);
@@ -86,10 +98,10 @@ export const CatalogDropdown: React.FC<CatalogDropdownProps> = ({
           }}
         >
           <List disablePadding>
-            {categories.map((cat) => (
+            {headerCategories.map((cat) => (
               <ListItem key={cat.id} disablePadding>
                 <ListItemButton
-                  selected={activeCategory?.id === cat.id}
+                  selected={resolvedActive?.id === cat.id}
                   onMouseEnter={() => onCategoryHover(cat)}
                   sx={{
                     py: 1.5,
@@ -115,7 +127,7 @@ export const CatalogDropdown: React.FC<CatalogDropdownProps> = ({
                     primary={cat.title}
                     primaryTypographyProps={{
                       fontSize: "14px",
-                      fontWeight: activeCategory?.id === cat.id ? 600 : 500,
+                      fontWeight: resolvedActive?.id === cat.id ? 600 : 500,
                     }}
                   />
                 </ListItemButton>
@@ -133,7 +145,7 @@ export const CatalogDropdown: React.FC<CatalogDropdownProps> = ({
               gap: 3,
             }}
           >
-            {activeCategory?.children?.map((child) => (
+            {resolvedActive?.children?.map((child) => (
               <Box key={child.id}>
                 <Typography
                   variant="body1"

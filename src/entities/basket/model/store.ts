@@ -21,11 +21,14 @@ const initialState: BasketState = {
   totalPrice: 0,
 };
 
-const updateTotals = (items: BasketItem[]): BasketState => ({
-  items,
-  totalCount: items.reduce((sum, i) => sum + i.quantity, 0),
-  totalPrice: items.reduce((sum, i) => sum + i.price * i.quantity, 0),
-});
+const updateTotals = (items: BasketItem[]): BasketState => {
+  const safe = Array.isArray(items) ? items : [];
+  return {
+    items: safe,
+    totalCount: safe.reduce((sum, i) => sum + (i.quantity || 0), 0),
+    totalPrice: safe.reduce((sum, i) => sum + (i.price || 0) * (i.quantity || 0), 0),
+  };
+};
 
 export const $basket = createStore<BasketState>(initialState).on(
   [

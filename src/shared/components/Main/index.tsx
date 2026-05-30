@@ -14,7 +14,7 @@ import Banners from "./Banners";
 import { Recommend } from "./Recommend";
 import NewArrivals from "./NewArrivals";
 import CenterBanner from "./MainBanner";
-import { API_URL } from "../../../entities/config/base";
+import { API_URL, getLangHeader } from "../../../entities/config/base";
 import { ensureHttps } from "@/shared/lib/media-url";
 
 type CategoryApi = {
@@ -25,6 +25,7 @@ type CategoryApi = {
   description?: string;
   link?: string;
   status?: string;
+  placements?: string[];
   image?: { url?: string | null } | null;
 };
 
@@ -48,7 +49,7 @@ export default function HomeCategories() {
       if (!API_URL) return;
       try {
         const { data } = await axios.get(`${API_URL}/api/categories`, {
-          params: { lang: currentLocale },
+          headers: getLangHeader(currentLocale),
           signal: controller.signal,
         });
         const list = Array.isArray(data) ? (data as CategoryApi[]) : [];
@@ -63,7 +64,13 @@ export default function HomeCategories() {
   }, [locale]);
 
   const activeCategories = useMemo(
-    () => categories.filter((c) => (c.status || "").toUpperCase() === "ACTIVE"),
+    () =>
+      categories.filter((c) => {
+        const statusMatch = (c.status || "").toUpperCase() === "ACTIVE";
+        const hasExplicitPlacements =
+          Array.isArray(c.placements) && c.placements.length > 0;
+        return statusMatch && !hasExplicitPlacements;
+      }),
     [categories],
   );
 

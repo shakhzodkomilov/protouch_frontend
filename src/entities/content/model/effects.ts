@@ -1,6 +1,6 @@
 import axios from "axios";
 import { createEffect } from "effector";
-import { API_URL } from "../../config/base";
+import { API_URL, getLangHeader } from "../../config/base";
 import { ensureHttps } from "@/shared/lib/media-url";
 import type { Banner, ContentBlock } from "./types";
 
@@ -25,7 +25,7 @@ const normalizeBlockToBanner = (block: ContentBlock, lang?: string): Banner | nu
 export const getBannersFx = createEffect<{ lang?: string }, Banner[]>(
   async ({ lang }) => {
     const { data } = await axios.get(`${API_URL}/api/content/blocks`, {
-      params: { lang: lang || "ru" },
+      headers: getLangHeader(lang),
     });
 
     const blocks: ContentBlock[] = Array.isArray(data)

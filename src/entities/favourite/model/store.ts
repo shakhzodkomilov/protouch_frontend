@@ -47,8 +47,6 @@ const loadFavoritesFx = createEffect<void, FavoriteItem[], Error>(async () => {
   }
 });
 
-export const $favoritesLoading = loadFavoritesFx.pending;
-
 // Sync toggle to API if authenticated
 const syncFavoritesApiFx = createEffect(async (item: FavoriteItem) => {
   const token =
@@ -87,6 +85,8 @@ const loadFavoritesRouterFx = createEffect(async () => {
   }
   return loadFavoritesFx();
 });
+
+export const $favoritesLoading = loadFavoritesRouterFx.pending;
 
 sample({ clock: toggleFavorite, target: [persistFavoritesFx, syncFavoritesApiFx] });
 sample({ clock: loadFavorites, target: loadFavoritesRouterFx });

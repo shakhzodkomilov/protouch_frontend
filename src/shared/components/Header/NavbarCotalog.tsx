@@ -44,7 +44,7 @@ import { CatalogDropdown } from "./CatalogDropdown";
 import DillerDialog from "./DillerDialog";
 import SearchResults from "./SearchResults";
 import { HeaderIcon } from "./HeaderIcon";
-import { API_URL } from "../../../entities/config/base";
+import { API_URL, getLangHeader } from "../../../entities/config/base";
 
 type CategoryApi = {
   id: number;
@@ -52,6 +52,7 @@ type CategoryApi = {
   title?: string;
   slug?: string;
   status?: string;
+  placements?: string[];
   children?: CategoryApi[];
 };
 
@@ -107,6 +108,11 @@ const NavbarCatalog = () => {
   });
 
   const [dillerOpen, setDillerOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Language switching
   const toggleLanguage = () => {
@@ -160,12 +166,16 @@ const NavbarCatalog = () => {
       if (!API_URL) return;
       try {
         const { data } = await axios.get(`${API_URL}/api/categories`, {
-          params: { lang: currentLocale },
+          headers: getLangHeader(currentLocale),
           signal: controller.signal,
         });
         const list = Array.isArray(data) ? (data as CategoryApi[]) : [];
         setInsideCategories(
-          list.filter((c) => (c.status || "").toUpperCase() === "INSIDE"),
+          list.filter(
+            (c) =>
+              (c.status || "").toUpperCase() === "ACTIVE" &&
+              (c.placements || []).includes("HEADER"),
+          ),
         );
       } catch {
         setInsideCategories([]);
@@ -531,7 +541,7 @@ const NavbarCatalog = () => {
               onClick={() => setDillerOpen(true)}
             />
 
-            {isAuth ? (
+            {mounted && isAuth ? (
               <Box
                 sx={{
                   display: "flex",

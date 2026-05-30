@@ -52,6 +52,7 @@ export default function LoginPage() {
     for (const attempt of attempts) {
       try {
         await attempt({ login, password });
+        setPending(false);
         return;
       } catch (err: any) {
         lastError =

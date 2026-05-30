@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -17,7 +17,8 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { clientRegisterFx, partnerRegisterFx } from "../../../entities/form/model";
+import { useUnit } from "effector-react";
+import { clientRegisterFx, partnerRegisterFx, $loginSuccess, resetAuthStatus } from "../../../entities/form/model";
 
 type Tab = "individual" | "legal";
 
@@ -45,6 +46,15 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  const [logSuccess, reset] = useUnit([$loginSuccess, resetAuthStatus]);
+
+  useEffect(() => {
+    if (logSuccess) {
+      router.push(`/${locale}/`);
+      reset();
+    }
+  }, [logSuccess, locale, router, reset]);
 
   const handlePhone = (e: React.ChangeEvent<HTMLInputElement>) => {
     let v = e.target.value.replace(/[^\d+]/g, "");
@@ -165,12 +175,12 @@ export default function RegisterPage() {
           </Typography>
           <Typography color="#666" mb={3}>
             {locale === "ru"
-              ? "Теперь вы можете войти в аккаунт"
-              : "Endi akkauntingizga kirishingiz mumkin"}
+              ? "Вы будете перенаправлены на главную"
+              : "Bosh sahifaga yo'naltirilasiz"}
           </Typography>
           <Button
             variant="contained"
-            onClick={() => router.push(`/${locale}/login`)}
+            onClick={() => router.push(`/${locale}/`)}
             sx={{
               py: 1.5,
               px: 4,
@@ -181,7 +191,7 @@ export default function RegisterPage() {
               "&:hover": { bgcolor: "#1a8ae5" },
             }}
           >
-            {locale === "ru" ? "Войти" : "Kirish"}
+            {locale === "ru" ? "На главную" : "Bosh sahifaga"}
           </Button>
         </Box>
       </Container>

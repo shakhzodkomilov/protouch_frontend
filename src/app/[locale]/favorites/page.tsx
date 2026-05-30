@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useUnit } from "effector-react";
-import { Box, Container, Typography, IconButton, Button } from "@mui/material";
+import { Box, Container, Typography, IconButton, Button, CircularProgress } from "@mui/material";
 import { useEffect, useCallback, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,6 +13,7 @@ import {
   $favorites,
   toggleFavorite,
   loadFavorites,
+  $favoritesLoading,
 } from "../../../entities/favourite/model/store";
 import { $basket, addToBasket } from "../../../entities/basket/model/store";
 
@@ -81,6 +82,7 @@ export default function FavoritesPage() {
   const t = useTranslations("favorites");
 
   const favorites = useUnit($favorites) as FavoriteItem[];
+  const loading = useUnit($favoritesLoading);
   const basket = useUnit($basket);
   const basketItems = basket?.items || [];
 
@@ -122,6 +124,14 @@ export default function FavoritesPage() {
       isInStock: true,
     });
   };
+
+  if (loading) {
+    return (
+      <Box sx={{ py: 12, textAlign: "center", bgcolor: "#FAFAFA", minHeight: "100vh" }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   if (favorites.length === 0) {
     return (

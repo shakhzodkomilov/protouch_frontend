@@ -109,6 +109,9 @@
       "privacy": "Maxfiylik siyosati",
       "serviceCenters": "Servis markazlari"
     },
+    "categories": {
+      "title": "Kategoriyalar"
+    },
     "contacts": {
       "title": "Aloqa",
       "address": "Mirabod tumani, Fuqarolar Tong Yulduzi"
@@ -428,6 +431,10 @@
     "toast": {
       "updated": "Sevimlilarda yangilandi"
     }
+  },
+  "catalog": {
+    "allProducts": "Barcha mahsulotlar",
+    "noProducts": "Ushbu kategoriyada hali mahsulotlar yo'q"
   },
   "MobileCatalog": {
     "breadcrumbs": {

@@ -31,7 +31,8 @@ const fetchBasketFromApi = async (): Promise<BasketItem[]> => {
 export const getBasketFx = createEffect<void, BasketItem[]>(async () => {
   if (isAuth()) {
     try {
-      return await fetchBasketFromApi();
+      const data = await fetchBasketFromApi();
+      return Array.isArray(data) ? data : [];
     } catch {
       return getLocalBasket();
     }
@@ -47,7 +48,8 @@ export const addToBasketFx = createEffect<BasketItem, BasketItem[]>(
           productId: newItem.productId,
           quantity: 1,
         });
-        return await fetchBasketFromApi();
+        const data = await fetchBasketFromApi();
+        return Array.isArray(data) ? data : [];
       } catch {
         // fallback to local
       }
@@ -78,7 +80,8 @@ export const removeFromBasketFx = createEffect<number, BasketItem[]>(
     if (isAuth()) {
       try {
         await removeFromBasketApiFx(productId);
-        return await fetchBasketFromApi();
+        const data = await fetchBasketFromApi();
+        return Array.isArray(data) ? data : [];
       } catch {
         // fallback to local
       }
@@ -98,7 +101,8 @@ export const updateQuantityFx = createEffect<
   if (isAuth()) {
     try {
       await updateBasketApiFx({ productId, quantity });
-      return await fetchBasketFromApi();
+      const data = await fetchBasketFromApi();
+      return Array.isArray(data) ? data : [];
     } catch {
       // fallback to local
     }
