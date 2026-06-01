@@ -74,6 +74,13 @@ export default function BasketPage() {
     setSubmitting(true);
     try {
       const productIds = items.map((item) => item.productId);
+      const products = items.map((item) => ({
+        id: item.productId,
+        name: item.title,
+        price: item.price,
+        image: item.image,
+        quantity: item.quantity,
+      }));
       const u = user as Record<string, unknown>;
       const isPartner = !!(u.companyName || u.partnerProfile);
       const body: Record<string, unknown> = {
@@ -82,6 +89,7 @@ export default function BasketPage() {
         firstName: u.firstName || "",
         lastName: u.lastName || "",
         productIds,
+        products,
         totalPrice,
       };
       if (isPartner) {
@@ -226,6 +234,13 @@ export default function BasketPage() {
         onSuccess={() => setOrderSuccess(true)}
         totalPrice={totalPrice}
         productIds={items.map((item) => item.productId)}
+        products={items.map((item) => ({
+          id: item.productId,
+          name: item.title,
+          price: item.price,
+          image: item.image,
+          quantity: item.quantity,
+        }))}
       />
     </Box>
   );

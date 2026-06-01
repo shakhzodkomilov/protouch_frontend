@@ -58,7 +58,7 @@ export default function OrderSummary({
           </Typography>
         </Box>
         <Typography variant="h5" sx={{ fontWeight: 700 }}>
-          {totalPrice.toLocaleString("ru-RU")} {currencyLabel}
+          {Number.isFinite(totalPrice) ? totalPrice.toLocaleString("ru-RU") : "0"} {currencyLabel}
         </Typography>
       </Box>
       <Button

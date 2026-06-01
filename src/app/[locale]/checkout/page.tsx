@@ -53,16 +53,31 @@ export default function ProfilePage() {
   const appsLoading = useUnit($applicationsLoading);
   const loadApplicationsEv = useUnit(loadApplications);
 
+  const [mounted, setMounted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
 
   useEffect(() => {
-    if (isAuth) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isAuth && mounted) {
       loadBasketEv();
       loadFavoritesEv();
       loadApplicationsEv();
     }
-  }, [isAuth, loadBasketEv, loadFavoritesEv, loadApplicationsEv]);
+  }, [isAuth, mounted, loadBasketEv, loadFavoritesEv, loadApplicationsEv]);
+
+  if (!mounted) {
+    return (
+      <Box sx={{ minHeight: "100vh", bgcolor: "#FAFAFA" }}>
+        <Container maxWidth="md" sx={{ py: { xs: 3, md: 6 } }}>
+          <CircularProgress sx={{ color: "#249FFC" }} />
+        </Container>
+      </Box>
+    );
+  }
 
   if (!isAuth) {
     return (
@@ -140,12 +155,20 @@ export default function ProfilePage() {
     setSubmitting(true);
     try {
       const productIds = basket.items.map((item) => item.productId);
+      const products = basket.items.map((item) => ({
+        id: item.productId,
+        name: item.title,
+        price: item.price,
+        image: item.image,
+        quantity: item.quantity,
+      }));
       const body: Record<string, unknown> = {
         type: role === "PARTNER" || role === "DISTRIBUTOR" ? "LEGAL" : "INDIVIDUAL",
         phone: u?.phone || u?.email || "",
         firstName: u?.firstName || "",
         lastName: u?.lastName || "",
         productIds,
+        products,
         totalPrice: basket.totalPrice,
       };
       if (role === "PARTNER" || role === "DISTRIBUTOR") {
@@ -359,7 +382,7 @@ export default function ProfilePage() {
             <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
               <CircularProgress size={32} sx={{ color: "#249FFC" }} />
             </Box>
-          ) : applications.length === 0 ? (
+          ) : !Array.isArray(applications) || applications.length === 0 ? (
             <Typography sx={{ color: "#999", fontSize: 14, textAlign: "center", py: 4 }}>
               {locale === "ru"
                 ? "У вас пока нет заявок"

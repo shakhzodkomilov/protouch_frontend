@@ -62,8 +62,10 @@
     "inStock": "В наличии",
     "notAvailable": "По запросу",
     "buyNow": "Купить сейчас",
+    "characteristics": "Характеристики",
+    "dealerPrice": "Дилерская цена",
     "breadcrumbs": {
-      "home": "Bosh sahifa"
+      "home": "Главная"
     },
     "pickup": {
       "pickup": {

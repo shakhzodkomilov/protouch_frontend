@@ -114,6 +114,7 @@ export default function DillerDialog({ open, onClose }: DillerDialogProps) {
           inn,
           region,
           productIds: [],
+          products: [],
           totalPrice: 0,
         }),
       });

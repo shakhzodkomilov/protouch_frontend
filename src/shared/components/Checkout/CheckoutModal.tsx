@@ -40,15 +40,24 @@ const inputStyle: React.CSSProperties = {
   backgroundColor: "#f5f6f8",
 };
 
+interface ProductPayload {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+}
+
 interface CheckoutModalProps {
   open: boolean;
   onClose: () => void;
   onSuccess: () => void;
   totalPrice: number;
   productIds: number[];
+  products?: ProductPayload[];
 }
 
-export default function CheckoutModal({ open, onClose, onSuccess, totalPrice, productIds }: CheckoutModalProps) {
+export default function CheckoutModal({ open, onClose, onSuccess, totalPrice, productIds, products = [] }: CheckoutModalProps) {
   const { locale } = useParams();
   const [checkoutType, setCheckoutType] = useState<CheckoutType>("individual");
   const [firstName, setFirstName] = useState("");
@@ -116,6 +125,7 @@ export default function CheckoutModal({ open, onClose, onSuccess, totalPrice, pr
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         productIds,
+        products,
         totalPrice,
       };
       if (isLegal) {

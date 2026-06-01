@@ -6,6 +6,7 @@ export interface BasketItem {
   image: string;
   quantity: number;
   isInStock: boolean;
+  currency?: string;
 }
 
 export interface BasketState {

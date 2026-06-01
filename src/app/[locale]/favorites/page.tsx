@@ -24,57 +24,42 @@ type FavoriteItem = {
   title: string;
   image: string;
   price: number;
+  currency?: string;
 };
 
-const cardStyle = {
-  width: "100%",
-  maxWidth: "280px",
-  margin: "0 auto",
-  minHeight: "380px",
-  borderRadius: 3,
-  p: 2,
-  boxShadow: "0px 4px 20px rgba(0,0,0,0.08)",
-  bgcolor: "#fff",
-  flexShrink: 0,
-  display: "flex",
-  position: "relative",
-  flexDirection: "column",
-  transition: "transform 0.2s",
-  "&:hover": { transform: "translateY(-5px)" },
-} as const;
+const FavoriteImage = ({ src, alt }: { src: string; alt: string }) => {
+  const [error, setError] = useState(false);
+  if (error) {
+    return (
+      <Box
+        sx={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: "#f9f9f9",
+        }}
+      >
+        <Typography sx={{ color: "#999", fontSize: 13 }}>Rasm yo'q</Typography>
+      </Box>
+    );
+  }
+  return (
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img
+      src={src || "/placeholder.jpg"}
+      alt={alt}
+      style={{ width: "100%", height: "100%", objectFit: "contain" }}
+      onError={() => setError(true)}
+    />
+  );
+};
 
-const statusBadgeStyle = (isInStock: boolean) => ({
-  padding: "4px 12px",
-  borderRadius: "8px",
-  fontSize: "14px",
-  fontWeight: 500,
-  color: isInStock ? "#3BB351" : "#FF5F5F",
-  bgcolor: isInStock ? "#D6F2DB" : "#FFE4E4",
-});
-
-const descriptionStyle = {
-  fontWeight: 600,
-  fontSize: "16px",
-  color: "#4E4E4E",
-  mb: 1,
-  display: "-webkit-box",
-  WebkitBoxOrient: "vertical",
-  WebkitLineClamp: 2,
-  overflow: "hidden",
-  lineHeight: "1.4em",
-} as const;
-
-const actionBtnStyle = {
-  minWidth: "54px",
-  width: "54px",
-  height: "54px",
-  borderRadius: "50%",
-  position: "absolute",
-  right: "15px",
-  bottom: "15px",
-  boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
-  transition: "all 0.3s ease",
-} as const;
+const formatPrice = (price: number) => {
+  if (!Number.isFinite(price) || price < 0) return null;
+  return new Intl.NumberFormat("ru-RU").format(price);
+};
 
 export default function FavoritesPage() {
   const params = useParams();
@@ -118,10 +103,11 @@ export default function FavoritesPage() {
       id: Number(item.productId),
       productId: Number(item.productId),
       title: item.title || "Product",
-      price: item.price || 0,
+      price: Number.isFinite(item.price) ? item.price : 0,
       image: item.image || "/placeholder.jpg",
       quantity: 1,
       isInStock: true,
+      currency: item.currency || "UZS",
     });
   };
 
@@ -167,11 +153,11 @@ export default function FavoritesPage() {
 
   return (
     <>
-      <Box sx={{ py: 8, bgcolor: "#FAFAFA", minHeight: "100vh" }}>
+      <Box sx={{ py: { xs: 4, md: 8 }, bgcolor: "#FAFAFA", minHeight: "100vh" }}>
         <Container maxWidth={false} sx={{ maxWidth: "1800px" }}>
           <Typography
             variant="h4"
-            sx={{ mb: 6, fontWeight: 700, color: "#000" }}
+            sx={{ mb: { xs: 4, md: 6 }, fontWeight: 700, color: "#000", fontSize: { xs: "24px", md: "34px" } }}
           >
             {t("title")} ({favorites.length})
           </Typography>
@@ -179,18 +165,21 @@ export default function FavoritesPage() {
           <Box
             sx={{
               display: "grid",
-              gap: 4,
+              gap: { xs: 2, md: 3 },
               gridTemplateColumns: {
                 xs: "1fr",
                 sm: "repeat(2, 1fr)",
                 md: "repeat(3, 1fr)",
-                lg: "repeat(6, 1fr)",
+                lg: "repeat(4, 1fr)",
+                xl: "repeat(5, 1fr)",
               },
               width: "100%",
             }}
           >
             {favorites.map((item) => {
               const inBasket = isItemInBasket(item.productId);
+              const priceFormatted = formatPrice(item.price);
+              const currency = item.currency || "UZS";
 
               return (
                 <Link
@@ -198,94 +187,141 @@ export default function FavoritesPage() {
                   href={`/${locale}/product/${item.productId}`}
                   style={{ textDecoration: "none" }}
                 >
-                  <Box sx={cardStyle}>
-                    <Box
-                      sx={{ display: "flex", justifyContent: "space-between" }}
-                    >
-                      <Typography sx={statusBadgeStyle(true)}>
+                  <Box
+                    sx={{
+                      width: "100%",
+                      borderRadius: "16px",
+                      p: { xs: 2, md: 2.5 },
+                      boxShadow: "0px 4px 20px rgba(0,0,0,0.08)",
+                      bgcolor: "#fff",
+                      display: "flex",
+                      flexDirection: "column",
+                      position: "relative",
+                      transition: "transform 0.2s, box-shadow 0.2s",
+                      "&:hover": {
+                        transform: "translateY(-5px)",
+                        boxShadow: "0px 8px 30px rgba(0,0,0,0.12)",
+                      },
+                    }}
+                  >
+                    {/* Top row: status + actions */}
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5 }}>
+                      <Typography
+                        sx={{
+                          padding: "4px 12px",
+                          borderRadius: "8px",
+                          fontSize: "13px",
+                          fontWeight: 600,
+                          color: "#3BB351",
+                          bgcolor: "#e8f8ed",
+                        }}
+                      >
                         {t("inFavorite")}
                       </Typography>
-                      <Box
-                        sx={{ display: "flex", gap: 1, alignItems: "center" }}
-                      >
+                      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
                         <Image
                           src="/scale.svg"
-                          height={24}
-                          width={24}
+                          height={22}
+                          width={22}
                           alt="compare"
                         />
                         <IconButton
                           size="small"
                           onClick={(e) => onFavoriteClick(e, item)}
                           sx={{
-                            p: 0.25,
-                            color: "#ff4444",
+                            p: 0.5,
+                            color: "#FF5F5F",
                             "&:hover": {
-                              backgroundColor: "transparent",
-                              color: "#cc0000",
+                              backgroundColor: "rgba(255,95,95,0.08)",
                             },
                           }}
                         >
-                          <FavoriteIcon sx={{ fontSize: 26 }} />
+                          <FavoriteIcon sx={{ fontSize: 24 }} />
                         </IconButton>
                       </Box>
                     </Box>
 
+                    {/* Product Image */}
                     <Box
                       sx={{
                         position: "relative",
                         width: "100%",
-                        height: "200px",
-                        my: 2,
+                        height: { xs: 180, md: 200 },
+                        bgcolor: "#f9f9f9",
+                        borderRadius: "12px",
+                        overflow: "hidden",
+                        mb: 2,
                       }}
                     >
-                      <Image
-                        src={item.image || "/placeholder-product.jpg"}
-                        alt={item.title || "Product"}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 250px"
-                        style={{ objectFit: "contain" }}
-                      />
+                      <FavoriteImage src={item.image} alt={item.title || "Product"} />
                     </Box>
 
-                    <Box sx={{ flexGrow: 1 }}>
-                      {/* <Typography sx={descriptionStyle}>
+                    {/* Product Info */}
+                    <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+                      <Typography
+                        sx={{
+                          fontWeight: 600,
+                          fontSize: "15px",
+                          color: "#1a1a1a",
+                          display: "-webkit-box",
+                          WebkitBoxOrient: "vertical",
+                          WebkitLineClamp: 2,
+                          overflow: "hidden",
+                          lineHeight: 1.4,
+                          minHeight: "42px",
+                        }}
+                      >
                         {item.title || t("titleUnavailable")}
-                      </Typography> */}
+                      </Typography>
+
                       <Typography
                         sx={{
                           color: "#000",
                           fontWeight: 700,
-                          fontSize: "20px",
+                          fontSize: "18px",
                         }}
                       >
-                        {item.price > 0
-                          ? `${new Intl.NumberFormat("ru-RU").format(item.price)} ${t("currency")}`
+                        {priceFormatted
+                          ? `${priceFormatted} ${currency}`
                           : t("priceUnavailable")}
                       </Typography>
                     </Box>
 
-                    <Button
-                      onClick={(e) => onBasketClick(e, item)}
-                      sx={{
-                        ...actionBtnStyle,
-                        bgcolor: inBasket ? "#3BB351" : "#249FFC",
-                        "&:hover": {
-                          bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
-                        },
-                      }}
-                    >
-                      {inBasket ? (
-                        <DoneIcon sx={{ color: "#fff", fontSize: 30 }} />
-                      ) : (
-                        <Image
-                          src="/basketIcon.svg"
-                          alt="basket"
-                          width={26}
-                          height={26}
-                        />
-                      )}
-                    </Button>
+                    {/* Add to basket button */}
+                    <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
+                      <Button
+                        fullWidth
+                        onClick={(e) => onBasketClick(e, item)}
+                        sx={{
+                          bgcolor: inBasket ? "#3BB351" : "#249FFC",
+                          color: "#fff",
+                          py: 1.2,
+                          borderRadius: "12px",
+                          fontSize: "14px",
+                          fontWeight: 600,
+                          textTransform: "none",
+                          display: "flex",
+                          gap: 1,
+                          alignItems: "center",
+                          justifyContent: "center",
+                          "&:hover": {
+                            bgcolor: inBasket ? "#2e8b40" : "#1a8ae5",
+                          },
+                        }}
+                      >
+                        {inBasket ? (
+                          <DoneIcon sx={{ color: "#fff", fontSize: 20 }} />
+                        ) : (
+                          <Image
+                            src="/basketIcon.svg"
+                            alt="basket"
+                            width={20}
+                            height={20}
+                          />
+                        )}
+                        {inBasket ? "Qo‘shildi" : "Savatchaga"}
+                      </Button>
+                    </Box>
                   </Box>
                 </Link>
               );

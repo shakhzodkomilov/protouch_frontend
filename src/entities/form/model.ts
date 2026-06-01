@@ -208,7 +208,11 @@ export interface ApplicationItem {
 
 export const fetchApplicationsFx = createEffect(async () => {
   const response = await $api.get("/api/b2b-applications");
-  return (response.data ?? []) as ApplicationItem[];
+  const data = response.data;
+  if (Array.isArray(data)) return data as ApplicationItem[];
+  if (Array.isArray(data?.results)) return data.results as ApplicationItem[];
+  if (Array.isArray(data?.items)) return data.items as ApplicationItem[];
+  return [] as ApplicationItem[];
 });
 
 export const logout = createEvent();

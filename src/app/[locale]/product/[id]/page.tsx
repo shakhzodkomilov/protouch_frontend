@@ -107,44 +107,47 @@ export default function ProductDetailPage() {
     setFavoriteToast(true);
   };
 
+  const safePrice = (p: unknown) => {
+    const n = Number(p);
+    return Number.isFinite(n) ? n : 0;
+  };
+
   const onBasketClick = () => {
     if (!product) return;
-    if (isProductInStock(product)) {
-      handleAddToBasket({
-        id: Number(product.id),
-        productId: Number(product.id),
-        title: product.name || product.title || t("fallback.product"),
-        price: Number(product.displayPrice ?? product.price ?? 0),
-        image:
-          product.images?.[0]?.url ??
-          product.media?.[0]?.url ??
-          product.image ??
-          "/placeholder.jpg",
-        quantity: 1,
-        isInStock: isProductInStock(product),
-      });
-      setOpenToast(true);
-    }
+    handleAddToBasket({
+      id: Number(product.id),
+      productId: Number(product.id),
+      title: product.name || product.title || t("fallback.product"),
+      price: safePrice(product.displayPrice ?? product.price ?? 0),
+      image:
+        product.images?.[0]?.url ??
+        product.media?.[0]?.url ??
+        product.image ??
+        "/placeholder.jpg",
+      quantity: 1,
+      isInStock: isProductInStock(product),
+      currency: product.currency || "UZS",
+    });
+    setOpenToast(true);
   };
 
   const onCheckoutClick = () => {
     if (!product) return;
-    if (isProductInStock(product)) {
-      handleAddToBasket({
-        id: Number(product.id),
-        productId: Number(product.id),
-        title: product.name || product.title || t("fallback.product"),
-        price: Number(product.displayPrice ?? product.price ?? 0),
-        image:
-          product.images?.[0]?.url ??
-          product.media?.[0]?.url ??
-          product.image ??
-          "/placeholder.jpg",
-        quantity: 1,
-        isInStock: isProductInStock(product),
-      });
-      router.push(`/${locale}/checkout/`);
-    }
+    handleAddToBasket({
+      id: Number(product.id),
+      productId: Number(product.id),
+      title: product.name || product.title || t("fallback.product"),
+      price: safePrice(product.displayPrice ?? product.price ?? 0),
+      image:
+        product.images?.[0]?.url ??
+        product.media?.[0]?.url ??
+        product.image ??
+        "/placeholder.jpg",
+      quantity: 1,
+      isInStock: isProductInStock(product),
+      currency: product.currency || "UZS",
+    });
+    router.push(`/${locale}/checkout/`);
   };
 
   useEffect(() => {

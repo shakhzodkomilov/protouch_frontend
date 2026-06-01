@@ -312,14 +312,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
               if (!Number.isFinite(productId)) return;
               if (!isInStock) return;
               if (inBasket) return;
+              const safePrice = Number.isFinite(Number(displayPrice)) ? Number(displayPrice) : 0;
               handleAddToBasket({
                 id: productId,
                 productId,
                 title: title || "Product",
-                price: Number(displayPrice),
+                price: safePrice,
                 image: images[0] || "/placeholder.png",
                 quantity: 1,
                 isInStock,
+                currency: product.currency || "UZS",
               });
               onAddedToBasket?.();
             }}
