@@ -27,6 +27,7 @@ type CategoryApi = {
   status?: string;
   placements?: string[];
   image?: { url?: string | null } | null;
+  children?: CategoryApi[];
 };
 
 const truncateText = (value: string, maxLen: number) =>
@@ -63,16 +64,25 @@ export default function HomeCategories() {
     return () => controller.abort();
   }, [locale]);
 
-  const activeCategories = useMemo(
-    () =>
-      categories.filter((c) => {
-        const statusMatch = (c.status || "").toUpperCase() === "ACTIVE";
-        const placements = c.placements || [];
-        if (placements.length === 0) return statusMatch;
-        return statusMatch && placements.includes("FOOTER");
-      }),
-    [categories],
-  );
+  const activeCategories = useMemo(() => {
+    const result: CategoryApi[] = [];
+
+    const extractCategories = (items: CategoryApi[]) => {
+      for (const item of items) {
+        const statusMatch = (item.status || "").toUpperCase() === "ACTIVE";
+        const placements = item.placements || [];
+        if (placements.length === 0 ? statusMatch : (statusMatch && placements.includes("FOOTER"))) {
+          result.push(item);
+        }
+        if (item.children?.length) {
+          extractCategories(item.children);
+        }
+      }
+    };
+
+    extractCategories(categories);
+    return result;
+  }, [categories]);
 
   // Drag-and-drop mantiqi o'zgarmasdan qoladi...
   const dragInfo = useRef({
