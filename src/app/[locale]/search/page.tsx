@@ -64,7 +64,7 @@ const NavbarCatalog = () => {
         // Xatolikni to'g'irlash: 'search' o'rniga model qabul qiladigan 'title' ishlatamiz
         fetchProducts({
           lang: locale,
-          title: searchQuery, // Agar modelda 'search' bo'lmasa, 'title' dan foydalanamiz
+          search: searchQuery,
           page: 1,
         });
         setShowResults(true);

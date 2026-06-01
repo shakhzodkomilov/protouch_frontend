@@ -24,7 +24,7 @@ export default function BrandPage(props: {
     setLoading(true);
     try {
       const { data } = await $api.get(`/api/products/`, {
-        params: { brand: slug, page },
+        params: { brandSlug: slug, page },
         headers: getLangHeader(locale),
       });
       const next = data?.next ?? null;

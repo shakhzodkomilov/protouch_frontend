@@ -99,9 +99,9 @@ export const getProductsFx = createEffect<
   {
     page: number;
     slug?: string;
-    brand?: string;
+    brandSlug?: string;
     lang?: string;
-    title?: string;
+    search?: string;
   },
   PaginationType
 >(async (params) => {
@@ -229,7 +229,7 @@ export const searchProductsFx = createEffect<
   const { data } = await axios.get(`${API_URL}/api/products/`, {
     params: {
       page,
-      title: search || undefined,
+      search: search || undefined,
     },
     headers: getAuthHeaders(lang),
   });

@@ -22,9 +22,9 @@ export const loadCategories = createEvent<{
 export const loadProducts = createEvent<{
   page: number;
   slug?: string;
-  brand?: string;
+  brandSlug?: string;
   lang?: string;
-  title?: string;
+  search?: string;
 }>();
 
 export const loadProductsByCategory = createEvent<{
