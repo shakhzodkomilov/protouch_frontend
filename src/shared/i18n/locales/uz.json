@@ -18,7 +18,8 @@
     "about": "Biz haqimiz",
     "legaldoc": "Davlat xaridlari",
     "Goverprocurement": "Yuridik shaxslarga",
-    "address": "Mirobod tumani, Tong yulduzi"
+    "address": "Mirobod tumani, Tong yulduzi",
+    "no_results": "So'rov bo'yicha hech narsa topilmadi"
   },
   "main": {
     "summary": "So'm",

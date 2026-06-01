@@ -18,7 +18,8 @@
     "about": "О нас",
     "legaldoc": "Гос. закупки",
     "Goverprocurement": "Юр. лицам",
-    "address": "Мирабадский район, Тонг Юлдузи"
+    "address": "Мирабадский район, Тонг Юлдузи",
+    "no_results": "Ничего не найдено по запросу"
   },
   "main": {
     "productCategoriesTitle": "Категория товара",
