@@ -5,8 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
-import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import { Product } from "../../entities/product/model/types";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -84,18 +82,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
   const characteristics = (product.characteristics ?? []).slice(0, 4);
   const features = (product.features ?? []).slice(0, 4);
-  const onPrev = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setActive((v) => (v - 1 + images.length) % images.length);
-  };
-
-  const onNext = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setActive((v) => (v + 1) % images.length);
-  };
-
   const onDot = (e: React.MouseEvent, index: number) => {
     e.preventDefault();
     e.stopPropagation();
@@ -118,8 +104,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
     >
       <Box
         sx={{
-          width: 340,
-          height: 540,
+          width: 350,
+          height: 530,
           borderRadius: 3,
           p: 2,
           boxShadow: "0px 4px 20px rgba(0,0,0,0.08)",
@@ -129,83 +115,45 @@ const ProductCard: React.FC<ProductCardProps> = ({
           display: "flex",
           flexDirection: "column",
           transition: "0.3s",
+          overflow: "hidden",
           "&:hover": { transform: "translateY(-5px)" },
         }}
       >
         {/* Image */}
-        <Box sx={{ position: "relative", width: "100%", height: 210, mt: 1 }}>
+        <Box sx={{ position: "relative", width: "100%", height: 180 }}>
           <Image
             src={images[active] || "/placeholder.png"}
             alt={title}
             fill
             style={{ objectFit: "contain" }}
           />
-
-          {images.length > 1 && (
-            <>
-              <IconButton
-                onClick={onPrev}
-                aria-label="prev"
-                size="small"
-                sx={{
-                  position: "absolute",
-                  left: -10,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  bgcolor: "#fff",
-                  boxShadow: "0px 6px 16px rgba(0,0,0,0.12)",
-                  border: "1px solid rgba(36,159,252,0.35)",
-                  "&:hover": { bgcolor: "#fff" },
-                }}
-              >
-                <ChevronLeftRoundedIcon sx={{ color: "#249FFC" }} />
-              </IconButton>
-              <IconButton
-                onClick={onNext}
-                aria-label="next"
-                size="small"
-                sx={{
-                  position: "absolute",
-                  right: -10,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  bgcolor: "#fff",
-                  boxShadow: "0px 6px 16px rgba(0,0,0,0.12)",
-                  border: "1px solid rgba(36,159,252,0.35)",
-                  "&:hover": { bgcolor: "#fff" },
-                }}
-              >
-                <ChevronRightRoundedIcon sx={{ color: "#249FFC" }} />
-              </IconButton>
-
-              <Box
-                sx={{
-                  position: "absolute",
-                  left: 0,
-                  right: 0,
-                  bottom: -12,
-                  display: "flex",
-                  gap: 0.75,
-                  justifyContent: "center",
-                }}
-              >
-                {images.slice(0, 5).map((_, i) => (
-                  <Box
-                    key={`dot-${i}`}
-                    onClick={(e) => onDot(e, i)}
-                    sx={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: "999px",
-                      bgcolor: i === active ? "#249FFC" : "#D9D9D9",
-                      cursor: "pointer",
-                    }}
-                  />
-                ))}
-              </Box>
-            </>
-          )}
         </Box>
+
+        {images.length > 1 && (
+          <Box
+            sx={{
+              display: "flex",
+              gap: 0.75,
+              justifyContent: "center",
+              mt: 1,
+              mb: 0.5,
+            }}
+          >
+            {images.slice(0, 5).map((_, i) => (
+              <Box
+                key={`dot-${i}`}
+                onClick={(e) => onDot(e, i)}
+                sx={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "999px",
+                  bgcolor: i === active ? "#249FFC" : "#D9D9D9",
+                  cursor: "pointer",
+                }}
+              />
+            ))}
+          </Box>
+        )}
         <Box
           sx={{
             mt: 2,
@@ -218,14 +166,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
           {/* Title */}
           <Typography
             sx={{
-              fontWeight: 600,
-              fontSize: 16,
-              color: "#4E4E4E",
+              fontWeight: 700,
+              fontSize: 15,
+              color: "#1C1C1C",
               display: "-webkit-box",
               WebkitLineClamp: 2,
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
-              mt: 3,
+              mt: 1.5,
               mb: 1.25,
             }}
           >
@@ -233,7 +181,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </Typography>
 
           {/* Characteristics */}
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
             {(characteristics.length ? characteristics : features).map((c) => (
               <Box
                 key={c.id}
@@ -284,7 +232,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </Box>
             ))}
           </Box>
-          <Typography sx={{ fontWeight: 700, fontSize: 20, mt: 2 }}>
+          <Typography sx={{ fontWeight: 700, fontSize: 20, mt: 1.5 }}>
             {formattedPrice} {currency}
           </Typography>
         </Box>
@@ -312,7 +260,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
               if (!Number.isFinite(productId)) return;
               if (!isInStock) return;
               if (inBasket) return;
-              const safePrice = Number.isFinite(Number(displayPrice)) ? Number(displayPrice) : 0;
+              const safePrice = Number.isFinite(Number(displayPrice))
+                ? Number(displayPrice)
+                : 0;
               handleAddToBasket({
                 id: productId,
                 productId,

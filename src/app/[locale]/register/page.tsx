@@ -122,6 +122,7 @@ export default function RegisterPage() {
     "& .MuiOutlinedInput-root": {
       borderRadius: "12px",
       color: "#000",
+      "&:hover fieldset": { borderColor: "#0C4DFD" },
       "&.Mui-focused fieldset": { borderColor: "#249FFC" },
     },
     "& .MuiInputLabel-root.Mui-focused": { color: "#249FFC" },

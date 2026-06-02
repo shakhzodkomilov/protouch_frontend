@@ -87,7 +87,7 @@ const ProductSection = ({
   const scrollBtn = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollBy({
-      left: dir === "left" ? -300 : 300,
+      left: dir === "left" ? -316 : 316,
       behavior: "smooth",
     });
   };

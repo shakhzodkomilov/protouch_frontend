@@ -144,7 +144,7 @@ export const getBestSellersFx = createEffect<{ lang?: string }, PaginationType>(
   async ({ lang }) => {
     const { data } = await axios.get(`${API_URL}/api/products`, {
       params: {
-        categorySlug: "best-seller",
+        catalogSlug: "best-sellers",
       },
       headers: getAuthHeaders(lang),
     });
@@ -161,7 +161,7 @@ export const getNewArrivalsFx = createEffect<{ lang?: string }, PaginationType>(
   async ({ lang }) => {
     const { data } = await axios.get(`${API_URL}/api/products`, {
       params: {
-        categorySlug: "new-collection",
+        catalogSlug: "new-products",
       },
       headers: getAuthHeaders(lang),
     });
@@ -174,12 +174,12 @@ export const getNewArrivalsFx = createEffect<{ lang?: string }, PaginationType>(
   },
 );
 
-//Reccomend
+// Recommend
 export const getRecommendsFx = createEffect<{ lang?: string }, PaginationType>(
   async ({ lang }) => {
     const { data } = await axios.get(`${API_URL}/api/products`, {
       params: {
-        categorySlug: "recommend",
+        catalogSlug: "we-recommend",
       },
       headers: getAuthHeaders(lang),
     });
@@ -191,14 +191,13 @@ export const getRecommendsFx = createEffect<{ lang?: string }, PaginationType>(
   },
 );
 // Stream and podcast
-export const getStreamAndPodcast = createEffect<
+export const getStreamAndPodcastFx = createEffect<
   { lang?: string },
   PaginationType
 >(async ({ lang }) => {
   const { data } = await axios.get(`${API_URL}/api/products/`, {
     params: {
-      slug: "studio-audio-equipment/stream-and-podcast",
-      is_new: true,
+      catalogSlug: "streams-and-podcasts",
     },
     headers: getAuthHeaders(lang),
   });

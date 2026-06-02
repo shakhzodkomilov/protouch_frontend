@@ -9,7 +9,7 @@ import {
   searchProductsFx,
   getNewArrivalsFx,
   getRecommendsFx,
-  getStreamAndPodcast,
+  getStreamAndPodcastFx,
 } from "./effects";
 import { CategoryType, PaginationType, ProductDetailType } from "./types";
 
@@ -60,7 +60,7 @@ export const $searchProducts = createStore<PaginationType | null>(null).on(
 );
 
 export const $steamAndPodcast = createStore<PaginationType | null>(null).on(
-  getStreamAndPodcast.doneData,
+  getStreamAndPodcastFx.doneData,
   (_, data) => data,
 );
 export const $searchLoading = searchProductsFx.pending;
@@ -89,7 +89,7 @@ export const $bestSellers = createStore<PaginationType | null>(null).on(
   getBestSellersFx.doneData,
   (_, data) => data,
 );
-export const $loadingSteamAndPodcast = getStreamAndPodcast.pending;
+export const $loadingSteamAndPodcast = getStreamAndPodcastFx.pending;
 export const $newArrivals = createStore<PaginationType | null>(null).on(
   getNewArrivalsFx.doneData,
   (_, data) => data,
@@ -158,5 +158,5 @@ sample({ clock: loadRecommends, target: getRecommendsFx });
 sample({ clock: searchProducts, target: searchProductsFx });
 sample({
   clock: loadSteamAndPodcast,
-  target: getStreamAndPodcast,
+  target: getStreamAndPodcastFx,
 });
